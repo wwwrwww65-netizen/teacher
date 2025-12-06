@@ -1,0 +1,80 @@
+{
+    "welcome": "مرحباً",
+    "hello": "أهلاً",
+    "navLessons": "الدروس",
+    "navClassroom": "الفصل الدراسي",
+    "navProfile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "name": "الاسم",
+    "confirmPassword": "تأكيد كلمة المرور",
+    "loginAsGuest": "الدخول كضيف",
+    "noAccount": "ليس لديك حساب؟",
+    "haveAccount": "لديك حساب؟",
+    "signUpNow": "سجل الآن",
+    "signIn": "سجل الدخول",
+    "home": {
+        "greeting": "مرحباً، {{name}}! 👋",
+        "subtitle": "جاهز للتعلم اليوم؟",
+        "level": "المستوى {{level}}",
+        "points": "{{points}} نقطة",
+        "nextLevel": "{{points}} نقطة للمستوى التالي",
+        "startLearning": "ابدأ التعلم",
+        "featuredLessons": "الدروس المميزة"
+    },
+    "lessons": {
+        "title": "الدروس",
+        "beginner": "مبتدئ",
+        "intermediate": "متوسط",
+        "advanced": "متقدم",
+        "minutes": "{{count}} دقيقة",
+        "topics": "{{count}} موضوع"
+    },
+    "classroom": {
+        "status": {
+            "idle": "جاهزة",
+            "listening": "أستمع",
+            "thinking": "أفكر",
+            "speaking": "أتحدث"
+        },
+        "welcomeMessage": "مرحباً بكم في الفصل! أنا معلمتكم اليوم.",
+        "listeningMessage": "أنا أستمع... اسألوني أي شيء!",
+        "thinkingMessage": "دعوني أفكر في ذلك...",
+        "clearBoard": "مسح السبورة",
+        "restart": "إعادة البدء"
+    },
+    "lesson": {
+        "play": "شغل",
+        "playing": "جاري التشغيل...",
+        "next": "التالي",
+        "previous": "السابق",
+        "finish": "إنهاء",
+        "progress": "{{current}} / {{total}}"
+    },
+    "profile": {
+        "title": "الملف الشخصي",
+        "stats": "الإحصائيات",
+        "achievements": "الإنجازات",
+        "completedLessons": "الدروس المكتملة",
+        "quizzes": "الاختبارات",
+        "timeSpent": "الوقت المستغرق",
+        "stars": "النجوم",
+        "totalPoints": "النقاط الكلية",
+        "unlocked": "مفتوح",
+        "locked": "مقفل"
+    },
+    "achievements": {
+        "beginner": "مبتدئ",
+        "beginnerDesc": "أكمل أول درس",
+        "fastLearner": "متعلم سريع",
+        "fastLearnerDesc": "أكمل 5 دروس",
+        "alphabetMaster": "خبير الحروف",
+        "alphabetMasterDesc": "أتقن جميع الحروف",
+        "numberGenius": "عبقري الأرقام",
+        "numberGeniusDesc": "أتقن جميع الأرقام"
+    }
+}

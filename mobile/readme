@@ -1,0 +1,200 @@
+# README — تصميم وتحريك شخصية "المعلّم الصغير" (Full‑body Avatar)
+
+**هدف هذا README:** ملف عملي موجّه للمصمّم والأنيماتر والمطوّر يشرح بشكل مفصّل كل ما يلزم لإنشاء شخصية كرتونية كاملة الجسم (full‑body) قابلة للحركة، مزوّدة بالـrigging والـanimations وملفات التصدير المناسبة للتكامل داخل تطبيق React Native. هذا الـREADME يبني على متطلبات المشروع "Tiny Teacher"، حيث تكون الشخصية تفاعلية تعليمية (مثل Talking Tom لكن مع سبورة ودردشة صوتية للأطفال)، مع دعم lip-sync، حركات جسم، وتزامن مع سبورة افتراضية. البناء كامل محلي بدون ربط مع أي محرك خارجي (مثل Live2D، Spine، Rive، أو Lottie)، ويعتمد فقط على كود React Native الأصلي (Animated، Reanimated، SVG) ليكون الشخصية ملكك 100% ومبنية يدويًا.
+
+**الإصدار الحالي:** 1.0 (بناءً على تاريخ اليوم: 03 ديسمبر 2025).
+
+**المتطلبات العامة للمشروع:**
+- الجمهور: أطفال KG1–Grade3 (أعمار 4-9 سنوات).
+- السياق: الشخصية تظهر في شاشة الدرس، تتحدث صوتيًا (دردشة AI)، تتحرك، وتشرح على سبورة (رسم/كتابة متزامنة).
+- المنصة: React Native للتطبيق المحمول (Android/iOS)، مع دعم offline جزئي.
+- الأسلوب: كرتوني دافئ، ألوان ناعمة (أزرق/أخضر/أصفر دافئ)، تعابير مرحة لجذب الأطفال.
+- **الاعتمادات التقنية**: استخدم فقط مكتبات React Native مجانية (react-native-reanimated للـanimations، react-native-svg للرسم، react-native-tts للصوت، react-native-voice للإدخال الصوتي). كل شيء مبني ككود محلي بدون استئجار أو ربط خارجي.
+
+**زمن التنفيذ الافتراضي:** 7–14 يوم عمل للتصميم والكود، +5 أيام للاختبار في RN (حسب الميزانية والفريق).
+
+---
+
+## 1. نظرة عامة على الشخصية
+- **الوصف**: شخصية "المعلم الصغير" هي روبوت أو معلم كرتوني أزرق مرح (مثل روبوت مع نظارات وابتسامة كبيرة)، كامل الجسم (رأس، جسم، أذرع، أرجل). تظهر في وسط الشاشة أو زاوية، تتحرك بشكل طبيعي، تتكلم مع lip-sync، تشير/ترسم على سبورة، وترد على الطفل صوتيًا عبر AI.
+- **التشابه مع Talking Tom**: مثل Talking Tom، الشخصية تظهر كاملة، تتحرك تلقائيًا (idle animations)، تعيد/ترد على الكلام بصوت كرتوني، لكن مع إضافة تعليمية (شرح على سبورة، دروس AI).
+- **الميزات الرئيسية**:
+  - حركة جسم كاملة (walk, point, write).
+  - دردشة صوتية (TTS للشرح، STT لإجابات الطفل).
+  - تفاعل مع سبورة (اليد تتحرك إلى نقاط محددة، رسم متزامن).
+- **التنفيذ المحلي**: الشخصية مبنية كمكون React Native (component) باستخدام SVG للرسم وReanimated للحركات، بدون أي محرك خارجي.
+
+---
+
+## 2. اختيار أدوات التحريك (بدون محركات خارجية)
+- **الأدوات المستخدمة**: 
+  - **react-native-svg**: لرسم الشخصية كأشكال vectored (circles, paths, rects) مباشرة في الكود.
+  - **react-native-reanimated**: للـanimations المتقدمة (transforms, timing, loops) بدون مكتبات خارجية مدفوعة.
+  - **Animated API (من React Native)**: للحركات البسيطة مثل lip-sync.
+- **توصية لـMVP**: ابدأ برسم SVG بسيط، ثم أضف rigging افتراضي عبر transforms (rotate/translate/scale). كل شيء كود محلي يمكن تعديله بنفسك.
+
+---
+
+## 3. مواصفات التصميم (Art & Layers)
+**مطلوب من المصمم (PSD/Figma مفصول طبقات، ثم تحويل يدوي إلى SVG كود):**
+- أبعاد افتراضية: 200x300 px (قابلة للتكبير via viewBox في SVG).
+- طبقات مفصولة في Figma/PSD، ثم تحول إلى elements SVG منفصلة في الكود (مثال):
+  - `root` (container View).
+  - `shadow` (Path للظل).
+  - `body/torso` (Rect أو Path للجسم).
+  - `head/face/eyes/eye_left/eye_right/pupil_left/pupil_right/eyebrows` (Circles وPaths للعيون/الحواجب).
+  - `mouth/mouth_closed/mouth_half/mouth_open/mouth_wide` (Paths لـvisemes الفم).
+  - `hair/front/hair_back` (Paths للشعر).
+  - `glasses` (Paths للنظارات).
+  - `left_arm/left_upper/left_lower/left_hand_point/left_hand_open` (Rects/Paths للذراع اليسرى).
+  - `right_arm/right_upper/right_lower/right_hand_write/right_hand_point` (Rects/Paths للذراع اليمنى).
+  - `legs/upper/lower/left_foot/right_foot` (Rects للأرجل).
+  - `clothes/jacket/patches` (Paths للملابس).
+  - `props/pen/book/apple/desk` (Paths للأدوات التعليمية).
+
+**نصيحة**: رسم الطبقات كـSVG كود يدويًا ليكون كامل محلي، مع استخدام Animated components لكل طبقة.
+
+---
+
+## 4. Pivot / Anchor Points (نقاط المحورية)
+- كل جزء: استخدم origin في transforms (مثل rotation حول نقطة المفصل).
+- مثال: للذراع، pivot عند الكتف عبر `transformOrigin` في Reanimated.
+
+---
+
+## 5. Rigging (هيكلة العظام / Bones)
+- خطوات محلية في الكود:
+  1. رسم كل جزء كـAnimated SVG element.
+  2. بناء هيكل افتراضي: استخدم nested Views مع transforms (مثل root -> torso -> arm).
+  3. ربط الحركات عبر Animated.Values (مثل زاوية الذراع).
+  4. إضافة constraints يدوية: حدد rotation limits في الكود (مثل if angle > 90, reset).
+- Controls: استخدم gestures (PanResponder) لتوجيه اليد إلى (x,y) على السبورة.
+
+---
+
+## 6. قائمة Animations المطلوبة
+### أساسية:
+1. `idle`: تنفس/إيماءات خفيفة (loop via Reanimated.withRepeat, 2-3s).
+2. `greet`: يلوح/يبتسم (timing animation, 1-1.5s).
+3. `talk`: فم + رأس/يد خفيفة (loop مع visemes عبر Animated.sequence).
+4. `pointToBoard`: إشارة إلى نقطة (spring animation, 0.8-1.2s).
+5. `writeOnBoard`: كتابة/رسم (sequence مع path animation, variable 1-4s، متزامن مع سبورة).
+6. `question`: يميل/ينتظر (timing, 0.7-1s).
+7. `celebrate`: قفز/تصفيق (bounce, 1-1.5s).
+8. `walkIn/walkOut`: دخول/خروج (translateX animation, 1-2s).
+
+### متقدمة (اختيارية):
+- `sad`, `surprised`, `thinking`.
+
+**ملاحظة**: كل animation مبنية كدالة كود (مثل startIdle())، loopable عبر Reanimated.
+
+---
+
+## 7. Lip-sync & Viseme Mapping
+- Visemes: closed, half, open, wide (غير شكل Path الفم عبر Animated.interpolate).
+- مزامنة: مع TTS (react-native-tts)، حلل الصوت محليًا عبر volume detection.
+- Interpolation: استخدم Animated.timing لfade 30-60ms.
+
+---
+
+## 8. ارتباط الحركة بالسبورة (BoardSync)
+- JSON مثال:
+```json
+{
+  "avatarActions": [
+    {"action": "pointToBoard", "at": 0},
+    {"action": "writeOnBoard", "at": 500, "params": {"text": "أ", "speed": 1.0}}
+  ],
+  "boardSteps": [
+    {"type": "text", "value": "أ", "x": 120, "y": 60, "at": 700}
+  ]
+}
+```
+- اليد تتحرك إلى (x,y) عبر Animated.toValue، متزامنة مع رسم SVG على السبورة.
+
+---
+
+## 9. Export Formats & Naming
+- لا exports خارجية: كل شيء ككود JS/TS في ملفات مثل Avatar.js، Animations.js.
+- Naming: anim_idle, head_eye_left (كمتغيرات أو functions).
+
+---
+
+## 10. Performance & Optimization
+- استخدم useNativeDriver=true للـanimations.
+- اختبار على low-end (3GB RAM).
+- Fallback: استخدم static SVG لو فشل الـanimation.
+
+---
+
+## 11. Deliverables
+1. PSD/Figma (للتصميم الأولي).
+2. كود SVG كامل في JS files.
+3. Functions للـrigging والanimations.
+4. README فني.
+5. Demo component في RN.
+6. Sample code sequences.
+
+---
+
+## 12. Acceptance Criteria
+- Sync ≤200ms.
+- أداء ≤120ms.
+- دورتي مراجعة.
+
+---
+
+## 13. التعديل لـReact Native
+- مكتبات: reanimated (للحركات)، svg (للرسم)، tts (للصوت).
+- Flow: JSON من backend -> TTS -> startAnimation محليًا.
+- كود مثال (TypeScript):
+```ts
+import React, { useRef } from 'react';
+import { Animated, View } from 'react-native';
+import Svg, { Circle, Rect, Path } from 'react-native-svg';
+import Reanimated, { useAnimatedStyle, withRepeat, withTiming } from 'react-native-reanimated';
+import Tts from 'react-native-tts';
+
+// مكون الشخصية
+const Avatar = () => {
+  const armAnim = useRef(new Animated.Value(0)).current; // rigging للذراع
+  const bodyStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: withRepeat(withTiming(1.05, { duration: 1000 }), -1, true) }], // idle animation
+  }));
+
+  const startTalk = (text) => {
+    Tts.speak(text); // دردشة صوتية
+    Animated.timing(armAnim, { toValue: 45, duration: 500, useNativeDriver: true }).start(); // حركة
+  };
+
+  return (
+    <Reanimated.View style={bodyStyle}>
+      <Svg height="300" width="200">
+        {/* الجسم والأجزاء كما في المثال السابق */}
+        <Animated.Rect x="140" y="150" width="20" height="80" fill="blue" rotation={armAnim} /> {/* rigged arm */}
+      </Svg>
+    </Reanimated.View>
+  );
+};
+
+export default Avatar;
+```
+- Lip-sync: interpolate قيمة الفم مع TTS duration.
+- سبورة: react-native-svg مع Animated.Path للرسم المتزامن.
+
+---
+
+## 14. Testing Checklist
+- [ ] تشغيل animations محليًا في RN.
+- [ ] Lip-sync مع TTS.
+- [ ] WriteOnBoard sync.
+- [ ] أداء على low/high-end.
+- [ ] الكود كامل محلي بدون imports خارجية مدفوعة.
+
+---
+
+## 15. ملاحظات ختامية
+- ابدأ بـMVP (idle/talk/write) ككود بسيط.
+- احتفظ بbeta للاختبار.
+- الكل مبني محليًا، ملكك 100%، قابل للتعديل بدون استئجار.
+- لو تحتاج تعديلات، راجع المطور.

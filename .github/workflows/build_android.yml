@@ -1,0 +1,51 @@
+name: Build Android App
+
+on:
+  workflow_dispatch: # يسمح بالتشغيل اليدوي بضغطة زر
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Dependencies
+        working-directory: ./mobile
+        run: npm install
+
+      - name: Prebuild (Generate Android Folder)
+        working-directory: ./mobile
+        run: npx expo prebuild --platform android --clean
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > mobile/android/app/my-upload-key.keystore
+        # ملاحظة: ستحتاج لتحويل ملف keystore إلى base64 وإضافته في GitHub Secrets باسم ANDROID_KEYSTORE_BASE64
+
+      - name: Build AAB
+        working-directory: ./mobile/android
+        run: ./gradlew bundleRelease
+        env:
+          MYAPP_UPLOAD_STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          MYAPP_UPLOAD_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          MYAPP_UPLOAD_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload AAB Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release
+          path: mobile/android/app/build/outputs/bundle/release/app-release.aab

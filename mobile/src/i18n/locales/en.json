@@ -1,0 +1,80 @@
+{
+    "welcome": "Welcome",
+    "hello": "Hello",
+    "navLessons": "Lessons",
+    "navClassroom": "Classroom",
+    "navProfile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "name": "Name",
+    "confirmPassword": "Confirm Password",
+    "loginAsGuest": "Login as Guest",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Have an account?",
+    "signUpNow": "Sign up now",
+    "signIn": "Sign in",
+    "home": {
+        "greeting": "Hello, {{name}}! 👋",
+        "subtitle": "Ready to learn today?",
+        "level": "Level {{level}}",
+        "points": "{{points}} points",
+        "nextLevel": "{{points}} points to next level",
+        "startLearning": "Start Learning",
+        "featuredLessons": "Featured Lessons"
+    },
+    "lessons": {
+        "title": "Lessons",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced",
+        "minutes": "{{count}} minutes",
+        "topics": "{{count}} topics"
+    },
+    "classroom": {
+        "status": {
+            "idle": "Ready",
+            "listening": "Listening",
+            "thinking": "Thinking",
+            "speaking": "Speaking"
+        },
+        "welcomeMessage": "Welcome to class! I'm your teacher today.",
+        "listeningMessage": "I'm listening... Ask me anything!",
+        "thinkingMessage": "Let me think about that...",
+        "clearBoard": "Clear Board",
+        "restart": "Restart"
+    },
+    "lesson": {
+        "play": "Play",
+        "playing": "Playing...",
+        "next": "Next",
+        "previous": "Previous",
+        "finish": "Finish",
+        "progress": "{{current}} / {{total}}"
+    },
+    "profile": {
+        "title": "Profile",
+        "stats": "Statistics",
+        "achievements": "Achievements",
+        "completedLessons": "Completed Lessons",
+        "quizzes": "Quizzes",
+        "timeSpent": "Time Spent",
+        "stars": "Stars",
+        "totalPoints": "Total Points",
+        "unlocked": "Unlocked",
+        "locked": "Locked"
+    },
+    "achievements": {
+        "beginner": "Beginner",
+        "beginnerDesc": "Complete first lesson",
+        "fastLearner": "Fast Learner",
+        "fastLearnerDesc": "Complete 5 lessons",
+        "alphabetMaster": "Alphabet Master",
+        "alphabetMasterDesc": "Master all letters",
+        "numberGenius": "Number Genius",
+        "numberGeniusDesc": "Master all numbers"
+    }
+}

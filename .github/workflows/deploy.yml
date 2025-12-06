@@ -1,0 +1,19 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [build-and-test] # Assuming we want to pass CI first, but for now I'll leave it independent or dependent if CI exists
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy to Production
+      run: |
+        echo "Deploying to production server..."
+        # Add your deployment scripts here (e.g., AWS CLI, Vercel, etc.)
+        # Example: npx vercel --prod

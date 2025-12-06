@@ -1,0 +1,7 @@
+Item,Cost (Monthly),Notes
+OpenAI API,$20,Estimated for 1000 lessons
+Vercel Pro,$20,Frontend hosting
+Render/Heroku,$7,Backend hosting
+PostgreSQL,$15,Managed database
+Domain,$1,Yearly cost divided by 12
+Total,$63,
