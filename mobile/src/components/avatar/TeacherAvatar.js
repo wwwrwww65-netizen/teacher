@@ -1,282 +1,244 @@
-import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
-import { View, StyleSheet, Image, Dimensions } from 'react-native';
-import Animated, {
-    useSharedValue,
-    useAnimatedStyle,
-    withRepeat,
-    withSequence,
-    withTiming,
-    withSpring,
-    Easing,
-    withDelay,
-    interpolate
-} from 'react-native-reanimated';
-import Svg, { Path, Circle, Ellipse } from 'react-native-svg';
-import arabicVoiceService from '../../services/ArabicVoiceService';
-import { MOUTH_SHAPES } from '../../utils/arabicVisemes';
-import { isRTL } from '../../i18n';
+import React, { useEffect, useImperativeHandle, forwardRef, useRef } from 'react';
+import { View, StyleSheet, Animated, Easing, ImageBackground, Platform } from 'react-native';
+import Svg, { Ellipse } from 'react-native-svg';
+import Tts from 'react-native-tts';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const AnimatedPath = Animated.createAnimatedComponent(Path);
-const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+// إنشاء مكونات SVG قابلة للتحريك
 const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 
 const TeacherAvatar = forwardRef((props, ref) => {
-    const [currentMouthShape, setCurrentMouthShape] = useState('CLOSED');
-    const [emotion, setEmotion] = useState('neutral'); // neutral, happy, surprised, thinking
+    // 1. قيم الحركة (Animated Values)
+    const mouthOpen = useRef(new Animated.Value(0.1)).current; // 0.1 = مغلق، 1 = مفتوح
+    const bodyTranslateY = useRef(new Animated.Value(0)).current;
+    const bodyScale = useRef(new Animated.Value(1)).current;
 
-    // Shared values
-    const breathingScale = useSharedValue(1);
-    const bounceY = useSharedValue(0);
-    const headTilt = useSharedValue(0);
-    const positionX = useSharedValue(0);
+    // حالة التحدث
+    const isSpeaking = useRef(false);
 
-    // Eyes
-    const leftEyeScaleY = useSharedValue(1); // For blinking
-    const rightEyeScaleY = useSharedValue(1);
-    const eyeX = useSharedValue(0); // Looking left/right
-    const eyeY = useSharedValue(0); // Looking up/down
-
-    useImperativeHandle(ref, () => ({
-        startIdle,
-        startTalking,
-        stopTalking,
-        walkToBoard,
-        walkToCenter,
-        setEmotion: (newEmotion) => {
-            setEmotion(newEmotion);
-            applyEmotion(newEmotion);
-        },
-        laugh: () => {
-            setEmotion('happy');
-            // Laugh animation sequence
-            bounceY.value = withSequence(
-                withTiming(-5, { duration: 100 }),
-                withTiming(0, { duration: 100 }),
-                withTiming(-5, { duration: 100 }),
-                withTiming(0, { duration: 100 }),
-                withTiming(-5, { duration: 100 }),
-                withTiming(0, { duration: 100 })
-            );
-            headTilt.value = withSequence(
-                withTiming(-5, { duration: 150 }),
-                withTiming(5, { duration: 150 }),
-                withTiming(-5, { duration: 150 }),
-                withTiming(0, { duration: 150 })
-            );
-        },
-        speakArabic: async (text) => {
-            await arabicVoiceService.speak(text, {
-                language: 'ar-SA',
-                rate: 0.45,
-                pitch: 1.15,
-                onVisemeChange: (shape) => setCurrentMouthShape(shape),
-            });
-        },
-    }));
-
+    // 2. إعداد الصوت
     useEffect(() => {
-        startIdle();
-        startBlinking();
+        // إعداد TTS
+        Tts.getInitStatus().then(() => {
+            Tts.setDefaultLanguage('ar-SA');
+            Tts.setDucking(true);
+        }, (err) => {
+            if (err.code === 'no_engine') {
+                Tts.requestInstallEngine();
+            }
+        });
+
+        const ttsStart = Tts.addListener('tts-start', () => {
+            isSpeaking.current = true;
+            startTalkingAnimation();
+        });
+
+        const ttsFinish = Tts.addListener('tts-finish', () => {
+            isSpeaking.current = false;
+            stopTalkingAnimation();
+        });
+
+        const ttsCancel = Tts.addListener('tts-cancel', () => {
+            isSpeaking.current = false;
+            stopTalkingAnimation();
+        });
+
+        // 3. بدء حركة التنفس الطبيعية
+        startBreathing();
+
+        return () => {
+            ttsStart.remove();
+            ttsFinish.remove();
+            ttsCancel.remove();
+            Tts.stop();
+        };
     }, []);
 
-    const startBlinking = () => {
-        const blink = () => {
-            const duration = 150;
-            leftEyeScaleY.value = withSequence(
-                withTiming(0.1, { duration: duration / 2 }),
-                withTiming(1, { duration: duration / 2 })
-            );
-            rightEyeScaleY.value = withSequence(
-                withTiming(0.1, { duration: duration / 2 }),
-                withTiming(1, { duration: duration / 2 })
-            );
-
-            // Random blink interval (2-6 seconds)
-            const nextBlink = Math.random() * 4000 + 2000;
-            setTimeout(blink, nextBlink);
-        };
-        blink();
+    // 4. دوال الحركة
+    const startBreathing = () => {
+        Animated.loop(
+            Animated.parallel([
+                Animated.sequence([
+                    Animated.timing(bodyTranslateY, {
+                        toValue: -8,
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(bodyTranslateY, {
+                        toValue: 0,
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                ]),
+                Animated.sequence([
+                    Animated.timing(bodyScale, {
+                        toValue: 1.02,
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                    Animated.timing(bodyScale, {
+                        toValue: 1,
+                        duration: 2500,
+                        easing: Easing.inOut(Easing.ease),
+                        useNativeDriver: true,
+                    }),
+                ])
+            ])
+        ).start();
     };
 
-    const applyEmotion = (emo) => {
-        switch (emo) {
-            case 'happy':
-                eyeY.value = withSpring(0);
-                headTilt.value = withSpring(5);
-                break;
-            case 'surprised':
-                eyeY.value = withSpring(0);
-                leftEyeScaleY.value = withSpring(1.2);
-                rightEyeScaleY.value = withSpring(1.2);
-                break;
-            case 'thinking':
-                eyeX.value = withSpring(5);
-                eyeY.value = withSpring(-5);
-                headTilt.value = withSpring(-10);
-                break;
-            default: // neutral
-                eyeX.value = withSpring(0);
-                eyeY.value = withSpring(0);
-                leftEyeScaleY.value = withSpring(1);
-                rightEyeScaleY.value = withSpring(1);
-                headTilt.value = withSpring(0);
-        }
-    };
+    const talkingAnimRef = useRef(null);
 
-    const startIdle = () => {
-        breathingScale.value = withRepeat(
-            withSequence(
-                withTiming(1.02, { duration: 2000, easing: Easing.inOut(Easing.ease) }),
-                withTiming(1, { duration: 2000, easing: Easing.inOut(Easing.ease) })
-            ), -1, false
+    const startTalkingAnimation = () => {
+        // حركة الفم أثناء الكلام
+        if (talkingAnimRef.current) talkingAnimRef.current.stop();
+
+        talkingAnimRef.current = Animated.loop(
+            Animated.sequence([
+                Animated.timing(mouthOpen, { toValue: 1, duration: 150, useNativeDriver: false }),
+                Animated.timing(mouthOpen, { toValue: 0.2, duration: 150, useNativeDriver: false }),
+                Animated.timing(mouthOpen, { toValue: 0.8, duration: 150, useNativeDriver: false }),
+                Animated.timing(mouthOpen, { toValue: 0.3, duration: 150, useNativeDriver: false }),
+            ])
         );
+        talkingAnimRef.current.start();
     };
 
-    const startTalking = () => {
-        bounceY.value = withRepeat(
-            withSequence(withTiming(-2, { duration: 200 }), withTiming(0, { duration: 200 })), -1, false
-        );
+    const stopTalkingAnimation = () => {
+        if (talkingAnimRef.current) talkingAnimRef.current.stop();
+        Animated.timing(mouthOpen, { toValue: 0.1, duration: 200, useNativeDriver: false }).start();
     };
 
-    const stopTalking = () => {
-        bounceY.value = withSpring(0);
-    };
+    // 5. التحكم الخارجي
+    useImperativeHandle(ref, () => ({
+        speakArabic: async (text) => {
+            if (!text) return;
 
-    const walkToBoard = () => {
-        const targetX = isRTL() ? -SCREEN_WIDTH * 0.25 : SCREEN_WIDTH * 0.25;
-        positionX.value = withTiming(targetX, { duration: 1000 });
-        bounceY.value = withSequence(
-            withTiming(-10, { duration: 250 }), withTiming(0, { duration: 250 }),
-            withTiming(-10, { duration: 250 }), withTiming(0, { duration: 250 })
-        );
-    };
+            return new Promise((resolve) => {
+                let resolved = false;
 
-    const walkToCenter = () => {
-        positionX.value = withTiming(0, { duration: 1000 });
-        bounceY.value = withSequence(
-            withTiming(-10, { duration: 250 }), withTiming(0, { duration: 250 }),
-            withTiming(-10, { duration: 250 }), withTiming(0, { duration: 250 })
-        );
-    };
+                const cleanup = () => {
+                    if (resolved) return;
+                    resolved = true;
+                    // eslint-disable-next-line
+                    if (finishListener && finishListener.remove) finishListener.remove();
+                    // eslint-disable-next-line
+                    if (cancelListener && cancelListener.remove) cancelListener.remove();
+                    // eslint-disable-next-line
+                    if (timeoutId) clearTimeout(timeoutId);
+                    resolve();
+                };
 
-    // Styles
-    const containerStyle = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: positionX.value },
-            { translateY: bounceY.value },
-            { scale: breathingScale.value },
-        ],
+                const finishListener = Tts.addListener('tts-finish', cleanup);
+                const cancelListener = Tts.addListener('tts-cancel', cleanup);
+
+                // Timeout safe-guard (10 ثواني كحد أقصى)
+                const timeoutId = setTimeout(() => {
+                    console.log('TTS Timeout - forcing continues');
+                    cleanup();
+                }, 10000);
+
+                try {
+                    Tts.stop();
+                    Tts.speak(text);
+                } catch (error) {
+                    console.warn('TTS Error:', error);
+                    cleanup();
+                }
+            });
+        },
+        pointToBoard: () => {
+            // يمكن إضافة حركة دوران بسيطة هنا
+        },
+        resetPosition: () => {
+            // mouthOpen.setValue(0.1);
+        },
+        setEmotion: (emotion) => {
+            // يمكن تغيير الصورة هنا إذا توفرت صور بتعبيرات مختلفة
+            // حالياً سنكتفي بالحركة
+        },
+        laugh: () => {
+            Animated.sequence([
+                Animated.timing(bodyTranslateY, { toValue: -10, duration: 100, useNativeDriver: true }),
+                Animated.timing(bodyTranslateY, { toValue: 0, duration: 100, useNativeDriver: true }),
+                Animated.timing(bodyTranslateY, { toValue: -10, duration: 100, useNativeDriver: true }),
+                Animated.timing(bodyTranslateY, { toValue: 0, duration: 100, useNativeDriver: true }),
+            ]).start();
+        },
+        walkToBoard: () => { },
+        walkToCenter: () => { }
     }));
-
-    const characterStyle = useAnimatedStyle(() => ({
-        transform: [
-            { rotate: `${headTilt.value}deg` },
-            { scaleX: isRTL() ? -1 : 1 },
-        ],
-    }));
-
-    const leftEyeStyle = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: eyeX.value },
-            { translateY: eyeY.value },
-            { scaleY: leftEyeScaleY.value }
-        ]
-    }));
-
-    const rightEyeStyle = useAnimatedStyle(() => ({
-        transform: [
-            { translateX: eyeX.value },
-            { translateY: eyeY.value },
-            { scaleY: rightEyeScaleY.value }
-        ]
-    }));
-
-    const getMouthPath = () => MOUTH_SHAPES[currentMouthShape]?.path || MOUTH_SHAPES.CLOSED.path;
 
     return (
-        <View style={styles.container}>
-            <Animated.View style={[styles.characterContainer, containerStyle]}>
-                <Animated.View style={characterStyle}>
-                    {/* Base Image */}
-                    <Image
-                        source={require('../../../assets/teacher-character.png')}
-                        style={styles.characterImage}
-                        resizeMode="contain"
-                    />
+        <Animated.View style={[
+            styles.container,
+            {
+                transform: [
+                    { translateY: bodyTranslateY },
+                    { scale: bodyScale }
+                ]
+            }
+        ]}>
+            <View style={styles.avatar}>
+                {/* صورة المعلمة الأصلية كخلفية */}
+                <ImageBackground
+                    source={require('../../../assets/teacher-character.png')}
+                    style={styles.characterImage}
+                    resizeMode="contain"
+                >
+                    {/* 
+                      تم إزالة العيون المرسومة (SVG) لأنها تبدو بدائية وغير متناسقة مع الصورة الأصلية.
+                      يتم الاعتماد على عيون الشخصية في الصورة.
+                    */}
 
-                    {/* Eyes Overlay (Adjust positions based on your image) */}
-                    <View style={styles.eyesContainer}>
-                        {/* Left Eye */}
-                        <View style={styles.eyeWrapper}>
-                            <Svg height="20" width="20">
-                                <AnimatedEllipse cx="10" cy="10" rx="8" ry="6" fill="#333" animatedProps={leftEyeStyle} />
-                                <Circle cx="12" cy="8" r="2" fill="white" />
-                            </Svg>
-                        </View>
-
-                        {/* Right Eye */}
-                        <View style={styles.eyeWrapper}>
-                            <Svg height="20" width="20">
-                                <AnimatedEllipse cx="10" cy="10" rx="8" ry="6" fill="#333" animatedProps={rightEyeStyle} />
-                                <Circle cx="12" cy="8" r="2" fill="white" />
-                            </Svg>
-                        </View>
-                    </View>
-
-                    {/* Mouth Overlay */}
-                    <View style={styles.mouthOverlay}>
-                        <Svg width="60" height="30" viewBox="80 80 40 30">
-                            <AnimatedPath
-                                d={getMouthPath()}
-                                stroke="#8B4513"
-                                strokeWidth="2.5"
-                                fill={currentMouthShape === 'CLOSED' ? 'none' : '#D35F5F'}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                    {/* --- الفم (Overlay) - يتم تحسينه ليكون أقل بروزاً --- */}
+                    <View style={[styles.mouthContainer, { left: '46%', top: '41%' }]}>
+                        <Svg height="25" width="30">
+                            <AnimatedEllipse
+                                cx="15" cy="10"
+                                rx="10"
+                                ry={mouthOpen.interpolate({
+                                    inputRange: [0, 1],
+                                    outputRange: [2, 10]
+                                })}
+                                fill="#A04040" // لون أغمق قليلاً ليبدو طبيعياً أكثر
+                                fillOpacity={0.8}
                             />
                         </Svg>
                     </View>
-                </Animated.View>
-            </Animated.View>
-        </View>
+                </ImageBackground>
+            </View>
+        </Animated.View>
     );
 });
 
 const styles = StyleSheet.create({
     container: {
-        width: 300,
-        height: 400,
         alignItems: 'center',
         justifyContent: 'center',
+        height: 350,
     },
-    characterContainer: {
-        width: '100%',
-        height: '100%',
+    avatar: {
+        width: 300,
+        height: 350,
         alignItems: 'center',
         justifyContent: 'center',
     },
     characterImage: {
-        width: 280,
-        height: 380,
-    },
-    eyesContainer: {
-        position: 'absolute',
-        top: 135, // Adjust based on image
-        flexDirection: 'row',
-        gap: 25, // Distance between eyes
-    },
-    eyeWrapper: {
-        width: 20,
-        height: 20,
-        alignItems: 'center',
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
     },
-    mouthOverlay: {
+    mouthContainer: {
         position: 'absolute',
-        bottom: 155, // Adjust based on image
-        alignSelf: 'center',
-    },
+        width: 30,
+        height: 25,
+        alignItems: 'center',
+        justifyContent: 'center',
+        transform: [{ translateX: -15 }]
+    }
 });
 
 export default TeacherAvatar;

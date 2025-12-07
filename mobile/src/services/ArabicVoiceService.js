@@ -1,17 +1,22 @@
 import Tts from 'react-native-tts';
 import Voice from '@react-native-voice/voice';
 import { Platform } from 'react-native';
+import axios from 'axios';
+import RNFS from 'react-native-fs';
+import SoundPlayer from 'react-native-sound-player';
 import { analyzeArabicText, generateVisemeTimeline } from '../utils/arabicVisemes';
+
+const GOOGLE_API_KEY = 'AIzaSyCd4HQDcNeF6WztPhTOhUbcoiqZi79Q5ug';
 
 /**
  * خدمة الصوت العربي الاحترافي
- * دعم كامل للنطق العربي مع مخارج الحروف
+ * دعم كامل للنطق العربي مع مخارج الحروف باستخدام Google Cloud TTS (WaveNet)
  */
 
 class ArabicVoiceService {
     constructor() {
         this.isInitialized = false;
-        this.currentLanguage = 'ar-SA';
+        this.currentLanguage = 'ar-SA'; // For STT
         this.voiceCallbacks = [];
     }
 
@@ -21,12 +26,28 @@ class ArabicVoiceService {
     async initialize() {
         if (this.isInitialized) return;
 
-        try {
-            // تكوين TTS
-            await this.configureTTS();
+        console.log('🔄 Initializing ArabicVoiceService...');
 
-            // تكوين Voice Recognition
-            await this.configureVoiceRecognition();
+        try {
+            // Subscribe to finish event Use a check to prevent multiple listeners
+            try {
+                // First remove any existing listeners if possible (library might not support removeAll easily, but let's try just adding)
+                SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
+                    console.log('✅ Finished playing:', success);
+                    this.stopVisemeAnimation();
+                });
+            } catch (e) {
+                console.warn('Listener attach error', e);
+            }
+
+            // Initialize Voice Recognition (Keep native for now)
+            if (Voice) {
+                try {
+                    await this.configureVoiceRecognition();
+                } catch (voiceError) {
+                    console.warn('⚠️ Failed to initialize Voice Recognition:', voiceError);
+                }
+            }
 
             this.isInitialized = true;
             console.log('✅ Arabic Voice Service initialized');
@@ -36,75 +57,40 @@ class ArabicVoiceService {
     }
 
     /**
-     * تكوين TTS للعربية
-     */
-    async configureTTS() {
-        // الحصول على الأصوات المتاحة
-        const voices = await Tts.voices();
-
-        // البحث عن أفضل صوت عربي
-        const arabicVoices = voices.filter(v =>
-            v.language.startsWith('ar') ||
-            v.name.includes('Arabic') ||
-            v.name.includes('عربي')
-        );
-
-        // ترتيب الأصوات حسب الجودة
-        const preferredVoices = [
-            // iOS - أصوات عالية الجودة
-            'Laila',           // صوت ليلى (iOS - Enhanced)
-            'Maged',           // صوت ماجد (iOS - Enhanced)
-            'Tarik',           // صوت طارق (iOS)
-
-            // Android - أصوات Google
-            'ar-xa-x-arc-network',  // Google Arabic (Female)
-            'ar-xa-x-ard-network',  // Google Arabic (Male)
-            'ar-XA-language',       // Google Arabic Standard
-        ];
-
-        // اختيار أفضل صوت متاح
-        let selectedVoice = null;
-        for (const voiceName of preferredVoices) {
-            const voice = arabicVoices.find(v =>
-                v.name === voiceName || v.id === voiceName
-            );
-            if (voice) {
-                selectedVoice = voice;
-                break;
-            }
-        }
-
-        // إذا لم يتم العثور على صوت مفضل، استخدم أول صوت عربي
-        if (!selectedVoice && arabicVoices.length > 0) {
-            selectedVoice = arabicVoices[0];
-        }
-
-        // تطبيق الإعدادات
-        if (selectedVoice) {
-            await Tts.setDefaultVoice(selectedVoice.id);
-            console.log(`🎤 Selected Arabic voice: ${selectedVoice.name}`);
-        }
-
-        // إعدادات النطق
-        await Tts.setDefaultLanguage('ar-SA'); // العربية السعودية (الأوضح)
-        await Tts.setDefaultRate(0.45);        // سرعة بطيئة للأطفال
-        await Tts.setDefaultPitch(1.15);       // نبرة أعلى قليلاً (صوت أنثوي دافئ)
-
-        // إضافة مستمعين للأحداث
-        Tts.addEventListener('tts-start', () => this.onSpeechStart());
-        Tts.addEventListener('tts-finish', () => this.onSpeechFinish());
-        Tts.addEventListener('tts-cancel', () => this.onSpeechCancel());
-        Tts.addEventListener('tts-progress', (event) => this.onSpeechProgress(event));
-    }
-
-    /**
      * تكوين التعرف على الصوت
      */
     async configureVoiceRecognition() {
-        Voice.onSpeechStart = () => console.log('🎤 Speech recognition started');
-        Voice.onSpeechEnd = () => console.log('🎤 Speech recognition ended');
-        Voice.onSpeechError = (e) => console.error('🎤 Speech error:', e);
-        Voice.onSpeechResults = (e) => this.onSpeechResults(e);
+        try {
+            Voice.onSpeechStart = () => console.log('🎤 Speech recognition started');
+            Voice.onSpeechEnd = () => console.log('🎤 Speech recognition ended');
+            Voice.onSpeechError = (e) => console.error('🎤 Speech error:', e);
+            Voice.onSpeechResults = (e) => this.onSpeechResults(e);
+        } catch (e) {
+            console.warn('⚠️ Error configuring Voice:', e);
+        }
+    }
+
+    /**
+     * الحصول على ملف صوتي من Google Cloud TTS
+     */
+    async fetchGoogleTTS(text) {
+        const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_API_KEY}`;
+        const body = {
+            input: { text: text },
+            voice: {
+                languageCode: 'ar-XA',
+                name: 'ar-XA-Wavenet-A', // WaveNet voice (A is typically female/neutral, good for kids)
+                ssmlGender: 'FEMALE'
+            },
+            audioConfig: {
+                audioEncoding: 'MP3',
+                speakingRate: 0.85, // أبطأ قليلاً للأطفال
+                pitch: 0.0
+            }
+        };
+
+        const response = await axios.post(url, body);
+        return response.data.audioContent;
     }
 
     /**
@@ -113,17 +99,28 @@ class ArabicVoiceService {
     async speak(text, options = {}) {
         const {
             language = 'ar-SA',
-            rate = 0.45,
-            pitch = 1.15,
+            rate = 0.85,
+            pitch = 1.0,
             onVisemeChange = null,
         } = options;
 
         try {
-            // إيقاف أي نطق سابق
-            await Tts.stop();
+            // 1. إيقاف أي صوت حالي
+            await this.stop();
 
-            // تحليل النص للحصول على مخارج الحروف
+            // 2. تحليل النص للحصول على مخارج الحروف (Animation)
             const { timeline, totalDuration } = generateVisemeTimeline(text);
+
+            // 3. جلب الصوت من Google Cloud
+            console.log('🔄 Fetching audio from Google Cloud...');
+            const audioData = await this.fetchGoogleTTS(text);
+
+            // 4. حفظ الملف محلياً
+            const path = `${RNFS.CachesDirectoryPath}/speech_${Date.now()}.mp3`;
+            await RNFS.writeFile(path, audioData, 'base64');
+
+            // 5. تشغيل الصوت
+            console.log('🔊 Playing audio:', path);
 
             // حفظ callback لتغيير الفم
             if (onVisemeChange) {
@@ -132,19 +129,22 @@ class ArabicVoiceService {
                 this.startVisemeAnimation();
             }
 
-            // النطق
-            await Tts.setDefaultLanguage(language);
-            await Tts.setDefaultRate(rate);
-            await Tts.setDefaultPitch(pitch);
-            await Tts.speak(text);
+            try {
+                // SoundPlayer takes file path directly
+                // Note: For Android 'loadUrl' or 'playUrl' with file:// might be needed
+                SoundPlayer.playUrl('file://' + path);
 
-            return {
-                timeline,
-                totalDuration,
-            };
+                return { timeline, totalDuration };
+            } catch (e) {
+                console.error('❌ SoundPlayer Error:', e);
+                this.stopVisemeAnimation();
+                return null;
+            }
+
         } catch (error) {
             console.error('❌ Error in speak:', error);
-            throw error;
+            // Fallback to console log or silent fail, user experience matters
+            return null;
         }
     }
 
@@ -164,9 +164,9 @@ class ArabicVoiceService {
             }
 
             const elapsed = Date.now() - startTime;
-            const current = this.currentTimeline[currentIndex];
-
-            if (elapsed >= current.time) {
+            // Find current viseme based on elapsed time (loop forward safely)
+            while (currentIndex < this.currentTimeline.length && elapsed >= this.currentTimeline[currentIndex].time) {
+                const current = this.currentTimeline[currentIndex];
                 this.currentVisemeCallback(current.shape, current.path);
                 currentIndex++;
             }
@@ -214,22 +214,34 @@ class ArabicVoiceService {
                 reject(e);
             };
 
-            const cleanup = () => {
-                Voice.destroy().then(Voice.removeAllListeners);
+            const cleanup = async () => {
+                try {
+                    await Voice.cancel();
+                    await Voice.stop();
+                    await Voice.destroy();
+                    Voice.removeAllListeners();
+                    console.log('🎤 Cleanup done');
+                } catch (e) {
+                    console.warn('🎤 Cleanup warning:', e);
+                }
             };
 
             Voice.onSpeechResults = onResults;
             Voice.onSpeechError = onError;
 
-            Voice.start(language)
-                .then(() => console.log('🎤 Listening started...'))
-                .catch((e) => {
-                    console.error(e);
-                    if (!hasResolved) {
-                        hasResolved = true;
-                        reject(e);
-                    }
-                });
+            // التأكد من تنظيف أي جلسة سابقة
+            Voice.destroy().then(() => {
+                Voice.start(language)
+                    .then(() => console.log('🎤 Listening started...'))
+                    .catch((e) => {
+                        console.error('🎤 Start Error:', e);
+                        if (!hasResolved) {
+                            cleanup();
+                            hasResolved = true;
+                            reject(e);
+                        }
+                    });
+            });
 
             // Timeout
             setTimeout(() => {
@@ -247,16 +259,20 @@ class ArabicVoiceService {
      * إيقاف النطق
      */
     async stop() {
-        await Tts.stop();
+        // Stop Sound
+        try {
+            SoundPlayer.stop();
+        } catch (e) { }
+
+        // Stop Viseme Animation
         this.stopVisemeAnimation();
     }
 
     /**
-     * تغيير اللغة
+     * تغيير اللغة (احتياطي فقط، غير مستخدم مع قوقل حاليا)
      */
     async setLanguage(language) {
         this.currentLanguage = language;
-        await Tts.setDefaultLanguage(language);
     }
 
     /**

@@ -6,8 +6,9 @@ import {
     SafeAreaView,
     ScrollView,
     TouchableOpacity,
+    StatusBar
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Card from '../components/Card';
 import Button from '../components/Button';
@@ -49,7 +50,7 @@ const ProfileScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar style="dark" />
+            <StatusBar barStyle="dark-content" />
 
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>

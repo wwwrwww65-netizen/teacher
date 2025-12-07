@@ -6,8 +6,9 @@ import {
     SafeAreaView,
     ScrollView,
     TouchableOpacity,
+    StatusBar
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Card from '../components/Card';
 import { theme } from '../config/theme';
@@ -34,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar style="dark" />
+            <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
             {/* Header */}
             <View style={styles.header}>
@@ -92,8 +93,9 @@ const HomeScreen = ({ navigation }) => {
                         </TouchableOpacity>
 
                         <TouchableOpacity
-                            style={[styles.quickAction, { backgroundColor: theme.colors.success }]}
-                            onPress={() => navigation.navigate('Quiz')}
+                            style={[styles.quickAction, { backgroundColor: theme.colors.accent }]}
+                            aria-label="اختبار"
+                            onPress={() => navigation.navigate('Quiz', { quizId: '1' })}
                         >
                             <Text style={styles.quickActionIcon}>🎯</Text>
                             <Text style={styles.quickActionText}>اختبار</Text>

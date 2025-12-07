@@ -1,0 +1,137 @@
+> Task :gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:jar UP-TO-DATE
+> Task :gradle-plugin:inspectClassesForKotlinIC UP-TO-DATE
+
+> Configure project :react-native-reanimated
+Android gradle plugin: 8.1.1
+Gradle: 8.3
+
+> Task :app:signingReport
+Variant: debug
+Config: debug
+Store: E:\jjj\mobile\android\app\debug.keystore
+Alias: androiddebugkey
+MD5: B7:DC:44:54:B0:9A:FB:7B:3E:7C:08:3B:7D:43:8B:0F
+SHA1: 48:9E:52:CC:33:D8:E8:83:E3:A4:CA:C4:70:A1:C1:01:09:9F:CC:91
+SHA-256: BA:57:63:05:47:AF:F1:B5:6F:09:A9:3D:B7:5B:63:E5:4B:28:CE:6B:E9:03:18:D6:06:86:82:BC:1F:31:5F:52
+Valid until: «·√—»⁄«¡° ?? √»—Ì· ????
+----------
+Variant: release
+Config: debug
+Store: E:\jjj\mobile\android\app\debug.keystore
+Alias: androiddebugkey
+MD5: B7:DC:44:54:B0:9A:FB:7B:3E:7C:08:3B:7D:43:8B:0F
+SHA1: 48:9E:52:CC:33:D8:E8:83:E3:A4:CA:C4:70:A1:C1:01:09:9F:CC:91
+SHA-256: BA:57:63:05:47:AF:F1:B5:6F:09:A9:3D:B7:5B:63:E5:4B:28:CE:6B:E9:03:18:D6:06:86:82:BC:1F:31:5F:52
+Valid until: «·√—»⁄«¡° ?? √»—Ì· ????
+----------
+Variant: debugAndroidTest
+Config: debug
+Store: E:\jjj\mobile\android\app\debug.keystore
+Alias: androiddebugkey
+MD5: B7:DC:44:54:B0:9A:FB:7B:3E:7C:08:3B:7D:43:8B:0F
+SHA1: 48:9E:52:CC:33:D8:E8:83:E3:A4:CA:C4:70:A1:C1:01:09:9F:CC:91
+SHA-256: BA:57:63:05:47:AF:F1:B5:6F:09:A9:3D:B7:5B:63:E5:4B:28:CE:6B:E9:03:18:D6:06:86:82:BC:1F:31:5F:52
+Valid until: «·√—»⁄«¡° ?? √»—Ì· ????
+----------
+
+> Task :react-native-async-storage_async-storage:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+> Task :react-native-gesture-handler:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+> Task :react-native-reanimated:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+> Task :react-native-safe-area-context:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+> Task :react-native-screens:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+> Task :react-native-svg:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+> Task :react-native-tts:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+> Task :react-native-voice_voice:signingReport
+Variant: debugAndroidTest
+Config: debug
+Store: C:\Users\lenovo\.android\debug.keystore
+Alias: AndroidDebugKey
+MD5: 01:CF:53:B1:06:AC:7A:DB:2B:5F:E4:30:CD:97:41:AD
+SHA1: 00:BC:2B:4A:84:8D:A6:0B:A9:A9:E2:9D:51:C4:8D:4F:3F:9B:C1:1A
+SHA-256: E9:E3:A7:43:2E:21:04:26:44:C7:19:B1:E3:9A:23:BD:68:03:58:CE:30:97:83:60:7C:51:7A:97:87:89:DC:44
+Valid until: «·Œ„Ì”° ?? ‰Ê›„»— ????
+----------
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 25s
+?? actionable tasks: ? executed, ? up-to-date

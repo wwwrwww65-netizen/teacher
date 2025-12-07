@@ -6,8 +6,9 @@ import {
     SafeAreaView,
     ScrollView,
     TouchableOpacity,
+    StatusBar
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import Card from '../components/Card';
 import { theme } from '../config/theme';
 import { lessons } from '../data/lessons';
@@ -15,7 +16,7 @@ import { lessons } from '../data/lessons';
 const LessonsScreen = ({ navigation }) => {
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar style="dark" />
+            <StatusBar barStyle="dark-content" />
 
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>

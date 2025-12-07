@@ -1,0 +1,844 @@
+> Task :gradle-plugin:compileKotlin UP-TO-DATE
+> Task :gradle-plugin:compileJava NO-SOURCE
+> Task :gradle-plugin:pluginDescriptors UP-TO-DATE
+> Task :gradle-plugin:processResources UP-TO-DATE
+> Task :gradle-plugin:classes UP-TO-DATE
+> Task :gradle-plugin:jar UP-TO-DATE
+> Task :gradle-plugin:inspectClassesForKotlinIC UP-TO-DATE
+
+> Configure project :react-native-reanimated
+Android gradle plugin: 8.1.1
+Gradle: 8.3
+
+> Task :react-native-screens:preBuild UP-TO-DATE
+> Task :react-native-screens:preReleaseBuild UP-TO-DATE
+> Task :react-native-screens:mergeReleaseJniLibFolders
+> Task :react-native-screens:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-screens:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-screens:generateReleaseResValues
+> Task :react-native-screens:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-screens:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-screens:generateReleaseBuildConfig
+> Task :react-native-screens:generateReleaseResources
+> Task :react-native-screens:packageReleaseResources
+> Task :react-native-screens:mergeReleaseShaders
+> Task :react-native-screens:compileReleaseShaders NO-SOURCE
+> Task :react-native-screens:generateReleaseAssets UP-TO-DATE
+> Task :react-native-screens:parseReleaseLocalResources
+> Task :react-native-screens:javaPreCompileRelease
+> Task :react-native-screens:packageReleaseAssets
+> Task :react-native-screens:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-screens:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-safe-area-context:preBuild UP-TO-DATE
+> Task :react-native-safe-area-context:preReleaseBuild UP-TO-DATE
+> Task :react-native-screens:writeReleaseAarMetadata
+
+> Task :react-native-screens:processReleaseManifest
+package="com.swmansion.rnscreens" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-screens\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.swmansion.rnscreens" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-screens\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-safe-area-context:mergeReleaseJniLibFolders
+> Task :react-native-safe-area-context:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-safe-area-context:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-safe-area-context:generateReleaseResValues
+> Task :react-native-safe-area-context:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-safe-area-context:generateReleaseBuildConfig
+> Task :react-native-safe-area-context:generateReleaseResources
+> Task :react-native-safe-area-context:packageReleaseResources
+> Task :react-native-safe-area-context:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-safe-area-context:parseReleaseLocalResources
+> Task :react-native-safe-area-context:javaPreCompileRelease
+> Task :react-native-safe-area-context:mergeReleaseShaders
+> Task :react-native-safe-area-context:compileReleaseShaders NO-SOURCE
+> Task :react-native-safe-area-context:generateReleaseAssets UP-TO-DATE
+> Task :react-native-safe-area-context:packageReleaseAssets
+> Task :react-native-safe-area-context:prepareLintJarForPublish UP-TO-DATE
+
+> Task :react-native-safe-area-context:processReleaseManifest
+package="com.th3rdwave.safeareacontext" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.th3rdwave.safeareacontext" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-safe-area-context:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-gesture-handler:preBuild UP-TO-DATE
+> Task :react-native-gesture-handler:preReleaseBuild UP-TO-DATE
+> Task :react-native-safe-area-context:writeReleaseAarMetadata
+> Task :react-native-gesture-handler:mergeReleaseJniLibFolders
+> Task :react-native-gesture-handler:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-gesture-handler:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-gesture-handler:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-gesture-handler:generateReleaseResValues
+> Task :react-native-gesture-handler:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-gesture-handler:generateReleaseBuildConfig
+> Task :react-native-gesture-handler:generateReleaseResources
+> Task :react-native-safe-area-context:generateReleaseRFile
+> Task :react-native-screens:generateReleaseRFile
+> Task :react-native-gesture-handler:packageReleaseResources
+> Task :react-native-gesture-handler:parseReleaseLocalResources
+> Task :react-native-reanimated:assertLatestReactNativeWithNewArchitectureTask SKIPPED
+> Task :react-native-reanimated:assertMinimalReactNativeVersionTask SKIPPED
+
+> Task :react-native-gesture-handler:processReleaseManifest
+package="com.swmansion.gesturehandler" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.swmansion.gesturehandler" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-screens:compileReleaseKotlin
+Failed to compile with Kotlin daemon: java.lang.RuntimeException: Could not connect to Kotlin compile daemon
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemon(GradleKotlinCompilerWork.kt:192)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:150)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:123)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:74)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:170)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Using fallback strategy: Compile without Kotlin daemon
+Try ./gradlew --stop if this issue persists.
+
+> Task :react-native-reanimated:prepareHeadersForPrefab
+> Task :react-native-reanimated:preBuild
+> Task :react-native-reanimated:preReleaseBuild
+> Task :react-native-reanimated:generateReleaseBuildConfig
+> Task :react-native-reanimated:generateReleaseResValues
+> Task :react-native-reanimated:generateReleaseResources
+> Task :react-native-reanimated:packageReleaseResources
+> Task :react-native-gesture-handler:generateReleaseRFile
+> Task :react-native-reanimated:parseReleaseLocalResources
+> Task :react-native-reanimated:javaPreCompileRelease
+> Task :react-native-reanimated:packageNdkLibs NO-SOURCE
+> Task :react-native-gesture-handler:javaPreCompileRelease
+> Task :react-native-gesture-handler:mergeReleaseShaders
+> Task :react-native-gesture-handler:compileReleaseShaders NO-SOURCE
+> Task :react-native-gesture-handler:generateReleaseAssets UP-TO-DATE
+> Task :react-native-gesture-handler:packageReleaseAssets
+> Task :react-native-gesture-handler:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-gesture-handler:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-gesture-handler:writeReleaseAarMetadata
+> Task :react-native-svg:preBuild UP-TO-DATE
+> Task :react-native-svg:preReleaseBuild UP-TO-DATE
+> Task :react-native-svg:mergeReleaseJniLibFolders
+> Task :react-native-svg:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-svg:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-svg:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-svg:generateReleaseResValues
+> Task :react-native-svg:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-svg:generateReleaseBuildConfig
+> Task :react-native-svg:generateReleaseResources
+
+> Task :react-native-reanimated:processReleaseManifest
+package="com.swmansion.reanimated" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-reanimated\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.swmansion.reanimated" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-reanimated\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-svg:packageReleaseResources
+> Task :react-native-svg:parseReleaseLocalResources
+> Task :react-native-reanimated:generateReleaseRFile
+
+> Task :react-native-svg:processReleaseManifest
+package="com.horcrux.svg" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-svg\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.horcrux.svg" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-svg\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-safe-area-context:compileReleaseKotlin
+Failed to compile with Kotlin daemon: java.lang.RuntimeException: Could not connect to Kotlin compile daemon
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemon(GradleKotlinCompilerWork.kt:192)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:150)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:123)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:74)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:170)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Using fallback strategy: Compile without Kotlin daemon
+Try ./gradlew --stop if this issue persists.
+
+> Task :react-native-reanimated:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :react-native-svg:generateReleaseRFile
+> Task :react-native-svg:extractReleaseAnnotations
+> Task :react-native-svg:javaPreCompileRelease
+> Task :react-native-reanimated:bundleLibCompileToJarRelease
+
+> Task :react-native-svg:compileReleaseJavaWithJavac
+E:\jjj\mobile\node_modules\react-native-svg\android\src\main\java\com\horcrux\svg\RNSVGRenderableManager.java:11: warning: [removal] StandardCharsets in com.facebook.react.common has been deprecated and marked for removal
+import static com.facebook.react.common.StandardCharsets.UTF_8;
+                                       ^
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+1 warning
+
+> Task :react-native-svg:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-svg:mergeReleaseConsumerProguardFiles
+> Task :react-native-svg:mergeReleaseShaders
+> Task :react-native-svg:compileReleaseShaders NO-SOURCE
+> Task :react-native-svg:generateReleaseAssets UP-TO-DATE
+> Task :react-native-svg:packageReleaseAssets
+> Task :react-native-svg:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-svg:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-svg:processReleaseJavaRes NO-SOURCE
+> Task :react-native-svg:mergeReleaseJavaResource
+> Task :react-native-svg:syncReleaseLibJars
+> Task :react-native-svg:writeReleaseAarMetadata
+> Task :react-native-svg:bundleReleaseLocalLintAar
+
+> Task :react-native-gesture-handler:compileReleaseKotlin
+Failed to compile with Kotlin daemon: java.lang.RuntimeException: Could not connect to Kotlin compile daemon
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemon(GradleKotlinCompilerWork.kt:192)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.compileWithDaemonOrFallbackImpl(GradleKotlinCompilerWork.kt:150)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:123)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:74)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:63)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:66)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:62)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:100)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:62)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:204)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:199)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:66)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:157)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:59)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:53)
+	at org.gradle.internal.operations.DefaultBuildOperationExecutor.call(DefaultBuildOperationExecutor.java:73)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:59)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:170)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:187)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:120)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:162)
+	at org.gradle.internal.Factories$1.create(Factories.java:31)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:264)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:157)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:126)
+	at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:539)
+	at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:264)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1136)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:635)
+	at java.base/java.lang.Thread.run(Thread.java:840)
+Using fallback strategy: Compile without Kotlin daemon
+Try ./gradlew --stop if this issue persists.
+
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[arm64-v8a]
+
+> Task :react-native-safe-area-context:compileReleaseKotlin
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaContextModule.kt:7:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaContextModule.kt:9:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = SafeAreaContextModule.NAME)
+ ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaContextPackage.kt:6:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaContextPackage.kt:26:51: warning: 'ReactModule' is deprecated. Deprecated in Java
+      val reactModule = moduleClass.getAnnotation(ReactModule::class.java) ?: continue
+                                                  ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaContextPackage.kt:28:11: warning: 'constructor ReactModuleInfo(String!, String!, Boolean, Boolean, Boolean, Boolean, Boolean)' is deprecated. Deprecated in Java
+          ReactModuleInfo(
+          ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaContextPackage.kt:34:27: warning: 'hasConstants: Boolean' is deprecated. Deprecated in Java
+              reactModule.hasConstants,
+                          ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaProviderManager.kt:4:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaProviderManager.kt:11:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = SafeAreaProviderManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaView.kt:59:23: warning: 'getter for uiImplementation: UIImplementation!' is deprecated. Deprecated in Java
+            uiManager.uiImplementation.dispatchViewUpdates(-1)
+                      ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaViewManager.kt:4:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\main\java\com\th3rdwave\safeareacontext\SafeAreaViewManager.kt:14:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = SafeAreaViewManager.REACT_CLASS)
+ ^
+
+> Task :react-native-safe-area-context:extractReleaseAnnotations
+
+> Task :react-native-safe-area-context:compileReleaseJavaWithJavac
+Note: E:\jjj\mobile\node_modules\react-native-safe-area-context\android\src\paper\java\com\th3rdwave\safeareacontext\NativeSafeAreaContextSpec.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+
+> Task :react-native-safe-area-context:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-safe-area-context:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :react-native-safe-area-context:processReleaseJavaRes
+> Task :react-native-safe-area-context:mergeReleaseJavaResource
+
+> Task :react-native-screens:compileReleaseKotlin
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenContainerViewManager.kt:5:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenContainerViewManager.kt:10:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = ScreenContainerViewManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackFragment.kt:65:28: warning: 'setter for targetElevation: Float' is deprecated. Deprecated in Java
+            mAppBarLayout?.targetElevation = if (hidden) 0f else PixelUtil.toPixelFromDIP(4f)
+                           ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackFragment.kt:128:28: warning: 'setter for targetElevation: Float' is deprecated. Deprecated in Java
+            mAppBarLayout?.targetElevation = 0f
+                           ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackHeaderConfig.kt:86:34: warning: 'getter for systemWindowInsetTop: Int' is deprecated. Deprecated in Java
+                rootWindowInsets.systemWindowInsetTop
+                                 ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackHeaderConfig.kt:229:37: warning: 'setColorFilter(Int, PorterDuff.Mode): Unit' is deprecated. Deprecated in Java
+            toolbar.navigationIcon?.setColorFilter(mTintColor, PorterDuff.Mode.SRC_ATOP)
+                                    ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackHeaderConfigViewManager.kt:7:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackHeaderConfigViewManager.kt:18:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = ScreenStackHeaderConfigViewManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackHeaderSubviewManager.kt:4:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackHeaderSubviewManager.kt:12:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = ScreenStackHeaderSubviewManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackViewManager.kt:6:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenStackViewManager.kt:15:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = ScreenStackViewManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenViewManager.kt:6:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenViewManager.kt:24:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = ScreenViewManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenViewManager.kt:47:42: warning: 'setStateWrapper(StateWrapper!): Unit' is deprecated. Deprecated in Java
+            view.fabricViewStateManager?.setStateWrapper(stateWrapper)
+                                         ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenWindowTraits.kt:137:47: warning: 'replaceSystemWindowInsets(Int, Int, Int, Int): WindowInsetsCompat' is deprecated. Deprecated in Java
+                                defaultInsets.replaceSystemWindowInsets(
+                                              ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenWindowTraits.kt:138:51: warning: 'getter for systemWindowInsetLeft: Int' is deprecated. Deprecated in Java
+                                    defaultInsets.systemWindowInsetLeft,
+                                                  ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenWindowTraits.kt:140:51: warning: 'getter for systemWindowInsetRight: Int' is deprecated. Deprecated in Java
+                                    defaultInsets.systemWindowInsetRight,
+                                                  ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\ScreenWindowTraits.kt:141:51: warning: 'getter for systemWindowInsetBottom: Int' is deprecated. Deprecated in Java
+                                    defaultInsets.systemWindowInsetBottom
+                                                  ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\SearchBarManager.kt:6:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\SearchBarManager.kt:17:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = SearchBarManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\SearchBarManager.kt:100:22: warning: parameter 'view' is never used
+    fun setPlacement(view: SearchBarView, placeholder: String?) = Unit
+                     ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\SearchBarManager.kt:100:43: warning: parameter 'placeholder' is never used
+    fun setPlacement(view: SearchBarView, placeholder: String?) = Unit
+                                          ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\SearchBarView.kt:147:43: warning: parameter 'flag' is never used
+    fun handleToggleCancelButtonJsRequest(flag: Boolean) = Unit
+                                          ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\events\HeaderHeightChangeEvent.kt:5:44: warning: 'RCTEventEmitter' is deprecated. Deprecated in Java
+import com.facebook.react.uimanager.events.RCTEventEmitter
+                                           ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\events\HeaderHeightChangeEvent.kt:10:5: warning: 'constructor Event<T : Event<(raw) Event<*>>!>(Int)' is deprecated. Deprecated in Java
+) : Event<HeaderHeightChangeEvent>(viewId) {
+    ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\events\HeaderHeightChangeEvent.kt:17:44: warning: 'RCTEventEmitter' is deprecated. Deprecated in Java
+    override fun dispatch(rctEventEmitter: RCTEventEmitter) {
+                                           ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\main\java\com\swmansion\rnscreens\events\HeaderHeightChangeEvent.kt:20:25: warning: 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+        rctEventEmitter.receiveEvent(viewTag, eventName, map)
+                        ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\paper\java\com\swmansion\rnscreens\FabricEnabledViewGroup.kt:5:37: warning: 'FabricViewStateManager' is deprecated. Deprecated in Java
+import com.facebook.react.uimanager.FabricViewStateManager
+                                    ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\paper\java\com\swmansion\rnscreens\FabricEnabledViewGroup.kt:9:48: warning: 'FabricViewStateManager' is deprecated. Deprecated in Java
+    val fabricViewStateManager get() = null as FabricViewStateManager?
+                                               ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\paper\java\com\swmansion\rnscreens\FabricEnabledViewGroup.kt:11:42: warning: parameter 'width' is never used
+    protected fun updateScreenSizeFabric(width: Int, height: Int) {
+                                         ^
+E:\jjj\mobile\node_modules\react-native-screens\android\src\paper\java\com\swmansion\rnscreens\FabricEnabledViewGroup.kt:11:54: warning: parameter 'height' is never used
+    protected fun updateScreenSizeFabric(width: Int, height: Int) {
+                                                     ^
+
+> Task :react-native-reanimated:buildCMakeRelWithDebInfo[arm64-v8a]
+
+> Task :react-native-gesture-handler:compileReleaseKotlin
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\core\GestureHandler.kt:770:11: warning: name shadowed: size
+      var size = size
+          ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerButtonViewManager.kt:23:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerButtonViewManager.kt:35:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = RNGestureHandlerButtonViewManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerEnabledRootView.kt:9:51: warning: unreachable code
+  constructor(context: Context?) : super(context) {}
+                                                  ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerEnabledRootView.kt:10:80: warning: unreachable code
+  constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {}
+                                                                               ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerModule.kt:14:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerRootHelper.kt:80:18: warning: 'onChildStartedNativeGesture(MotionEvent!): Unit' is deprecated. Deprecated in Java
+        rootView.onChildStartedNativeGesture(event)
+                 ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerRootHelper.kt:86:42: warning: parameter 'disallowIntercept' is never used
+  fun requestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
+                                         ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerRootHelper.kt:118:28: warning: parameter 'viewTag' is never used
+  fun handleSetJSResponder(viewTag: Int, blockNativeResponder: Boolean) {
+                           ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerRootViewManager.kt:3:46: warning: 'ReactModule' is deprecated. Deprecated in Java
+import com.facebook.react.module.annotations.ReactModule
+                                             ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerRootViewManager.kt:15:2: warning: 'ReactModule' is deprecated. Deprecated in Java
+@ReactModule(name = RNGestureHandlerRootViewManager.REACT_CLASS)
+ ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerTouchEvent.kt:7:44: warning: 'RCTEventEmitter' is deprecated. Deprecated in Java
+import com.facebook.react.uimanager.events.RCTEventEmitter
+                                           ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerTouchEvent.kt:14:11: warning: 'init(Int): Unit' is deprecated. Deprecated in Java
+    super.init(handler.view!!.id)
+          ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerTouchEvent.kt:30:42: warning: 'RCTEventEmitter' is deprecated. Deprecated in Java
+  override fun dispatch(rctEventEmitter: RCTEventEmitter) {
+                                         ^
+E:\jjj\mobile\node_modules\react-native-gesture-handler\android\src\main\java\com\swmansion\gesturehandler\react\RNGestureHandlerTouchEvent.kt:31:21: warning: 'receiveEvent(Int, String!, WritableMap?): Unit' is deprecated. Deprecated in Java
+    rctEventEmitter.receiveEvent(viewTag, EVENT_NAME, extraData)
+                    ^
+
+> Task :react-native-screens:extractReleaseAnnotations
+> Task :react-native-screens:compileReleaseJavaWithJavac
+> Task :react-native-screens:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-screens:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :react-native-screens:processReleaseJavaRes
+> Task :react-native-screens:mergeReleaseJavaResource
+> Task :react-native-safe-area-context:syncReleaseLibJars
+> Task :react-native-screens:syncReleaseLibJars
+> Task :react-native-screens:bundleReleaseLocalLintAar
+> Task :react-native-safe-area-context:bundleReleaseLocalLintAar
+> Task :react-native-gesture-handler:extractReleaseAnnotations
+> Task :react-native-gesture-handler:compileReleaseJavaWithJavac
+> Task :react-native-gesture-handler:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-gesture-handler:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :react-native-gesture-handler:processReleaseJavaRes
+> Task :react-native-gesture-handler:mergeReleaseJavaResource
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-gesture-handler:syncReleaseLibJars
+> Task :react-native-gesture-handler:bundleReleaseLocalLintAar
+> Task :react-native-reanimated:buildCMakeRelWithDebInfo[armeabi-v7a]
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86]
+> Task :react-native-reanimated:buildCMakeRelWithDebInfo[x86]
+> Task :react-native-reanimated:configureCMakeRelWithDebInfo[x86_64]
+> Task :react-native-reanimated:buildCMakeRelWithDebInfo[x86_64]
+> Task :react-native-reanimated:mergeReleaseJniLibFolders
+> Task :react-native-reanimated:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-reanimated:extractReleaseAnnotations
+> Task :react-native-reanimated:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-reanimated:mergeReleaseConsumerProguardFiles
+> Task :react-native-reanimated:mergeReleaseShaders
+> Task :react-native-reanimated:compileReleaseShaders NO-SOURCE
+> Task :react-native-reanimated:generateReleaseAssets UP-TO-DATE
+> Task :react-native-reanimated:packageReleaseAssets
+> Task :react-native-reanimated:mergeReleaseNativeLibs
+> Task :react-native-reanimated:externalNativeBuildRelease
+> Task :react-native-reanimated:generateJsonModelRelease
+> Task :react-native-reanimated:prefabReleaseConfigurePackage UP-TO-DATE
+> Task :react-native-reanimated:stripReleaseDebugSymbols
+> Task :react-native-reanimated:prefabReleasePackage
+> Task :react-native-reanimated:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-reanimated:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-reanimated:processReleaseJavaRes NO-SOURCE
+> Task :react-native-async-storage_async-storage:preBuild UP-TO-DATE
+> Task :react-native-async-storage_async-storage:preReleaseBuild UP-TO-DATE
+> Task :react-native-reanimated:writeReleaseAarMetadata
+> Task :react-native-reanimated:mergeReleaseJavaResource
+> Task :react-native-async-storage_async-storage:mergeReleaseJniLibFolders
+> Task :react-native-reanimated:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-reanimated:syncReleaseLibJars
+> Task :react-native-reanimated:bundleReleaseLocalLintAar
+> Task :react-native-async-storage_async-storage:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-async-storage_async-storage:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateReleaseResValues
+> Task :react-native-async-storage_async-storage:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-async-storage_async-storage:generateReleaseBuildConfig
+> Task :react-native-async-storage_async-storage:generateReleaseResources
+> Task :react-native-async-storage_async-storage:packageReleaseResources
+> Task :react-native-async-storage_async-storage:parseReleaseLocalResources
+> Task :react-native-async-storage_async-storage:javaPreCompileRelease
+> Task :react-native-async-storage_async-storage:mergeReleaseShaders
+> Task :react-native-async-storage_async-storage:compileReleaseShaders NO-SOURCE
+> Task :react-native-async-storage_async-storage:generateReleaseAssets UP-TO-DATE
+> Task :react-native-async-storage_async-storage:packageReleaseAssets
+> Task :react-native-async-storage_async-storage:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-async-storage_async-storage:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-async-storage_async-storage:processReleaseJavaRes NO-SOURCE
+> Task :react-native-async-storage_async-storage:mergeReleaseJavaResource
+> Task :react-native-async-storage_async-storage:writeReleaseAarMetadata
+> Task :react-native-tts:preBuild UP-TO-DATE
+> Task :react-native-tts:preReleaseBuild UP-TO-DATE
+
+> Task :react-native-async-storage_async-storage:processReleaseManifest
+package="com.reactnativecommunity.asyncstorage" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.reactnativecommunity.asyncstorage" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\@react-native-async-storage\async-storage\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-tts:mergeReleaseJniLibFolders
+> Task :react-native-tts:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-tts:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-tts:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-tts:generateReleaseResValues
+> Task :react-native-tts:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-tts:generateReleaseBuildConfig
+> Task :react-native-tts:generateReleaseResources
+> Task :react-native-async-storage_async-storage:generateReleaseRFile
+> Task :react-native-tts:packageReleaseResources
+> Task :react-native-async-storage_async-storage:extractReleaseAnnotations
+
+> Task :react-native-async-storage_async-storage:compileReleaseJavaWithJavac
+Note: Some input files use or override a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: E:\jjj\mobile\node_modules\@react-native-async-storage\async-storage\android\src\javaPackage\java\com\reactnativecommunity\asyncstorage\AsyncStoragePackage.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :react-native-async-storage_async-storage:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-async-storage_async-storage:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :react-native-async-storage_async-storage:syncReleaseLibJars
+> Task :react-native-async-storage_async-storage:bundleReleaseLocalLintAar
+> Task :react-native-tts:parseReleaseLocalResources
+> Task :react-native-tts:javaPreCompileRelease
+> Task :react-native-tts:mergeReleaseShaders
+> Task :react-native-tts:compileReleaseShaders NO-SOURCE
+> Task :react-native-tts:generateReleaseAssets UP-TO-DATE
+> Task :react-native-tts:packageReleaseAssets
+> Task :react-native-tts:prepareLintJarForPublish UP-TO-DATE
+
+> Task :react-native-tts:processReleaseManifest
+package="net.no_mad.tts" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-tts\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="net.no_mad.tts" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\react-native-tts\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-tts:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-tts:processReleaseJavaRes NO-SOURCE
+> Task :react-native-voice_voice:preBuild UP-TO-DATE
+> Task :react-native-voice_voice:preReleaseBuild UP-TO-DATE
+> Task :react-native-voice_voice:mergeReleaseJniLibFolders
+> Task :react-native-voice_voice:mergeReleaseNativeLibs NO-SOURCE
+> Task :react-native-voice_voice:stripReleaseDebugSymbols NO-SOURCE
+> Task :react-native-tts:mergeReleaseJavaResource
+> Task :react-native-tts:writeReleaseAarMetadata
+> Task :react-native-voice_voice:copyReleaseJniLibsProjectAndLocalJars
+> Task :react-native-voice_voice:generateReleaseResValues
+> Task :react-native-voice_voice:extractDeepLinksForAarRelease UP-TO-DATE
+> Task :react-native-voice_voice:generateReleaseBuildConfig
+> Task :react-native-voice_voice:generateReleaseResources
+> Task :react-native-tts:generateReleaseRFile
+> Task :react-native-voice_voice:packageReleaseResources
+> Task :react-native-tts:extractReleaseAnnotations
+
+> Task :react-native-tts:compileReleaseJavaWithJavac
+Note: E:\jjj\mobile\node_modules\react-native-tts\android\src\main\java\net\no_mad\tts\TextToSpeechModule.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+Note: E:\jjj\mobile\node_modules\react-native-tts\android\src\main\java\net\no_mad\tts\TextToSpeechModule.java uses unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+
+> Task :react-native-tts:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-tts:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :react-native-tts:syncReleaseLibJars
+> Task :react-native-tts:bundleReleaseLocalLintAar
+> Task :react-native-voice_voice:parseReleaseLocalResources
+> Task :react-native-voice_voice:javaPreCompileRelease
+> Task :react-native-voice_voice:mergeReleaseShaders
+> Task :react-native-voice_voice:compileReleaseShaders NO-SOURCE
+> Task :react-native-voice_voice:generateReleaseAssets UP-TO-DATE
+> Task :react-native-voice_voice:packageReleaseAssets
+> Task :react-native-voice_voice:prepareLintJarForPublish UP-TO-DATE
+> Task :react-native-voice_voice:prepareReleaseArtProfile UP-TO-DATE
+> Task :react-native-voice_voice:processReleaseJavaRes NO-SOURCE
+
+> Task :react-native-voice_voice:processReleaseManifest
+package="com.wenkesj.voice" found in source AndroidManifest.xml: E:\jjj\mobile\node_modules\@react-native-voice\voice\android\src\main\AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.wenkesj.voice" from the source AndroidManifest.xml: E:\jjj\mobile\node_modules\@react-native-voice\voice\android\src\main\AndroidManifest.xml.
+
+> Task :react-native-voice_voice:mergeReleaseJavaResource
+> Task :react-native-voice_voice:writeReleaseAarMetadata
+> Task :app:buildKotlinToolingMetadata
+> Task :app:generateCodegenSchemaFromJavaScript SKIPPED
+> Task :app:generateCodegenArtifactsFromSchema SKIPPED
+> Task :app:generatePackageList
+> Task :app:preBuild
+> Task :app:preReleaseBuild
+> Task :react-native-voice_voice:generateReleaseRFile
+> Task :app:generateReleaseBuildConfig
+> Task :react-native-voice_voice:extractReleaseAnnotations
+> Task :react-native-voice_voice:compileReleaseJavaWithJavac
+> Task :react-native-voice_voice:mergeReleaseGeneratedProguardFiles UP-TO-DATE
+> Task :react-native-voice_voice:mergeReleaseConsumerProguardFiles UP-TO-DATE
+> Task :react-native-voice_voice:syncReleaseLibJars
+> Task :react-native-voice_voice:bundleReleaseLocalLintAar
+> Task :app:checkReleaseAarMetadata
+
+> Task :app:createBundleReleaseJsAndAssets
+debug Reading Metro config from E:\jjj\mobile\metro.config.js
+warning: the transform cache was reset.
+                Welcome to Metro v0.80.12
+              Fast - Scalable - Integrated
+
+
+info Writing bundle output to: android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle
+info Writing sourcemap output to: android\app\build\intermediates\sourcemaps\react\release\index.android.bundle.packager.map
+info Done writing bundle output
+info Done writing sourcemap output
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:2515:18: warning: the variable "DebuggerInternal" was not declared in function "__shouldPauseOnThrow"
+          typeof DebuggerInternal !== 'undefined' &&
+                 ^~~~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:6169:7: warning: the variable "setTimeout" was not declared in function "logCapturedError"
+      setTimeout(function () {
+      ^~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:4138:108: warning: the variable "nativeFabricUIManager" was not declared in function "onChange"
+...lInstanceHandle ? (from && nativeFabricUIManager.setIsJSResponder(from.sta...
+                              ^~~~~~~~~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:4750:21: warning: the variable "clearTimeout" was not declared in anonymous function " 118#"
+    cancelTimeout = clearTimeout;
+                    ^~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:8500:30: warning: the variable "__REACT_DEVTOOLS_GLOBAL_HOOK__" was not declared in anonymous function " 118#"
+  if ("undefined" !== typeof __REACT_DEVTOOLS_GLOBAL_HOOK__) {
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:10861:5: warning: the variable "setImmediate" was not declared in function "handleResolved"
+    setImmediate(function () {
+    ^~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15136:12: warning: the variable "fetch" was not declared in anonymous function " 358#"
+    fetch: fetch,
+           ^~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15137:14: warning: the variable "Headers" was not declared in anonymous function " 358#"
+    Headers: Headers,
+             ^~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15138:14: warning: the variable "Request" was not declared in anonymous function " 358#"
+    Request: Request,
+             ^~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15139:15: warning: the variable "Response" was not declared in anonymous function " 358#"
+    Response: Response
+              ^~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15296:24: warning: the variable "FileReader" was not declared in function "readBlobAsArrayBuffer"
+      var reader = new FileReader();
+                       ^~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15347:36: warning: the variable "Blob" was not declared in anonymous function " 369#"
+        } else if (support.blob && Blob.prototype.isPrototypeOf(body)) {
+                                   ^~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15349:40: warning: the variable "FormData" was not declared in anonymous function " 369#"
+        } else if (support.formData && FormData.prototype.isPrototypeOf(body)) {
+                                       ^~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15351:44: warning: the variable "URLSearchParams" was not declared in anonymous function " 369#"
+...e if (support.searchParams && URLSearchParams.prototype.isPrototypeOf(body...
+                                 ^~~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15470:26: warning: the variable "AbortController" was not declared in anonymous function " 375#"
+          var ctrl = new AbortController();
+                         ^~~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15604:23: warning: the variable "XMLHttpRequest" was not declared in anonymous function " 379#"
+        var xhr = new XMLHttpRequest();
+                      ^~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:15149:71: warning: the variable "self" was not declared in anonymous function " 361#"
+...undefined' && globalThis || typeof self !== 'undefined' && self ||
+                                      ^~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:25686:27: warning: the variable "performance" was not declared in anonymous function " 683#"
+  if ("object" === typeof performance && "function" === typeof performance.no...
+                          ^~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:25709:26: warning: the variable "navigator" was not declared in anonymous function " 683#"
+  "undefined" !== typeof navigator && undefined !== navigator.scheduling && u...
+                         ^~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:25819:37: warning: the variable "MessageChannel" was not declared in anonymous function " 683#"
+  };else if ("undefined" !== typeof MessageChannel) {
+                                    ^~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:25834:34: warning: the variable "nativeRuntimeScheduler" was not declared in anonymous function " 683#"
+... = "undefined" !== typeof nativeRuntimeScheduler ? nativeRuntimeScheduler....
+                             ^~~~~~~~~~~~~~~~~~~~~~
+android\app\build\generated\assets\createBundleReleaseJsAndAssets\index.android.bundle:35115:34: warning: the variable "requestAnimationFrame" was not declared in function "start 9#"
+...    this._animationFrame = requestAnimationFrame(this.onUpdate.bind(this));
+                              ^~~~~~~~~~~~~~~~~~~~~
+
+> Task :app:generateReleaseResValues
+> Task :app:mapReleaseSourceSetPaths
+> Task :app:generateReleaseResources
+> Task :app:packageReleaseResources
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease
+> Task :react-native-async-storage_async-storage:extractDeepLinksRelease
+> Task :app:parseReleaseLocalResources
+> Task :react-native-gesture-handler:extractDeepLinksRelease
+> Task :react-native-reanimated:extractDeepLinksRelease
+> Task :react-native-safe-area-context:extractDeepLinksRelease
+> Task :react-native-screens:extractDeepLinksRelease
+> Task :react-native-svg:extractDeepLinksRelease
+> Task :react-native-tts:extractDeepLinksRelease
+> Task :react-native-voice_voice:extractDeepLinksRelease
+> Task :app:processReleaseMainManifest
+> Task :app:processReleaseManifest
+> Task :react-native-async-storage_async-storage:compileReleaseLibraryResources
+> Task :react-native-gesture-handler:compileReleaseLibraryResources
+> Task :react-native-reanimated:compileReleaseLibraryResources
+> Task :react-native-safe-area-context:compileReleaseLibraryResources
+> Task :react-native-svg:compileReleaseLibraryResources
+> Task :app:processReleaseManifestForPackage
+> Task :react-native-tts:compileReleaseLibraryResources
+> Task :react-native-async-storage_async-storage:bundleLibCompileToJarRelease
+> Task :react-native-gesture-handler:bundleLibCompileToJarRelease
+> Task :react-native-safe-area-context:bundleLibCompileToJarRelease
+> Task :react-native-screens:bundleLibCompileToJarRelease
+> Task :react-native-voice_voice:compileReleaseLibraryResources
+> Task :react-native-screens:compileReleaseLibraryResources
+> Task :react-native-tts:bundleLibCompileToJarRelease
+> Task :react-native-voice_voice:bundleLibCompileToJarRelease
+> Task :app:javaPreCompileRelease
+> Task :app:extractProguardFiles
+> Task :react-native-async-storage_async-storage:writeReleaseLintModelMetadata
+> Task :react-native-async-storage_async-storage:bundleLibRuntimeToJarRelease
+> Task :react-native-gesture-handler:bundleLibRuntimeToJarRelease
+> Task :react-native-svg:bundleLibCompileToJarRelease
+> Task :app:mergeReleaseResources
+> Task :react-native-async-storage_async-storage:createFullJarRelease
+> Task :react-native-gesture-handler:createFullJarRelease
+> Task :react-native-gesture-handler:writeReleaseLintModelMetadata
+> Task :react-native-reanimated:writeReleaseLintModelMetadata
+> Task :react-native-safe-area-context:writeReleaseLintModelMetadata
+> Task :react-native-safe-area-context:bundleLibRuntimeToJarRelease
+> Task :react-native-reanimated:bundleLibRuntimeToJarRelease
+> Task :react-native-safe-area-context:createFullJarRelease
+> Task :react-native-reanimated:createFullJarRelease
+> Task :react-native-screens:writeReleaseLintModelMetadata
+> Task :react-native-screens:bundleLibRuntimeToJarRelease
+> Task :react-native-screens:createFullJarRelease
+> Task :react-native-svg:writeReleaseLintModelMetadata
+> Task :react-native-tts:bundleLibRuntimeToJarRelease
+> Task :react-native-svg:bundleLibRuntimeToJarRelease
+> Task :react-native-tts:createFullJarRelease
+> Task :react-native-svg:createFullJarRelease
+> Task :react-native-tts:writeReleaseLintModelMetadata
+> Task :react-native-voice_voice:bundleLibRuntimeToJarRelease
+> Task :react-native-voice_voice:createFullJarRelease
+> Task :react-native-voice_voice:writeReleaseLintModelMetadata
+> Task :app:mergeReleaseJniLibFolders
+> Task :react-native-async-storage_async-storage:copyReleaseJniLibsProjectOnly
+> Task :react-native-gesture-handler:copyReleaseJniLibsProjectOnly
+> Task :react-native-safe-area-context:copyReleaseJniLibsProjectOnly
+> Task :react-native-screens:copyReleaseJniLibsProjectOnly
+> Task :react-native-svg:copyReleaseJniLibsProjectOnly
+> Task :react-native-tts:copyReleaseJniLibsProjectOnly
+> Task :react-native-voice_voice:copyReleaseJniLibsProjectOnly
+> Task :react-native-reanimated:copyReleaseJniLibsProjectOnly
+> Task :app:mergeReleaseNativeLibs
+> Task :app:processReleaseResources
+> Task :app:compileReleaseKotlin NO-SOURCE
+
+> Task :app:compileReleaseJavaWithJavac FAILED
+E:\jjj\mobile\android\app\src\main\java\com\tinyteacher\MainApplication.java:60: error: cannot find symbol
+    ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
+    ^
+  symbol:   variable ReactNativeFlipper
+  location: class MainApplication
+1 error
+
+> Task :app:stripReleaseDebugSymbols
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileReleaseJavaWithJavac'.
+> Compilation failed; see the compiler error output for details.
+
+* Try:
+> Run with --info option to get more log output.
+> Run with --scan to get full insights.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 9.0.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/8.3/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 4m 52s
+??? actionable tasks: ??? executed, ?? up-to-date

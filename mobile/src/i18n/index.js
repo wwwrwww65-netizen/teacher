@@ -1,17 +1,16 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import * as Localization from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import ar from './locales/ar.json';
-import en from './locales/en.json';
+const ar = require('./locales/ar.json');
+const en = require('./locales/en.json');
 
 const LANGUAGE_KEY = '@app_language';
 
 // Get device language
+// Get device language
 const getDeviceLanguage = () => {
-    const locale = Localization.locale;
-    return locale.startsWith('ar') ? 'ar' : 'en';
+    return 'ar'; // Default to Arabic for now
 };
 
 // Get saved language or device language

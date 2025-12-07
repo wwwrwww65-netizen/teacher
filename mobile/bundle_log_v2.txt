@@ -1,0 +1,33 @@
+debug Reading Metro config from E:\jjj\mobile\metro.config.js
+                Welcome to Metro v0.80.12
+              Fast - Scalable - Integrated
+
+
+error Unable to resolve module expo-localization from E:\jjj\mobile\src\i18n\index.js: expo-localization could not be found within the project or in these directories:
+  node_modules
+[0m [90m 1 |[39m [36mimport[39m i18n [36mfrom[39m [32m'i18next'[39m[33m;[39m
+ [90m 2 |[39m [36mimport[39m { initReactI18next } [36mfrom[39m [32m'react-i18next'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mLocalization[39m [36mfrom[39m [32m'expo-localization'[39m[33m;[39m
+ [90m   |[39m                                [31m[1m^[22m[39m
+ [90m 4 |[39m [36mimport[39m [33mAsyncStorage[39m [36mfrom[39m [32m'@react-native-async-storage/async-storage'[39m[33m;[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mimport[39m ar [36mfrom[39m [32m'./locales/ar.json'[39m[33m;[39m[0m.
+Error: Unable to resolve module expo-localization from E:\jjj\mobile\src\i18n\index.js: expo-localization could not be found within the project or in these directories:
+  node_modules
+[0m [90m 1 |[39m [36mimport[39m i18n [36mfrom[39m [32m'i18next'[39m[33m;[39m
+ [90m 2 |[39m [36mimport[39m { initReactI18next } [36mfrom[39m [32m'react-i18next'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 3 |[39m [36mimport[39m [33m*[39m [36mas[39m [33mLocalization[39m [36mfrom[39m [32m'expo-localization'[39m[33m;[39m
+ [90m   |[39m                                [31m[1m^[22m[39m
+ [90m 4 |[39m [36mimport[39m [33mAsyncStorage[39m [36mfrom[39m [32m'@react-native-async-storage/async-storage'[39m[33m;[39m
+ [90m 5 |[39m
+ [90m 6 |[39m [36mimport[39m ar [36mfrom[39m [32m'./locales/ar.json'[39m[33m;[39m[0m
+    at ModuleResolver.resolveDependency (E:\jjj\mobile\node_modules\metro\src\node-haste\DependencyGraph\ModuleResolution.js:139:15)
+    at DependencyGraph.resolveDependency (E:\jjj\mobile\node_modules\metro\src\node-haste\DependencyGraph.js:232:43)
+    at E:\jjj\mobile\node_modules\metro\src\lib\transformHelpers.js:156:21
+    at resolveDependencies (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:42:25)
+    at visit (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:83:30)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async Promise.all (index 9)
+    at async visit (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:92:5)
+    at async Promise.all (index 6)
+    at async visit (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:92:5)

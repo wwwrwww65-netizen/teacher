@@ -7,10 +7,12 @@ import {
     TouchableOpacity,
     ScrollView,
     ActivityIndicator,
-    Alert
+    Alert,
+    StatusBar,
+    Platform,
+    PermissionsAndroid
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
-import * as ImagePicker from 'expo-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ClassroomScene from '../components/ClassroomScene';
 import TeacherAvatar from '../components/avatar/TeacherAvatar';
@@ -39,7 +41,31 @@ const ClassroomScreen = ({ navigation }) => {
         };
     }, []);
 
+    const requestPermissions = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const grants = await PermissionsAndroid.requestMultiple([
+                    PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+                ]);
+
+                if (grants['android.permission.RECORD_AUDIO'] === PermissionsAndroid.RESULTS.GRANTED) {
+                    console.log('Audio permission granted');
+                } else {
+                    console.log('Audio permission denied');
+                    Alert.alert('تنبيه', 'التطبيق يحتاج لصلاحية الميكروفون ليعمل');
+                }
+            } catch (err) {
+                console.warn(err);
+            }
+        }
+    };
+
     const initializeClassroom = async () => {
+        await requestPermissions();
+
         try {
             const userDataStr = await AsyncStorage.getItem('userProfile');
             if (userDataStr) {
@@ -56,7 +82,6 @@ const ClassroomScreen = ({ navigation }) => {
         setStatus('thinking');
         const response = await aiService.generateGreeting();
         await speakResponse(response);
-        startListening();
     };
 
     const startListening = async () => {
@@ -73,13 +98,16 @@ const ClassroomScreen = ({ navigation }) => {
                 setIsMicActive(false);
                 processUserMessage(userText);
             } else {
+                // Timeout or empty
                 setIsMicActive(false);
                 setStatus('idle');
-                setTranscript("اضغط على الميكروفون للتحدث");
+                setTranscript("لم أسمعك جيداً 😕");
             }
         } catch (error) {
+            console.warn("Speech Error:", error);
             setIsMicActive(false);
             setStatus('idle');
+            setTranscript("حدث خطأ في الميكروفون");
         }
     };
 
@@ -94,7 +122,7 @@ const ClassroomScreen = ({ navigation }) => {
         // التعامل مع الأوامر الخاصة
         if (response.action === 'practice_writing') {
             setWritingLetter(response.data || 'أ');
-            setTimeout(() => setIsWritingModalVisible(true), 2000);
+            setTimeout(() => setIsWritingModalVisible(true), 1500);
         } else if (response.text.includes('؟') || response.action === 'quiz') {
             setTimeout(startListening, 1000);
         } else {
@@ -129,28 +157,43 @@ const ClassroomScreen = ({ navigation }) => {
         } else {
             avatarRef.current?.resetPosition();
         }
+
+        setStatus('idle'); // Ensure status returns to idle after speaking
     };
 
     // --- Image Picker Logic ---
     const pickImage = async () => {
-        const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ImagePicker.MediaTypeOptions.Images,
-            allowsEditing: true,
-            base64: true,
-            quality: 0.5,
-        });
+        try {
+            const result = await launchCamera({
+                mediaType: 'photo',
+                includeBase64: true,
+                quality: 0.5,
+                saveToPhotos: true,
+            });
 
-        if (!result.canceled) {
+            if (result.didCancel) {
+                return;
+            }
+
+            if (result.errorMessage) {
+                Alert.alert("خطأ", result.errorMessage);
+                return;
+            }
+
             const asset = result.assets[0];
 
-            // 1. عرض الصورة على السبورة
-            whiteboardRef.current?.showImage(asset.uri);
-            avatarRef.current?.walkToBoard();
-            avatarRef.current?.pointToBoard();
+            if (asset.uri) {
+                // 1. عرض الصورة على السبورة
+                whiteboardRef.current?.showImage(asset.uri);
+                avatarRef.current?.walkToBoard();
 
-            // 2. إرسال الصورة للتحليل
-            setTranscript("جاري تحليل الصورة... 🖼️");
-            await processUserMessage("انظري لهذه الصورة، هل حلي صحيح؟", asset.base64);
+                // 2. إرسال الصورة للتحليل
+                setTranscript("جاري تحليل الصورة... 🖼️");
+                await processUserMessage("انظري لهذه الصورة، هل حلي صحيح؟", asset.base64);
+            }
+        } catch (error) {
+            console.error("ImagePicker Error:", error);
+            Alert.alert("خطأ", "حدث خطأ أثناء فتح المعرض");
         }
     };
 
@@ -191,7 +234,7 @@ const ClassroomScreen = ({ navigation }) => {
                 {/* Footer Buttons */}
                 <View style={styles.footer}>
                     {/* Camera Button */}
-                    <TouchableOpacity style={styles.secondaryButton} onPress={pickImage} disabled={status !== 'idle'}>
+                    <TouchableOpacity style={styles.secondaryButton} onPress={pickImage} disabled={status === 'speaking'}>
                         <Text style={styles.secondaryButtonIcon}>📷</Text>
                     </TouchableOpacity>
 
@@ -212,10 +255,11 @@ const ClassroomScreen = ({ navigation }) => {
                     <TouchableOpacity
                         style={styles.secondaryButton}
                         onPress={() => {
+                            // تغيير الحرف عشوائياً أو بناءً على الدرس
                             setWritingLetter('أ');
                             setIsWritingModalVisible(true);
                         }}
-                        disabled={status !== 'idle'}
+                        disabled={status === 'speaking'}
                     >
                         <Text style={styles.secondaryButtonIcon}>✏️</Text>
                     </TouchableOpacity>

@@ -1,29 +1,29 @@
-import React, { forwardRef, useImperativeHandle, useState } from 'react';
-import { View, StyleSheet, ImageBackground, Image } from 'react-native';
+import React, { forwardRef, useImperativeHandle, useState, useRef } from 'react';
+import { View, StyleSheet, ImageBackground, Image, Animated, Easing } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import Animated, {
-    useSharedValue,
-    useAnimatedProps,
-    withTiming,
-    Easing,
-} from 'react-native-reanimated';
 
+// إنشاء مكون Path قابل للتحريك
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 const ChalkboardWhiteboard = forwardRef((props, ref) => {
     const [currentPath, setCurrentPath] = useState('');
     const [imageUri, setImageUri] = useState(null); // صورة الواجب
-    const progress = useSharedValue(0);
+
+    // قيمة الحركة للرسم
+    const progress = useRef(new Animated.Value(0)).current;
 
     useImperativeHandle(ref, () => ({
         write: (svgPath, duration = 3000) => {
             setImageUri(null); // إخفاء الصورة عند الكتابة
             setCurrentPath(svgPath);
-            progress.value = 0;
-            progress.value = withTiming(1, {
-                duration,
+            progress.setValue(0);
+
+            Animated.timing(progress, {
+                toValue: 1,
+                duration: duration,
                 easing: Easing.linear,
-            });
+                useNativeDriver: true, // استخدام Native Driver للأداء
+            }).start();
         },
         showImage: (uri) => {
             setCurrentPath(''); // مسح الكتابة عند عرض الصورة
@@ -32,18 +32,17 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
         clear: () => {
             setCurrentPath('');
             setImageUri(null);
-            progress.value = 0;
+            progress.setValue(0);
         },
     }));
 
-    const animatedProps = useAnimatedProps(() => {
-        if (!currentPath) return {};
-        const pathLength = 1000;
-        const strokeDashoffset = pathLength * (1 - progress.value);
-        return {
-            strokeDasharray: [pathLength, pathLength],
-            strokeDashoffset,
-        };
+    // تحريك strokeDashoffset لمحاكاة حركة الكتابة
+    // بما أننا لا نستطيع معرفة طول المسار بدقة بدون `getTotalLength` (الذي يحتاج DOM)،
+    // سنستخدم قيمة كبيرة تقديرية (1000) ونحركها.
+    const pathLength = 1000;
+    const strokeDashoffset = progress.interpolate({
+        inputRange: [0, 1],
+        outputRange: [pathLength, 0],
     });
 
     return (
@@ -53,6 +52,9 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
                 style={styles.chalkboard}
                 resizeMode="cover"
             >
+                {/* طبقة شفافة لزيادة وضوح الكتابة */}
+                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(20, 40, 30, 0.8)' }} />
+
                 <View style={styles.drawingArea}>
                     {/* عرض صورة الواجب إذا وجدت */}
                     {imageUri ? (
@@ -71,7 +73,8 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
                                     fill="none"
                                     strokeLinecap="round"
                                     strokeLinejoin="round"
-                                    animatedProps={animatedProps}
+                                    strokeDasharray={[pathLength, pathLength]}
+                                    strokeDashoffset={strokeDashoffset}
                                 />
                             )}
                         </Svg>

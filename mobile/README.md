@@ -7,7 +7,7 @@
 **تطبيق تعليمي ذكي للأطفال (4-8 سنوات) مع معلم روبوت متحرك**
 
 [![React Native](https://img.shields.io/badge/React%20Native-0.73-blue.svg)](https://reactnative.dev/)
-[![Expo](https://img.shields.io/badge/Expo-50.0-black.svg)](https://expo.dev/)
+[![Native Build](https://img.shields.io/badge/Build-Native_Android-green.svg)]()
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 [التحميل](#-التحميل) • [الميزات](#-الميزات) • [التثبيت](#-التثبيت) • [الاستخدام](#-الاستخدام) • [المساهمة](#-المساهمة)
@@ -26,271 +26,113 @@
 - 🎯 **نظام نقاط ومكافآت** لتحفيز التعلم
 - 📚 **دروس متنوعة** (الحروف، الأرقام، الألوان، الأشكال، الحيوانات)
 
----
-
-## ✨ الميزات
-
-### 🎓 التعليم التفاعلي
-- ✅ دروس مصممة للأطفال (4-8 سنوات)
-- ✅ شخصية معلم متحركة تتكلم وتتفاعل
-- ✅ سبورة ذكية للرسم والشرح
-- ✅ اختبارات تفاعلية
-
-### 🤖 الذكاء الاصطناعي
-- ✅ التعرف على الصوت (Speech Recognition)
-- ✅ تحويل النص إلى كلام (Text-to-Speech)
-- ✅ إجابات ذكية من OpenAI
-- ✅ رسومات تلقائية على السبورة
-
-### 🎨 التصميم
-- ✅ واجهة مستخدم جذابة للأطفال
-- ✅ ألوان مرحة ومتناسقة
-- ✅ رسوم متحركة سلسة (60fps)
-- ✅ Material Design 3
-
-### 📊 التقدم والمكافآت
-- ✅ نظام نقاط ومستويات
-- ✅ إنجازات وشارات
-- ✅ إحصائيات مفصلة
-- ✅ ملف شخصي للطفل
+تم تحديث التطبيق لبناؤه كنظام Android Native كامل بدون الاعتماد على خدمات Expo في بيئة التشغيل، مما يضمن أداء أفضل واستقراراً أعلى.
 
 ---
 
-## 🚀 التثبيت
+## ✨ التحديثات والاصلالحات (Latest Fixes 🛠️)
 
-### المتطلبات
-- Node.js 18+
-- npm أو yarn
-- Expo CLI
-- Android Studio (للأندرويد) أو Xcode (لـ iOS)
+تم إجراء مجموعة شاملة من الإصلاحات لضمان عمل التطبيق بسلاسة وبناء ملف APK بنجاح:
 
-### خطوات التثبيت
+1.  **إصلاح بناء Android APK:**
+    *   تم حل مشكلة `AAPT: error: file failed to compile` من خلال تحويل جميع صور الـ Assets "المزيفة" (JPEG بامتداد PNG) إلى صور PNG حقيقية باستخدام سكريبت PowerShell مخصص.
+    *   تم تعطيل `ReactNativeFlipper` في `MainApplication.java` لحل مشاكل التوافق في البناء.
+    *   تم إضافة دالة `onCreate` المفقودة في `MainActivity.java` لمنع توقف التطبيق (Crash) عند استخدام `react-navigation`.
 
+2.  **إزالة الاعتماد على Expo:**
+    *   تم استبدال `expo-status-bar` بمكون `StatusBar` الأصلي من React Native.
+    *   تم إزالة `expo-localization` واستبداله بحل مخصص في `src/i18n/index.js`.
+    *   تم تعطيل `expo-image-picker` مؤقتاً لتجنب أخطاء الربط (Linking Errors) في البناء المحلي.
+
+3.  **تحسين واجهة المستخدم (UI/UX):**
+    *   **شريط الإشعارات (Status Bar):** تم ضبط الألوان ديناميكياً لتتناسب مع كل شاشة (داكن/فاتح) وتم توحيد خلفية الشريط مع تصميم التطبيق.
+    *   **التنقل (Navigation):** تم إعداد `React Navigation` بالكامل لربط جميع الشاشات (Login, Home, Lessons, Quiz, Classroom).
+
+4.  **إصلاحات أخرى:**
+    *   استخدام `require` بدلاً من `import` لملفات JSON في نظام الترجمة لتجنب مشاكل Metro Bundler.
+
+---
+
+## 🚀 التثبيت والتشغيل
+
+### المتطلبات المسبقة
+*   Node.js (LTS version)
+*   JDK 17 or 11
+*   Android Studio & SDK
+*   React Native CLI
+
+### 1. إعداد البيئة وتثبيت الحزم
 ```bash
-# 1. استنساخ المشروع
-git clone https://github.com/yourusername/tiny-teacher.git
-cd tiny-teacher/mobile
+# اذهب لمجلد المشروع
+cd mobile
 
-# 2. تثبيت الحزم
+# تثبيت الحزم
 npm install
-
-# 3. إضافة مفتاح OpenAI
-# افتح src/config/ApiKeys.js وضع مفتاحك:
-# OPENAI_API_KEY: "sk-YOUR_KEY_HERE"
-
-# 4. تشغيل التطبيق
-npx expo start
-
-# 5. اختر المنصة:
-# - اضغط 'a' للأندرويد
-# - اضغط 'i' لـ iOS
-# - اضغط 'w' للويب
 ```
 
----
-
-## 📱 البناء للإنتاج
-
-### بناء APK (Android)
+### 2. بناء التطبيق (APK)
+لبناء نسخة Release APK جاهزة للتثبيت على الهاتف:
 
 ```bash
-# باستخدام EAS Build (موصى به)
-npm install -g eas-cli
-eas login
-eas build --platform android --profile preview
-
-# أو بناء محلي
-npx expo prebuild --platform android
+# تشغيل أداة البناء من مجلد android
 cd android
 ./gradlew assembleRelease
 ```
+ستجد ملف الـ APK الناتج في:
+`mobile\android\app\build\outputs\apk\release\app-release.apk`
 
-### بناء IPA (iOS)
+### 3. حل مشاكل البناء (Troubleshooting)
+إذا واجهت أي مشاكل أثناء البناء، جرب تنظيف المشروع أولاً:
 
 ```bash
-eas build --platform ios --profile preview
+cd android
+./gradlew clean
+./gradlew assembleRelease
+```
+
+---
+
+## 🏗️ هيكل المشروع
+
+```
+mobile/
+├── android/                 # ملفات مشروع أندرويد الأصلي (Gradle, Manifest, Java)
+├── src/
+│   ├── components/          # المكونات القابلة لإعادة الاستخدام (Buttons, Cards, Avatar)
+│   ├── screens/             # شاشات التطبيق الكاملة
+│   │   ├── LoginScreen.js
+│   │   ├── HomeScreen.js
+│   │   ├── ClassroomScreen.js  # شاشة المعلم الذكي
+│   │   └── ...
+│   ├── services/            # الخدمات (API, AI, Voice)
+│   │   └── ArabicVoiceService.js # خدمة الصوت العربي المتقدمة
+│   ├── config/              # الإعدادات (Theme, API Keys)
+│   ├── i18n/                # ملفات الترجمة (AR/EN)
+│   └── assets/              # الصور والأيقونات
+├── App.js                   # نقطة الدخول الرئيسية وإعدادات التنقل
+├── index.js                 # تسجيل التطبيق
+└── package.json             # تعريف المشروع والسكربتات
 ```
 
 ---
 
 ## 🎯 الاستخدام
 
-### 1. تسجيل الدخول
-- افتح التطبيق
-- سجل دخول أو ادخل كضيف
-
-### 2. اختر درساً
-- من الشاشة الرئيسية، اضغط "الدروس"
-- اختر درساً (مثلاً: الحروف الأبجدية)
-
-### 3. تعلم مع المعلم
-- اضغط "▶️ شغل"
-- المعلم سيشرح الدرس
-- سيرسم على السبورة
-- استمع وتعلم!
-
-### 4. استخدم المعلم الذكي
-- اضغط "🤖 المعلم" من الشاشة الرئيسية
-- تحدث مع المعلم
-- اسأل أي سؤال
-- المعلم سيجيب ويرسم على السبورة
+1.  **تسجيل الدخول:** استخدم أي بريد إلكتروني وكلمة مرور (لغرض التجربة والديمو) أو ادخل كـ "ضيف".
+2.  **لوحة التحكم:** ابدأ رحلة التعلم عبر الدروس، أو اذهب مباشرة إلى "المعلم".
+3.  **الفصل الذكي:** تحدث مع المعلم بالصوت، وسيرد عليك ويشرح لك ويرسم على السبورة.
+4.  **الاختبارات:** اختبر معلوماتك واحصل على نتائج فورية.
 
 ---
 
-## 🏗️ البنية التقنية
+## 🔧 أدوات مفيدة (Scripts)
 
-### التقنيات المستخدمة
-
-```
-Frontend:
-├── React Native 0.73
-├── Expo 50.0
-├── React Navigation 6
-├── Reanimated 3 (للحركات)
-└── React Native SVG (للرسم)
-
-Backend/Services:
-├── OpenAI API (الذكاء الاصطناعي)
-├── React Native TTS (النطق)
-├── React Native Voice (التعرف على الصوت)
-└── AsyncStorage (التخزين المحلي)
-
-Design:
-├── Material Design 3
-├── Custom Theme System
-└── Responsive Layout
-```
-
-### هيكل المشروع
-
-```
-mobile/
-├── src/
-│   ├── components/
-│   │   ├── avatar/          # الشخصية المتحركة
-│   │   ├── Button.js        # مكون الزر
-│   │   ├── Card.js          # مكون البطاقة
-│   │   └── Whiteboard.js    # السبورة
-│   ├── screens/
-│   │   ├── LoginScreen.js
-│   │   ├── HomeScreen.js
-│   │   ├── LessonsScreen.js
-│   │   ├── LessonDetailScreen.js
-│   │   ├── ClassroomScreen.js
-│   │   └── ProfileScreen.js
-│   ├── services/
-│   │   └── AIService.js     # خدمة OpenAI
-│   ├── config/
-│   │   ├── theme.js         # نظام الألوان
-│   │   └── ApiKeys.js       # المفاتيح
-│   └── data/
-│       └── lessons.js       # بيانات الدروس
-├── assets/                  # الصور والأيقونات
-├── App.js                   # نقطة الدخول
-└── app.json                 # تكوين Expo
-```
-
----
-
-## 🎨 لقطات الشاشة
-
-### الشاشة الرئيسية
-![Home Screen](./screenshots/home.png)
-
-### الدروس
-![Lessons](./screenshots/lessons.png)
-
-### المعلم التفاعلي
-![Teacher](./screenshots/classroom.png)
-
----
-
-## 🔧 التكوين
-
-### إعداد OpenAI API
-
-1. احصل على مفتاح من: https://platform.openai.com/api-keys
-2. افتح `src/config/ApiKeys.js`
-3. ضع المفتاح:
-
-```javascript
-export const API_KEYS = {
-  OPENAI_API_KEY: "sk-YOUR_KEY_HERE",
-};
-```
-
-### تخصيص الألوان
-
-افتح `src/config/theme.js` وعدل الألوان:
-
-```javascript
-export const theme = {
-  colors: {
-    primary: '#5B8DEF',      // اللون الأساسي
-    secondary: '#FFB84D',    // اللون الثانوي
-    // ...
-  },
-};
-```
-
----
-
-## 📚 الدروس المتوفرة
-
-1. **الحروف الأبجدية** (A-Z)
-2. **الأرقام** (1-10)
-3. **الألوان** (الأحمر، الأزرق، الأصفر...)
-4. **الأشكال** (مربع، دائرة، مثلث...)
-5. **الحيوانات** (كلب، قطة، طائر...)
-
----
-
-## 🤝 المساهمة
-
-نرحب بالمساهمات! إذا كنت تريد المساعدة:
-
-1. Fork المشروع
-2. أنشئ branch جديد (`git checkout -b feature/AmazingFeature`)
-3. Commit التغييرات (`git commit -m 'Add some AmazingFeature'`)
-4. Push إلى Branch (`git push origin feature/AmazingFeature`)
-5. افتح Pull Request
-
----
-
-## 📄 الترخيص
-
-هذا المشروع مرخص تحت MIT License - انظر ملف [LICENSE](LICENSE) للتفاصيل.
-
----
-
-## 👥 الفريق
-
-- **المطور**: [اسمك]
-- **التصميم**: AI-Generated Assets
-- **المحتوى التعليمي**: فريق Tiny Teacher
-
----
-
-## 📞 التواصل
-
-- **Email**: support@tinyteacher.com
-- **Website**: www.tinyteacher.com
-- **GitHub**: https://github.com/yourusername/tiny-teacher
-
----
-
-## 🙏 شكر خاص
-
-- [Expo](https://expo.dev/) - منصة التطوير
-- [OpenAI](https://openai.com/) - الذكاء الاصطناعي
-- [React Native](https://reactnative.dev/) - إطار العمل
+تم إنشاء أدوات مساعدة أثناء عملية الإصلاح، تجدها في المجلد الرئيسي:
+*   `fix_assets.ps1`: لإصلاح صور الـ PNG التالفة أو المزيفة في مجلد `assets`.
+*   `rename_icons.ps1`: لإصلاح أيقونات التطبيق في مجلدات `android/app/src/main/res`.
 
 ---
 
 <div align="center">
-
 **صنع بـ ❤️ للأطفال في كل مكان**
-
-⭐ إذا أعجبك المشروع، لا تنسَ إعطاءه نجمة!
-
 </div>

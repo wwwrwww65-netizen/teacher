@@ -9,8 +9,9 @@ import {
     Platform,
     Image,
     TouchableOpacity,
+    StatusBar // Use RN StatusBar
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Button from '../components/Button';
 import { theme } from '../config/theme';
@@ -53,7 +54,7 @@ const LoginScreen = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar style="dark" />
+            <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={styles.content}

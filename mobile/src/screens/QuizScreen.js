@@ -11,7 +11,7 @@ import {
 import { getQuizById } from '../services/api';
 
 export default function QuizScreen({ route, navigation }) {
-    const { quizId } = route.params;
+    const quizId = route.params?.quizId;
     const [quiz, setQuiz] = useState(null);
     const [answers, setAnswers] = useState({});
     const [score, setScore] = useState(null);

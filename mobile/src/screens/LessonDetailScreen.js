@@ -7,8 +7,9 @@ import {
     TouchableOpacity,
     ScrollView,
     ActivityIndicator,
+    StatusBar
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+// import { StatusBar } from 'expo-status-bar';
 import ClassroomScene from '../components/ClassroomScene';
 import TeacherAvatar from '../components/avatar/TeacherAvatar';
 import ChalkboardWhiteboard from '../components/ChalkboardWhiteboard';
@@ -130,7 +131,7 @@ const LessonDetailScreen = ({ route, navigation }) => {
     return (
         <ClassroomScene>
             <SafeAreaView style={styles.container}>
-                <StatusBar style="light" />
+                <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
 
                 {/* Header */}
                 <View style={styles.header}>

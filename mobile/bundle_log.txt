@@ -1,0 +1,33 @@
+debug Reading Metro config from E:\jjj\mobile\metro.config.js
+                Welcome to Metro v0.80.12
+              Fast - Scalable - Integrated
+
+
+error Unable to resolve module expo-status-bar from E:\jjj\mobile\src\screens\LoginScreen.js: expo-status-bar could not be found within the project or in these directories:
+  node_modules
+[0m [90m 11 |[39m     [33mTouchableOpacity[39m[33m,[39m
+ [90m 12 |[39m } [36mfrom[39m [32m'react-native'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 13 |[39m [36mimport[39m { [33mStatusBar[39m } [36mfrom[39m [32m'expo-status-bar'[39m[33m;[39m
+ [90m    |[39m                            [31m[1m^[22m[39m
+ [90m 14 |[39m [36mimport[39m [33mAsyncStorage[39m [36mfrom[39m [32m'@react-native-async-storage/async-storage'[39m[33m;[39m
+ [90m 15 |[39m [36mimport[39m [33mButton[39m [36mfrom[39m [32m'../components/Button'[39m[33m;[39m
+ [90m 16 |[39m [36mimport[39m { theme } [36mfrom[39m [32m'../config/theme'[39m[33m;[39m[0m.
+Error: Unable to resolve module expo-status-bar from E:\jjj\mobile\src\screens\LoginScreen.js: expo-status-bar could not be found within the project or in these directories:
+  node_modules
+[0m [90m 11 |[39m     [33mTouchableOpacity[39m[33m,[39m
+ [90m 12 |[39m } [36mfrom[39m [32m'react-native'[39m[33m;[39m
+[31m[1m>[22m[39m[90m 13 |[39m [36mimport[39m { [33mStatusBar[39m } [36mfrom[39m [32m'expo-status-bar'[39m[33m;[39m
+ [90m    |[39m                            [31m[1m^[22m[39m
+ [90m 14 |[39m [36mimport[39m [33mAsyncStorage[39m [36mfrom[39m [32m'@react-native-async-storage/async-storage'[39m[33m;[39m
+ [90m 15 |[39m [36mimport[39m [33mButton[39m [36mfrom[39m [32m'../components/Button'[39m[33m;[39m
+ [90m 16 |[39m [36mimport[39m { theme } [36mfrom[39m [32m'../config/theme'[39m[33m;[39m[0m
+    at ModuleResolver.resolveDependency (E:\jjj\mobile\node_modules\metro\src\node-haste\DependencyGraph\ModuleResolution.js:139:15)
+    at DependencyGraph.resolveDependency (E:\jjj\mobile\node_modules\metro\src\node-haste\DependencyGraph.js:232:43)
+    at E:\jjj\mobile\node_modules\metro\src\lib\transformHelpers.js:156:21
+    at resolveDependencies (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:42:25)
+    at visit (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:83:30)
+    at async Promise.all (index 2)
+    at async visit (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:92:5)
+    at async Promise.all (index 2)
+    at async visit (E:\jjj\mobile\node_modules\metro\src\DeltaBundler\buildSubgraph.js:92:5)
+    at async Promise.all (index 0)

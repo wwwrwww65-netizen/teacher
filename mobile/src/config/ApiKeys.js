@@ -19,3 +19,6 @@ export const API_CONFIG = {
     // gpt-4o أفضل في توليد رسومات SVG دقيقة.
     OPENAI_MODEL: "gpt-4o",
 };
+
+// Export for AIService compatibility
+export const API_KEY = API_KEYS.OPENAI_API_KEY;

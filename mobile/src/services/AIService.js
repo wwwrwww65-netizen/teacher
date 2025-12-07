@@ -1,6 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_KEY } from '../config/ApiKeys';
+
+// استخدام نفس مفتاح Google Cloud المستخدم للصوت
+const GOOGLE_API_KEY = 'AIzaSyCd4HQDcNeF6WztPhTOhUbcoiqZi79Q5ug';
 
 class AIService {
     constructor() {
@@ -13,7 +15,6 @@ class AIService {
         this.loadMemory();
     }
 
-    // ... (loadMemory, saveMemory, setUserProfile methods remain the same) ...
     async loadMemory() {
         try {
             const savedContext = await AsyncStorage.getItem('ai_memory');
@@ -34,84 +35,95 @@ class AIService {
     }
 
     /**
-     * المحادثة مع دعم الصور (Vision)
-     * @param {string} userMessage - رسالة المستخدم
-     * @param {string} base64Image - (اختياري) صورة الواجب
+     * المحادثة باستخدام Google Gemini AI
      */
     async chat(userMessage, base64Image = null) {
         try {
-            const systemPrompt = `
-        أنتِ معلمة ذكية "تيني".
-        
-        القدرات الجديدة:
-        1. **تحليل الصور**: إذا أرسل الطفل صورة واجب، حلليها بدقة. صححي الأخطاء واشرحي الحل.
-        2. **تعليم الكتابة**: إذا أردتِ تعليم الطفل حرفاً، اطلبي منه كتابته.
-           - استخدمي action: "practice_writing"
-           - ضعي الحرف في data: "أ"
-        
-        Format Response JSON:
-        {
-          "text": "الرد",
-          "draw": "SVG path (optional)",
-          "action": "listening|quiz|explain_board|talk_center|practice_writing|idle",
-          "emotion": "happy|surprised|thinking|neutral",
-          "data": "أي بيانات إضافية (مثل الحرف المراد كتابته)"
-        }
-      `;
+            const systemPrompt = `أنتِ معلمة ذكية اسمها "تيني" تعلم الأطفال.
 
-            // تجهيز محتوى الرسالة
-            let userContent = [{ type: "text", text: userMessage }];
+القدرات:
+1. شرح الدروس بطريقة بسيطة وممتعة
+2. الرسم على السبورة (SVG paths)
+3. تشجيع الطفل
 
-            if (base64Image) {
-                userContent.push({
-                    type: "image_url",
-                    image_url: {
-                        url: `data:image/jpeg;base64,${base64Image}`
-                    }
-                });
-            }
+عند الرد، استخدم JSON بهذا الشكل:
+{
+  "text": "الرد بالعربية",
+  "draw": "SVG path للرسم على السبورة (اختياري)",
+  "action": "listening أو explain_board أو idle",
+  "emotion": "happy أو surprised أو thinking أو neutral"
+}
 
-            this.context.push({ role: 'user', content: userContent });
+مثال للرسم: حرف الألف = "M150 50 L150 200 M150 50 L130 30 M150 50 L170 30"`;
 
+            // بناء المحادثة
+            let conversationHistory = this.context.slice(-5).map(msg => {
+                if (typeof msg.content === 'string') {
+                    return msg.role === 'user' ? `الطفل: ${msg.content}` : `المعلمة: ${msg.content}`;
+                }
+                return msg.role === 'user' ? `الطفل: ${msg.content[0]?.text || ''}` : `المعلمة: ${msg.content}`;
+            }).join('\n');
+
+            const fullPrompt = `${systemPrompt}\n\nالمحادثة السابقة:\n${conversationHistory}\n\nالطفل الآن: ${userMessage}\n\nردك (JSON فقط):`;
+
+            // استدعاء Google Gemini API
             const response = await axios.post(
-                'https://api.openai.com/v1/chat/completions',
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GOOGLE_API_KEY}`,
                 {
-                    model: "gpt-4o",
-                    messages: [
-                        { role: "system", content: systemPrompt },
-                        ...this.context.slice(-10)
-                    ],
-                    response_format: { type: "json_object" },
-                    max_tokens: 500
+                    contents: [{
+                        parts: [{
+                            text: fullPrompt
+                        }]
+                    }],
+                    generationConfig: {
+                        temperature: 0.7,
+                        maxOutputTokens: 500,
+                    }
                 },
                 {
                     headers: {
-                        'Authorization': `Bearer ${API_KEY}`,
                         'Content-Type': 'application/json',
                     },
                 }
             );
 
-            const aiResponse = JSON.parse(response.data.choices[0].message.content);
+            // استخراج الرد
+            const aiText = response.data.candidates[0].content.parts[0].text;
 
-            // حفظ الرد كنص فقط في الذاكرة لتوفير المساحة
+            // محاولة تحليل JSON
+            let aiResponse;
+            try {
+                // إزالة markdown code blocks إذا وجدت
+                const cleanedText = aiText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+                aiResponse = JSON.parse(cleanedText);
+            } catch (parseError) {
+                // إذا فشل التحليل، استخدم النص مباشرة
+                aiResponse = {
+                    text: aiText,
+                    action: "listening",
+                    emotion: "happy"
+                };
+            }
+
+            // حفظ في الذاكرة
+            this.context.push({ role: 'user', content: userMessage });
             this.context.push({ role: 'assistant', content: aiResponse.text });
             this.saveMemory();
 
             return aiResponse;
 
         } catch (error) {
-            console.error('AI Service Error:', error);
+            console.error('Google Gemini Error:', error);
             return {
-                text: "حدث خطأ في الاتصال، هل يمكنك المحاولة مرة أخرى؟",
+                text: "عذراً، لم أفهم جيداً. هل يمكنك الإعادة؟",
                 action: "listening",
-                emotion: "surprised"
+                emotion: "thinking"
             };
         }
     }
 
     async generateGreeting() {
-        return this.chat(`الطفل ${this.userProfile.name} موجود. رحب به.`);
+        return this.chat(`الطفل ${this.userProfile.name} موجود. رحب به بحماس.`);
     }
 }
 
