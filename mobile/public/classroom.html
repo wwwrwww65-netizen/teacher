@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2.5D Teacher</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            overflow: hidden;
+            background-color: transparent;
+        }
+
+        #loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: sans-serif;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+    </style>
+    <!-- Import Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="loader">Loading Teacher...</div>
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- Config ---
+        const BACKGROUND_IMAGE = 'classroom_bg.jpg';
+        // New Assets
+        const TEACHER_IDLE = 'teacher_idle.png';
+        const TEACHER_FRAME_1 = 'teacher_frame_1.png';
+        const TEACHER_FRAME_2 = 'teacher_frame_2.png';
+        const TEACHER_FRAME_3 = 'teacher_frame_3.png';
+
+        let scene, camera, renderer;
+        let teacherMesh, uniforms;
+        let textures = {};
+        const clock = new THREE.Clock();
+
+        let isTalking = false;
+        let currentFrame = 0;
+        let frameTime = 0;
+        const FRAME_DURATION = 0.15; // Speed of animation
+
+        // Movement State
+        let targetPosition = new THREE.Vector3(0, 0, 0);
+        const WALK_SPEED = 2.0;
+        const BOARD_X = 1.2; // Position near the board
+        const CENTER_X = 0.0; // Position at center
+
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+            // Optimized camera for full teacher view
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 0.0, 4.0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            const manager = new THREE.LoadingManager();
+
+            manager.onLoad = () => {
+                console.log('✅ All textures loaded!');
+                createTeacherSprite();
+                document.getElementById('loader').style.display = 'none';
+                sendMessage('READY', 'Teacher Loaded');
+            };
+
+            manager.onProgress = (url, loaded, total) => {
+                console.log(`📦 Loading: ${url} (${loaded}/${total})`);
+            };
+
+            manager.onError = (url) => {
+                console.error(`❌ Error loading: ${url}`);
+            };
+
+            const loader = new THREE.TextureLoader(manager);
+
+            // 1. Load Background
+            loader.load(BACKGROUND_IMAGE, (bgTex) => {
+                bgTex.colorSpace = THREE.SRGBColorSpace;
+                scene.background = bgTex;
+            });
+
+            // 2. Load Teacher Frames
+            textures['idle'] = loader.load(TEACHER_IDLE);
+            textures['frame1'] = loader.load(TEACHER_FRAME_1);
+            textures['frame2'] = loader.load(TEACHER_FRAME_2);
+            textures['frame3'] = loader.load(TEACHER_FRAME_3);
+
+            // Configure color space
+            for (const key in textures) {
+                textures[key].colorSpace = THREE.SRGBColorSpace;
+                textures[key].minFilter = THREE.LinearFilter;
+                textures[key].magFilter = THREE.LinearFilter;
+            }
+
+            window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('teacher-control', handleControlEvent);
+        }
+
+        function createTeacherSprite() {
+            // Square plane to match 1024x1024 image ratio
+            const geometry = new THREE.PlaneGeometry(3.0, 3.0);
+
+            // --- CHROMA KEY SHADER ---
+            uniforms = {
+                uTexture: { value: textures['idle'] },
+                uTime: { value: 0 },
+                uIsTalking: { value: 0.0 }
+            };
+
+            const material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                transparent: true,
+                side: THREE.DoubleSide,
+                vertexShader: `
+                    uniform float uTime;
+                    uniform float uIsTalking;
+                    varying vec2 vUv;
+
+                    void main() {
+                        vUv = uv;
+                        vec3 pos = position;
+
+                        // LIVE ANIMATION: Idle Breathing
+                        float breath = sin(uTime * 2.5) * 0.015;
+                        pos.y += breath * uv.y; 
+                        
+                        // Talking Bounce
+                        if (uIsTalking > 0.5) {
+                            pos.y += abs(sin(uTime * 18.0)) * 0.04;
+                        }
+
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler2D uTexture;
+                    varying vec2 vUv;
+
+                    void main() {
+                        vec4 color = texture2D(uTexture, vUv);
+                        
+                        // 1. Green Screen Removal
+                        if (color.g > 0.4 && color.r < 0.4 && color.b < 0.4) {
+                            discard;
+                        }
+
+                        // 2. White Background Removal
+                        float distWhite = distance(color.rgb, vec3(1.0, 1.0, 1.0));
+                        if (distWhite < 0.1) {
+                            discard;
+                        }
+
+                        gl_FragColor = color;
+                    }
+                `
+            });
+
+            teacherMesh = new THREE.Mesh(geometry, material);
+            // Position: Centered (0.0)
+            teacherMesh.position.set(0.0, 0.0, 0);
+            scene.add(teacherMesh);
+
+            // Simple Shadow
+            const shadow = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.0, 0.5),
+                new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.2 })
+            );
+            shadow.rotation.x = -Math.PI / 2;
+            shadow.position.set(0.0, -1.5, 0);
+            scene.add(shadow);
+        }
+
+        function handleControlEvent(e) {
+            const data = e.detail;
+            if (!data) return;
+            switch (data.type) {
+                case 'startTalking': isTalking = true; break;
+                case 'stopTalking': isTalking = false; break;
+                case 'walkToBoard': targetPosition.x = BOARD_X; break;
+                case 'walkToCenter': targetPosition.x = CENTER_X; break;
+                case 'playAnimation': break;
+            }
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function sendMessage(type, message) {
+            const msg = JSON.stringify({ type, message });
+            if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(msg);
+            else if (window.parent) window.parent.postMessage(msg, '*');
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            if (teacherMesh && uniforms) {
+                uniforms.uTime.value = time;
+                uniforms.uIsTalking.value = isTalking ? 1.0 : 0.0;
+
+                // --- MOVEMENT LOGIC (Walking) ---
+                const dist = targetPosition.x - teacherMesh.position.x;
+                const isWalking = Math.abs(dist) > 0.05;
+
+                if (isWalking) {
+                    // Move towards target
+                    const dir = Math.sign(dist);
+                    teacherMesh.position.x += dir * WALK_SPEED * delta;
+
+                    // Prevent overshooting
+                    if ((dir > 0 && teacherMesh.position.x > targetPosition.x) ||
+                        (dir < 0 && teacherMesh.position.x < targetPosition.x)) {
+                        teacherMesh.position.x = targetPosition.x;
+                    }
+
+                    // Walking Bounce (Stronger than idle)
+                    teacherMesh.position.y = 0.0 + Math.abs(Math.sin(time * 10.0)) * 0.1;
+
+                    // Shadow follows
+                    // shadow is defined in init scope? No, createTeacherSprite scope.
+                    // We need global access to shadow or query it.
+                    const shadow = scene.children.find(c => c.type === 'Mesh' && c.geometry.type === 'PlaneGeometry' && c.position.y < -1.0);
+                    if (shadow) shadow.position.x = teacherMesh.position.x;
+
+                } else {
+                    // Snap to target if stopped
+                    if (Math.abs(teacherMesh.position.x - targetPosition.x) < 0.05) {
+                        teacherMesh.position.x = targetPosition.x;
+                    }
+
+                    // --- TALKING / IDLE LOGIC ---
+                    // ... (existing logic) ...
+
+                    // --- FRAME ANIMATION LOGIC ---
+                    let currentTex = textures['idle'];
+
+                    if (isTalking) {
+                        frameTime += delta;
+                        if (frameTime > FRAME_DURATION) {
+                            frameTime = 0;
+                            currentFrame = (currentFrame + 1) % 3;
+                        }
+
+                        if (currentFrame === 0) currentTex = textures['frame1'];
+                        if (currentFrame === 1) currentTex = textures['frame2'];
+                        if (currentFrame === 2) currentTex = textures['frame3'];
+
+                        // Add subtle bounce (Base Y = 0.0)
+                        teacherMesh.position.y = 0.0 + Math.sin(clock.elapsedTime * 10) * 0.02;
+
+                    } else {
+                        currentTex = textures['idle'];
+                        currentFrame = 0; // Reset
+
+                        // Idle Breathing (Base Y = 0.0)
+                        teacherMesh.position.y = 0.0 + Math.sin(clock.elapsedTime * 2) * 0.01;
+                    }
+
+                    uniforms.uTexture.value = currentTex;
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+
+</html>

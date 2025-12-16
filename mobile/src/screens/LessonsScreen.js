@@ -3,26 +3,28 @@ import {
     View,
     Text,
     StyleSheet,
-    SafeAreaView,
+    // SafeAreaView, // Use from context
     ScrollView,
     TouchableOpacity,
     StatusBar
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 // import { StatusBar } from 'expo-status-bar';
 import Card from '../components/Card';
 import { theme } from '../config/theme';
 import { lessons } from '../data/lessons';
 
 const LessonsScreen = ({ navigation }) => {
+    console.log('📚 LessonsScreen Rendered');
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
             <StatusBar barStyle="dark-content" />
 
             <View style={styles.header}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Text style={styles.backButton}>←</Text>
                 </TouchableOpacity>
-                <Text style={styles.title}>الدروس</Text>
+                <Text style={styles.title}>الدروس المتاحة</Text>
                 <View style={{ width: 40 }} />
             </View>
 
@@ -34,7 +36,17 @@ const LessonsScreen = ({ navigation }) => {
                     <Card
                         key={lesson.id}
                         style={styles.lessonCard}
-                        onPress={() => navigation.navigate('LessonDetail', { lesson })}
+                        onPress={() => {
+                            if (lesson.mode === 'ai_classroom') {
+                                console.log('🚀 Navigating to AI Classroom Lesson:', lesson.id);
+                                navigation.navigate('Classroom', {
+                                    mode: 'lesson',
+                                    prompt: lesson.prompt
+                                });
+                            } else {
+                                navigation.navigate('LessonDetail', { lesson });
+                            }
+                        }}
                     >
                         <View style={styles.lessonContent}>
                             <Text style={styles.lessonIcon}>{lesson.icon}</Text>
@@ -47,9 +59,11 @@ const LessonsScreen = ({ navigation }) => {
                                     <Text style={styles.lessonLevel}>
                                         {lesson.level === 'beginner' ? '🟢 مبتدئ' : '🟡 متوسط'}
                                     </Text>
-                                    <Text style={styles.lessonTopics}>
-                                        📝 {lesson.topics.length} موضوع
-                                    </Text>
+                                    {lesson.topics && (
+                                        <Text style={styles.lessonTopics}>
+                                            📝 {lesson.topics.length} موضوع
+                                        </Text>
+                                    )}
                                 </View>
                             </View>
                             <Text style={styles.arrow}>→</Text>

@@ -7,191 +7,225 @@ import {
     SafeAreaView,
     KeyboardAvoidingView,
     Platform,
-    Image,
-    TouchableOpacity,
-    StatusBar // Use RN StatusBar
+    StatusBar,
+    ScrollView,
+    TouchableOpacity
 } from 'react-native';
-// import { StatusBar } from 'expo-status-bar';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Button from '../components/Button';
+import BouncyButton from '../components/BouncyButton';
 import { theme } from '../config/theme';
+import { soundService } from '../services/SoundService';
+import Svg, { Defs, LinearGradient, Stop, Rect, Circle } from 'react-native-svg';
 
 const LoginScreen = ({ navigation }) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
+    const [name, setName] = useState('');
+    const [selectedAvatar, setSelectedAvatar] = useState('👦');
+
+    const avatars = ['👦', '👧', '🦁', '🐰', '🦊', '🐱'];
 
     const handleLogin = async () => {
-        setLoading(true);
-
-        // Simulate API call
-        setTimeout(async () => {
-            // For demo: accept any email/password
-            await AsyncStorage.setItem('token', 'demo-token');
-            await AsyncStorage.setItem('user', JSON.stringify({
-                name: 'طفل صغير',
-                email,
-                avatar: '👦',
-                level: 1,
-                points: 0,
-            }));
-            setLoading(false);
-            navigation.replace('Home');
-        }, 1000);
-    };
-
-    const handleGuestLogin = async () => {
-        await AsyncStorage.setItem('token', 'guest-token');
-        await AsyncStorage.setItem('user', JSON.stringify({
-            name: 'ضيف',
-            email: 'guest@tinyteacher.com',
-            avatar: '👤',
+        soundService.playSuccess();
+        const user = {
+            name: name || 'البطل الصغير',
+            avatar: selectedAvatar,
             level: 1,
-            points: 0,
-        }));
-        navigation.replace('Home');
+            points: 50
+        };
+        try {
+            await AsyncStorage.setItem('user', JSON.stringify(user));
+        } catch (e) {
+            console.log('AsyncStorage error', e); 
+        }
+        if (navigation && navigation.replace) {
+            navigation.replace('Home');
+        } else {
+            console.log('Navigation not available, but Login Logic executed.');
+            alert('Login Successful! (Navigation mocked)');
+        }
     };
+
+    // Background Gradient Component
+    const Background = () => (
+        <View style={StyleSheet.absoluteFill}>
+            <Svg height="100%" width="100%">
+                <Defs>
+                    <LinearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <Stop offset="0" stopColor="#E0F7FA" stopOpacity="1" />
+                        <Stop offset="1" stopColor="#F8FAFC" stopOpacity="1" />
+                    </LinearGradient>
+                </Defs>
+                <Rect x="0" y="0" width="100%" height="100%" fill="url(#bgGrad)" />
+                {/* Decorative Circles */}
+                <Circle cx="10%" cy="10%" r="50" fill={theme.colors.primary} opacity="0.1" />
+                <Circle cx="90%" cy="20%" r="80" fill={theme.colors.secondary} opacity="0.1" />
+                <Circle cx="30%" cy="80%" r="60" fill={theme.colors.accent} opacity="0.1" />
+            </Svg>
+        </View>
+    );
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor={theme.colors.background} />
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.content}
-            >
-                {/* Logo/Mascot */}
-                <View style={styles.header}>
-                    <Text style={styles.logo}>🤖</Text>
-                    <Text style={styles.title}>Tiny Teacher</Text>
-                    <Text style={styles.subtitle}>تعلم مع المعلم الصغير</Text>
-                </View>
+        <View style={styles.container}>
+            <Background />
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
-                {/* Form */}
-                <View style={styles.form}>
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>البريد الإلكتروني</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="your@email.com"
-                            value={email}
-                            onChangeText={setEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                    </View>
+            <SafeAreaView style={{ flex: 1 }}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={{ flex: 1 }}
+                >
+                    <ScrollView contentContainerStyle={styles.scrollContent}>
 
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.label}>كلمة المرور</Text>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="••••••••"
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry
-                        />
-                    </View>
+                        <View style={styles.mascotContainer}>
+                            <Text style={styles.mascot}>🤖</Text>
+                            <Text style={styles.title}>أهلاً بك يا بطل!</Text>
+                            <Text style={styles.subtitle}>المدرس الصغير ينتظرك</Text>
+                        </View>
 
-                    <Button
-                        title="تسجيل الدخول"
-                        onPress={handleLogin}
-                        loading={loading}
-                        fullWidth
-                        style={styles.loginButton}
-                    />
+                        <View style={styles.card}>
+                            <Text style={styles.label}>اختر شكلك المفضل</Text>
+                            <View style={styles.avatarGrid}>
+                                {avatars.map((av, index) => (
+                                    <BouncyButton
+                                        key={index}
+                                        onPress={() => {
+                                            soundService.playPop();
+                                            setSelectedAvatar(av);
+                                        }}
+                                        style={[
+                                            styles.avatarItem,
+                                            selectedAvatar === av && styles.avatarSelected
+                                        ]}
+                                    >
+                                        <Text style={styles.avatarText}>{av}</Text>
+                                    </BouncyButton>
+                                ))}
+                            </View>
 
-                    <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                        <Text style={styles.link}>ليس لديك حساب؟ سجل الآن</Text>
-                    </TouchableOpacity>
+                            <Text style={styles.label}>ما اسمك؟</Text>
+                            <View style={styles.inputWrapper}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="اكتب اسمك هنا..."
+                                    placeholderTextColor="#A0AEC0"
+                                    value={name}
+                                    onChangeText={setName}
+                                    textAlign="right"
+                                />
+                            </View>
 
-                    <View style={styles.divider}>
-                        <View style={styles.dividerLine} />
-                        <Text style={styles.dividerText}>أو</Text>
-                        <View style={styles.dividerLine} />
-                    </View>
+                            <BouncyButton
+                                onPress={handleLogin}
+                                style={styles.loginButton}
+                                soundName="success"
+                            >
+                                <Text style={styles.loginButtonText}>ابدأ المغامرة 🚀</Text>
+                            </BouncyButton>
+                        </View>
 
-                    <Button
-                        title="الدخول كضيف"
-                        onPress={handleGuestLogin}
-                        variant="outline"
-                        fullWidth
-                    />
-                </View>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: theme.colors.background,
+        backgroundColor: '#fff',
     },
-    content: {
-        flex: 1,
-        padding: theme.spacing.xl,
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: 'center',
+        padding: theme.spacing.lg,
     },
-    header: {
+    mascotContainer: {
         alignItems: 'center',
-        marginBottom: theme.spacing.xxl,
+        marginBottom: theme.spacing.xl,
     },
-    logo: {
+    mascot: {
         fontSize: 80,
-        marginBottom: theme.spacing.md,
+        marginBottom: theme.spacing.sm,
+        textShadowColor: 'rgba(0,0,0,0.1)',
+        textShadowOffset: { width: 0, height: 4 },
+        textShadowRadius: 8,
     },
     title: {
-        fontSize: theme.fontSize.xxxl,
+        fontSize: theme.fontSize.xxl,
         fontWeight: theme.fontWeight.bold,
-        color: theme.colors.primary,
+        color: theme.colors.text,
         marginBottom: theme.spacing.xs,
     },
     subtitle: {
         fontSize: theme.fontSize.md,
         color: theme.colors.textSecondary,
     },
-    form: {
-        width: '100%',
-    },
-    inputContainer: {
-        marginBottom: theme.spacing.lg,
+    card: {
+        backgroundColor: '#fff',
+        borderRadius: theme.borderRadius.xl,
+        padding: theme.spacing.xl,
+        ...theme.shadows.lg,
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
     },
     label: {
-        fontSize: theme.fontSize.sm,
-        fontWeight: theme.fontWeight.medium,
+        fontSize: theme.fontSize.md,
+        fontWeight: theme.fontWeight.bold,
         color: theme.colors.text,
-        marginBottom: theme.spacing.sm,
+        marginBottom: theme.spacing.md,
+        textAlign: 'center',
+    },
+    avatarGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: theme.spacing.md,
+        marginBottom: theme.spacing.xl,
+    },
+    avatarItem: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: '#F7FAFC',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: 'transparent',
+    },
+    avatarSelected: {
+        borderColor: theme.colors.primary,
+        backgroundColor: '#E0F2FE',
+        transform: [{ scale: 1.1 }],
+    },
+    avatarText: {
+        fontSize: 30,
+    },
+    inputWrapper: {
+        marginBottom: theme.spacing.xl,
+        backgroundColor: '#F7FAFC',
+        borderRadius: theme.borderRadius.lg,
+        borderWidth: 2,
+        borderColor: '#E2E8F0',
+        paddingHorizontal: theme.spacing.md,
     },
     input: {
-        backgroundColor: theme.colors.surface,
-        borderRadius: theme.borderRadius.md,
-        padding: theme.spacing.md,
-        fontSize: theme.fontSize.md,
-        borderWidth: 1,
-        borderColor: theme.colors.border,
+        paddingVertical: theme.spacing.md,
+        fontSize: theme.fontSize.lg,
+        color: theme.colors.text,
+        textAlign: 'right', // Force RTL for Arabic name
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'Roboto', // Ideally nice font
     },
     loginButton: {
-        marginTop: theme.spacing.md,
-    },
-    link: {
-        textAlign: 'center',
-        color: theme.colors.primary,
-        fontSize: theme.fontSize.sm,
-        marginTop: theme.spacing.md,
-    },
-    divider: {
-        flexDirection: 'row',
+        backgroundColor: theme.colors.primary,
+        paddingVertical: theme.spacing.md,
+        borderRadius: theme.borderRadius.round,
         alignItems: 'center',
-        marginVertical: theme.spacing.xl,
+        ...theme.shadows.button,
     },
-    dividerLine: {
-        flex: 1,
-        height: 1,
-        backgroundColor: theme.colors.border,
-    },
-    dividerText: {
-        marginHorizontal: theme.spacing.md,
-        color: theme.colors.textSecondary,
-        fontSize: theme.fontSize.sm,
+    loginButtonText: {
+        color: '#fff',
+        fontSize: theme.fontSize.xl,
+        fontWeight: theme.fontWeight.bold,
     },
 });
 

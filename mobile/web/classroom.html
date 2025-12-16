@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>2.5D Teacher</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            overflow: hidden;
+            background-color: #f0f0f0;
+            /* DEBUG: CACHE CHECK - If you see this, file updated */
+        }
+
+        #loader {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: sans-serif;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 100;
+        }
+    </style>
+    <!-- Import Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <div id="loader">Loading Teacher...</div>
+    <script type="module">
+        import * as THREE from 'three';
+
+        // --- Config ---
+        // --- Config ---
+        const BACKGROUND_IMAGE = 'classroom_bg.jpg';
+        const TEACHER_TALKING = 'teacher_talking.mp4';
+        const TEACHER_IDLE = 'teacher_idle.mp4';
+        const BACKGROUND_MUSIC = 'classroom_music.mp3';
+
+        let scene, camera, renderer;
+        let teacherMesh, backgroundMesh, uniforms;
+        let textures = {};
+
+        // Video State
+        let videoTalking, videoIdle;
+        let textureTalking, textureIdle;
+
+        // Audio State
+        let bgMusic;
+
+        const clock = new THREE.Clock(); // Keep clock declared once
+
+        let isTalking = false;
+
+        // Movement State
+        let targetPosition = new THREE.Vector3(0, 0.1, 0);
+        const WALK_SPEED = 2.0;
+        const BOARD_X = -0.6;
+        const CENTER_X = 0.0;
+
+        // ... (Viseme vars removed as unused) ...
+
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 0.0, 4.0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            document.body.appendChild(renderer.domElement);
+
+            createBackground();
+
+            // --- SETUP VIDEOS ---
+            videoTalking = createVideoElement(TEACHER_TALKING, false); // No loop for talking (optional)
+            videoIdle = createVideoElement(TEACHER_IDLE, true); // Loop idle
+
+            // --- SETUP TEXTURES ---
+            textureTalking = createVideoTexture(videoTalking);
+            textureIdle = createVideoTexture(videoIdle);
+
+            // --- SETUP MUSIC (Low & Calm) ---
+            bgMusic = new Audio(BACKGROUND_MUSIC);
+            bgMusic.loop = true;
+            bgMusic.volume = 0.02; // Very low volume as requested
+            bgMusic.play().catch(e => console.log('Music Autoplay blocked', e));
+
+            // Ensure music starts on first interaction if blocked
+            window.addEventListener('click', () => {
+                if (bgMusic.paused) bgMusic.play();
+            }, { once: true });
+
+            // Create Teacher with Initial Texture (Idle)
+            createTeacherVideoSprite();
+
+            // Start Idle immediately
+            videoIdle.play().catch(e => console.log('Idle Autoplay blocked', e));
+
+            onWindowResize();
+
+            window.addEventListener('resize', onWindowResize, false);
+            window.addEventListener('teacher-control', handleControlEvent);
+            window.addEventListener('message', (e) => {
+                try {
+                    if (typeof e.data === 'string') {
+                        const parsed = JSON.parse(e.data);
+                        handleControlEvent({ detail: parsed });
+                    }
+                } catch (err) { }
+            });
+
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        function createVideoElement(src, loop) {
+            const vid = document.createElement('video');
+            vid.src = src;
+            vid.loop = loop; // Loop idle, maybe talking too? Talking usually handled by app logic
+            vid.muted = true;
+            vid.playsInline = true;
+            vid.crossOrigin = 'anonymous';
+            vid.style.display = 'none';
+            document.body.appendChild(vid);
+            return vid;
+        }
+
+        function createVideoTexture(video) {
+            const tex = new THREE.VideoTexture(video);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            tex.minFilter = THREE.LinearFilter;
+            tex.magFilter = THREE.LinearFilter;
+            return tex;
+        }
+
+        function createBackground() {
+            const loader = new THREE.TextureLoader();
+            const bgTex = loader.load(BACKGROUND_IMAGE, (tex) => {
+                textures['bg'] = tex;
+                onWindowResize();
+                sendMessage('READY', 'Teacher Loaded');
+            });
+            bgTex.colorSpace = THREE.SRGBColorSpace;
+
+            const geometry = new THREE.PlaneGeometry(1, 1);
+            const material = new THREE.MeshBasicMaterial({ map: bgTex, depthTest: false });
+            backgroundMesh = new THREE.Mesh(geometry, material);
+            backgroundMesh.position.set(0, 0, -5);
+            backgroundMesh.renderOrder = -1;
+            scene.add(backgroundMesh);
+            textures['bg'] = bgTex;
+        }
+
+        function createTeacherVideoSprite() {
+            // Initial Texture: Idle
+            const initialTexture = textureIdle;
+
+            // Geometry: SQUARE (2.5 x 2.5) 
+            const geometry = new THREE.PlaneGeometry(2.5, 2.5);
+
+            uniforms = {
+                uTexture: { value: initialTexture },
+                uTime: { value: 0 },
+                uIsTalking: { value: 0.0 }
+            };
+
+            const material = new THREE.ShaderMaterial({
+                uniforms: uniforms,
+                transparent: true,
+                side: THREE.DoubleSide,
+                vertexShader: `
+                    uniform float uTime;
+                    uniform float uIsTalking;
+                    varying vec2 vUv;
+
+                    void main() {
+                        // CROP VIDEO: Focus on the center 50% of width to cut off side black bars
+                        vUv = vec2(uv.x * 0.5 + 0.25, uv.y);
+                        
+                        vec3 pos = position;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler2D uTexture;
+                    varying vec2 vUv;
+
+                    void main() {
+                        vec4 color = texture2D(uTexture, vUv);
+                        
+                        // GREEN SCREEN REMOVAL
+                        vec3 keyColor = vec3(0.0, 1.0, 0.0);
+                        float dist = distance(color.rgb, keyColor);
+                        if (dist < 0.6) discard;
+                        if (color.g > 0.5 && color.g > (color.r + 0.2) && color.g > (color.b + 0.2)) discard;
+
+                        gl_FragColor = color;
+                    }
+                `
+            });
+
+            teacherMesh = new THREE.Mesh(geometry, material);
+            teacherMesh.position.set(0.0, 0.1, 0); // Keep original pos
+            scene.add(teacherMesh);
+
+            // Shadow
+            const shadow = new THREE.Mesh(
+                new THREE.PlaneGeometry(1.0, 0.5),
+                new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.4 })
+            );
+            shadow.rotation.x = -Math.PI / 2;
+            shadow.position.set(0.0, -1.1, 0);
+            scene.add(shadow);
+        }
+
+        function handleControlEvent(e) {
+            const data = e.detail;
+            if (!data) return;
+            switch (data.type) {
+                case 'startTalking':
+                    if (!isTalking) {
+                        isTalking = true;
+                        // Switch to Talking Video
+                        videoIdle.pause();
+                        uniforms.uTexture.value = textureTalking;
+                        videoTalking.play().catch(e => console.log('Play error', e));
+                    }
+                    break;
+                case 'stopTalking':
+                    if (isTalking) {
+                        isTalking = false;
+                        // Switch to Idle Video
+                        videoTalking.pause();
+                        videoTalking.currentTime = 0; // Reset talking so it starts fresh next time?
+                        uniforms.uTexture.value = textureIdle;
+                        videoIdle.play().catch(e => console.log('Play error', e));
+                    }
+                    break;
+                case 'walkToBoard': targetPosition.x = BOARD_X; break;
+                case 'walkToCenter': targetPosition.x = CENTER_X; break;
+                case 'viseme': break;
+                case 'playAnimation': break;
+            }
+        }
+
+        function onWindowResize() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+
+            if (backgroundMesh && textures['bg'] && textures['bg'].image) {
+                backgroundMesh.scale.set(backgroundMesh.scale.x, backgroundMesh.scale.y, 1);
+                // Background Cover Logic
+                const imgAspect = textures['bg'].image.width / textures['bg'].image.height;
+                const screenAspect = width / height;
+                const dist = camera.position.z - backgroundMesh.position.z;
+                const vFOV = THREE.MathUtils.degToRad(camera.fov);
+                const visibleHeight = 2 * Math.tan(vFOV / 2) * dist;
+                const visibleWidth = visibleHeight * camera.aspect;
+
+                let scaleX = 1;
+                let scaleY = 1;
+
+                if (screenAspect > imgAspect) {
+                    scaleX = visibleWidth;
+                    scaleY = visibleWidth / imgAspect;
+                } else {
+                    scaleY = visibleHeight;
+                    scaleX = visibleHeight * imgAspect;
+                }
+                backgroundMesh.scale.set(scaleX, scaleY, 1);
+            }
+        }
+
+        function sendMessage(type, message) {
+            const msg = JSON.stringify({ type, message });
+            if (window.ReactNativeWebView) window.ReactNativeWebView.postMessage(msg);
+            else if (window.parent) window.parent.postMessage(msg, '*');
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const delta = clock.getDelta();
+            const time = clock.getElapsedTime();
+
+            if (teacherMesh && uniforms) {
+                uniforms.uTime.value = time;
+                uniforms.uIsTalking.value = isTalking ? 1.0 : 0.0;
+
+                // --- MOVEMENT LOGIC (Walking) ---
+                const dist = targetPosition.x - teacherMesh.position.x;
+                const isWalking = Math.abs(dist) > 0.05;
+
+                if (isWalking) {
+                    // Move towards target
+                    const dir = Math.sign(dist);
+                    teacherMesh.position.x += dir * WALK_SPEED * delta;
+
+                    // Prevent overshooting
+                    if ((dir > 0 && teacherMesh.position.x > targetPosition.x) ||
+                        (dir < 0 && teacherMesh.position.x < targetPosition.x)) {
+                        teacherMesh.position.x = targetPosition.x;
+                    }
+
+                    // Walking Bounce (Much gentler now)
+                    teacherMesh.position.y = 0.1 + Math.abs(Math.sin(time * 10.0)) * 0.02; // Reduced from 0.05
+
+                    // Shadow follows
+                    // Find shadow in scene
+                    scene.traverse((child) => {
+                        if (child.isMesh && child.geometry.type === 'PlaneGeometry' && child !== teacherMesh && child !== backgroundMesh) {
+                            child.position.x = teacherMesh.position.x;
+                        }
+                    });
+
+                } else {
+                    // --- VIDEO ANIMATION LOGIC ---
+                    // Just update time for shader breathing
+                    // Video updates itself via VideoTexture.
+
+                    // Note: VideoTexture handles the "talking" visual by simply playing.
+                    // The shader adds the breath.
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+    </script>
+</body>
+
+</html>

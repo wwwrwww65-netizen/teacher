@@ -1,0 +1,245 @@
+--------- beginning of crash
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: Process: com.tinyteacher, PID: 4206
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: anonymous@1:1044755
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: metroRequire@1:33652
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: anonymous@1:941537
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: metroRequire@1:33652
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: anonymous@1:40711
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: metroRequire@1:33652
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: global@1:33180
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: Process: com.tinyteacher, PID: 15150
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: anonymous@1:1044755
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: metroRequire@1:33652
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: anonymous@1:941537
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: metroRequire@1:33652
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: anonymous@1:40711
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: metroRequire@1:33652
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: global@1:33180
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 01:11:29.342 15150 18833 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: Process: com.tinyteacher, PID: 3657
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: anonymous@1:1044755
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: metroRequire@1:33652
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: anonymous@1:941537
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: metroRequire@1:33652
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: anonymous@1:40711
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: metroRequire@1:33652
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: global@1:33180
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 01:42:18.812  3657  6928 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: Process: com.tinyteacher, PID: 6874
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: anonymous@1:1044755
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: metroRequire@1:33652
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: anonymous@1:941537
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: metroRequire@1:33652
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: anonymous@1:40711
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: metroRequire@1:33652
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: global@1:33180
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 01:42:24.211  6874  7305 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: Process: com.tinyteacher, PID: 10531
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: anonymous@1:1044755
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: metroRequire@1:33652
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: anonymous@1:941537
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: metroRequire@1:33652
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: anonymous@1:40711
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: metroRequire@1:33652
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: global@1:33180
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 01:58:51.781 10531 13134 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: Process: com.tinyteacher, PID: 13026
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: anonymous@1:1044755
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: metroRequire@1:33652
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: anonymous@1:941537
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: metroRequire@1:33652
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: anonymous@1:40711
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: metroRequire@1:33652
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: global@1:33180
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 01:58:55.968 13026 13419 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: Process: com.tinyteacher, PID: 13378
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: anonymous@1:1044755
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: metroRequire@1:33652
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: anonymous@1:941537
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: metroRequire@1:33652
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: anonymous@1:40711
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: metroRequire@1:33652
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: global@1:33180
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 01:59:04.189 13378 13516 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+--------- beginning of system
+--------- beginning of main
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: Process: com.tinyteacher, PID: 13546
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Can't find variable: StyleSheet, stack:
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: <unknown>@889:676
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: h@2:1804
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: <unknown>@800:248
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: h@2:1804
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: <unknown>@6:69
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: h@2:1804
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: d@2:1187
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: global code@1128:3
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 02:38:09.270 13546 21851 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: Process: com.tinyteacher, PID: 20870
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Can't find variable: StyleSheet, stack:
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: <unknown>@889:676
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: h@2:1804
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: <unknown>@800:248
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: h@2:1804
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: <unknown>@6:69
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: h@2:1804
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: d@2:1187
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: global code@1128:3
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 02:38:17.967 20870 22347 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)

@@ -8,7 +8,7 @@ const ClassroomScene = ({ children }) => {
         <View style={styles.container}>
             {/* Background Image */}
             <ImageBackground
-                source={require('../../assets/classroom-bg.png')}
+                source={null} // require('../../assets/classroom-bg.png')
                 style={styles.background}
                 resizeMode="cover"
             >

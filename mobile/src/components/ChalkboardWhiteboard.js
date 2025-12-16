@@ -47,65 +47,45 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
 
     return (
         <View style={styles.container}>
-            <ImageBackground
-                source={require('../../assets/chalkboard.png')}
-                style={styles.chalkboard}
-                resizeMode="cover"
-            >
-                {/* طبقة شفافة لزيادة وضوح الكتابة */}
-                <View style={{ ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(20, 40, 30, 0.8)' }} />
-
-                <View style={styles.drawingArea}>
-                    {/* عرض صورة الواجب إذا وجدت */}
-                    {imageUri ? (
-                        <Image
-                            source={{ uri: imageUri }}
-                            style={styles.homeworkImage}
-                            resizeMode="contain"
-                        />
-                    ) : (
-                        <Svg width="100%" height="100%" viewBox="0 0 300 200">
-                            {currentPath && (
-                                <AnimatedPath
-                                    d={currentPath}
-                                    stroke="#FFFFFF"
-                                    strokeWidth="3"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeDasharray={[pathLength, pathLength]}
-                                    strokeDashoffset={strokeDashoffset}
-                                />
-                            )}
-                        </Svg>
-                    )}
-                </View>
-            </ImageBackground>
+            {/* Transparent Overlay - Drawing Only */}
+            <View style={styles.drawingArea}>
+                {/* عرض صورة الواجب إذا وجدت */}
+                {imageUri ? (
+                    <Image
+                        source={{ uri: imageUri }}
+                        style={styles.homeworkImage}
+                        resizeMode="contain"
+                    />
+                ) : (
+                    <Svg width="100%" height="100%" viewBox="0 0 300 300">
+                        {currentPath && (
+                            <AnimatedPath
+                                d={currentPath}
+                                stroke="#FFFFFF"
+                                strokeWidth="8"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeDasharray={[pathLength, pathLength]}
+                                strokeDashoffset={strokeDashoffset}
+                            />
+                        )}
+                    </Svg>
+                )}
+            </View>
         </View>
     );
 });
 
 const styles = StyleSheet.create({
     container: {
-        width: '90%',
-        aspectRatio: 3 / 2,
-        alignSelf: 'center',
-        marginVertical: 20,
-        borderRadius: 8,
-        overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 8,
-    },
-    chalkboard: {
         width: '100%',
-        height: '100%',
+        height: '100%', // Flexible
+        backgroundColor: 'transparent', // Explicitly transparent
     },
     drawingArea: {
         flex: 1,
-        padding: 20,
+        // padding: 20, // Optional padding inside board
         justifyContent: 'center',
         alignItems: 'center',
     },

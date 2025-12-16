@@ -1,0 +1,338 @@
+Activity Resolver Table:
+  Non-Data Actions:
+      android.intent.action.MAIN:
+        b3ffddf com.tinyteacher/.MainActivity filter 487737a
+          Action: "android.intent.action.MAIN"
+          Category: "android.intent.category.LAUNCHER"
+
+Permissions:
+  Permission [com.tinyteacher.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION] (3133a2c):
+    sourcePackage=com.tinyteacher
+    uid=10724 gids=null type=0 prot=signature
+    perm=Permission{4f15cf5 com.tinyteacher.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION}
+    packageSetting=PackageSetting{f956a8a com.tinyteacher/10724}
+
+Registered ContentProviders:
+  com.tinyteacher/com.reactnativecommunity.webview.RNCWebViewFileProvider:
+    Provider{9d098fb com.tinyteacher/com.reactnativecommunity.webview.RNCWebViewFileProvider}
+  com.tinyteacher/com.imagepicker.ImagePickerProvider:
+    Provider{98fcd18 com.tinyteacher/com.imagepicker.ImagePickerProvider}
+  com.tinyteacher/androidx.startup.InitializationProvider:
+    Provider{b47d371 com.tinyteacher/androidx.startup.InitializationProvider}
+
+ContentProvider Authorities:
+  [com.tinyteacher.androidx-startup]:
+    Provider{b47d371 com.tinyteacher/androidx.startup.InitializationProvider}
+      applicationInfo=ApplicationInfo{a67a556 com.tinyteacher}
+  [com.tinyteacher.fileprovider]:
+    Provider{9d098fb com.tinyteacher/com.reactnativecommunity.webview.RNCWebViewFileProvider}
+      applicationInfo=ApplicationInfo{a67a556 com.tinyteacher}
+  [com.tinyteacher.imagepickerprovider]:
+    Provider{98fcd18 com.tinyteacher/com.imagepicker.ImagePickerProvider}
+      applicationInfo=ApplicationInfo{a67a556 com.tinyteacher}
+
+Key Set Manager:
+  [com.tinyteacher]
+      Signing KeySets: 513
+
+Packages:
+  Package [com.tinyteacher] (f956a8a):
+    userId=10724
+    pkg=Package{905c9d7 com.tinyteacher}
+    codePath=/data/app/com.tinyteacher-SFzl4kTdvpYG30CjncGteA==
+    resourcePath=/data/app/com.tinyteacher-SFzl4kTdvpYG30CjncGteA==
+    legacyNativeLibraryDir=/data/app/com.tinyteacher-SFzl4kTdvpYG30CjncGteA==/lib
+    primaryCpuAbi=arm64-v8a
+    secondaryCpuAbi=null
+    versionCode=2 minSdk=23 targetSdk=34
+    versionName=1.0
+    splits=[base]
+    apkSigningVersion=2
+    applicationInfo=ApplicationInfo{a67a556 com.tinyteacher}
+    flags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    privateFlags=[ PRIVATE_FLAG_ACTIVITIES_RESIZE_MODE_RESIZEABLE_VIA_SDK_VERSION ALLOW_AUDIO_PLAYBACK_CAPTURE ]
+    dataDir=/data/user/0/com.tinyteacher
+    supportsScreens=[small, medium, large, xlarge, resizeable, anyDensity]
+    timeStamp=٢٠٢٥-١٢-١٠ ٢٣:٠٥:٠٢
+    firstInstallTime=٢٠٢٥-١٢-١٠ ٢٣:٠٥:٠٧
+    lastUpdateTime=٢٠٢٥-١٢-١٠ ٢٣:٠٥:٠٧
+    installerPackageName=com.google.android.packageinstaller
+    signatures=PackageSignatures{e40a2c4 version:2, signatures:[3451ee94], past signatures:[]}
+    installPermissionsFixed=true
+    pkgFlags=[ HAS_CODE ALLOW_CLEAR_USER_DATA ]
+    declared permissions:
+      com.tinyteacher.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: prot=signature, INSTALLED
+    requested permissions:
+      android.permission.INTERNET
+      android.permission.RECORD_AUDIO
+      android.permission.CAMERA
+      android.permission.READ_EXTERNAL_STORAGE: restricted=true
+      android.permission.WRITE_EXTERNAL_STORAGE: restricted=true
+      com.tinyteacher.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+    install permissions:
+      com.tinyteacher.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION: granted=true
+      android.permission.INTERNET: granted=true
+    User 0: ceDataInode=1888362 installed=true hidden=false suspended=false stopped=false notLaunched=false enabled=0 instant=false virtual=false
+    overlay paths:
+      /vendor/overlay/NavigationBarMode3Button/NavigationBarMode3ButtonOverlay.apk
+      lastDisabledCaller: com.google.android.packageinstaller
+      gids=[3003]
+      runtime permissions:
+        android.permission.READ_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+        android.permission.CAMERA: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+        android.permission.WRITE_EXTERNAL_STORAGE: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED|RESTRICTION_INSTALLER_EXEMPT]
+        android.permission.RECORD_AUDIO: granted=false, flags=[ USER_SENSITIVE_WHEN_GRANTED|USER_SENSITIVE_WHEN_DENIED]
+
+SkippingApks:
+  name : 100Game_PERSONAL_4x4_PF36_2009_2.0.2.apk
+  name : AccessTmobile_TMO.apk
+  name : AdaptClient.apk
+  name : AmazonMDIP_CAN.apk
+  name : AmazonMDIP_USA.apk
+  name : AmazonShopping-64bit.apk
+  name : AmazonShopping-Android-20.18.0-patron-32bit-release.apk
+  name : AmazonShopping-Android-22.6-Patron-32bit-release.apk
+  name : AmazonShopping_CAN.apk
+  name : AmazonShopping_USA.apk
+  name : AmazonVideo_SPR_stub.apk
+  name : AppSelect_ATT.apk
+  name : AttIqi_ATT.apk
+  name : AttSmartHelp_ATT.apk
+  name : BellMobileTV.apk
+  name : BellTVWidget.apk
+  name : CallGuardian_uscc.apk
+  name : CallProtect_ATT.apk
+  name : CallingPlus.apk
+  name : CarrierDeviceManager.apk
+  name : CarrierSetupWizard.apk
+  name : CarrierWifi.apk
+  name : Chameleon2.apk
+  name : ClaroContenedor_Full.apk
+  name : ClaroJuegos_Stub.apk
+  name : CnnPanel.apk
+  name : Crane.apk
+  name : DeviceCheckup_TLS.apk
+  name : DriveMode_hvpl_ATT.apk
+  name : ESEServiceAgent.apk
+  name : EntelPlay_5.0.apk
+  name : Excel_SamsungStub.apk
+  name : FBAppManager_NS.apk
+  name : FBInstagram_stub.apk
+  name : FBInstaller_NS.apk
+  name : FBMessenger_stub.apk
+  name : FBServices.apk
+  name : Facebook_stub.apk
+  name : Fast.apk
+  name : FotaAgent.apk
+  name : Ignite-uscc.apk
+  name : Ignite_AIO.apk
+  name : JanskySettings.apk
+  name : KidsHome_Installer.apk
+  name : LinkedIn_SamsungStub.apk
+  name : LoginClientUnbranded_sku.apk
+  name : LookoutFull_SPR.apk
+  name : Lookout_ATT.apk
+  name : Lookout_MTR.apk
+  name : Lookout_TMO.apk
+  name : MDIP.apk
+  name : MHSWrapperMTR.apk
+  name : MHSWrapperUSC.apk
+  name : MaftPreloadManagerAndroidApp-MovistarMX.apk
+  name : MaftPreloadManagerAndroidApp-TEF_LATAM.apk
+  name : MaftPreloadManagerAndroidApp-release-signed-tagged.apk
+  name : MasDynamicSetting.apk
+  name : MdecService.apk
+  name : MetroAppStore_MTR.apk
+  name : MetroZone_MTR.apk
+  name : MeuTIM.apk
+  name : MinhaOi.apk
+  name : MobileID.apk
+  name : MobileInstaller.apk
+  name : MobileSecurity_ATT.apk
+  name : MovistarPlayTGU_stub_v1.3_20190628.apk
+  name : MyATT_ATT.apk
+  name : MyAccount_FMC.apk
+  name : MyAccount_VMC.apk
+  name : MyBell.apk
+  name : MyCricket_AIO.apk
+  name : MyMetro_MTR.apk
+  name : MyRogers.apk
+  name : NameIDVPL_TMO.apk
+  name : NameID_MTR.apk
+  name : NaverV_N.apk
+  name : NetWise_AIO.apk
+  name : OiApps.apk
+  name : OiAppsClube.apk
+  name : OiRecarga.apk
+  name : OiWiFi.apk
+  name : OmaCP.apk
+  name : OmadmSpr.apk
+  name : OmadmSprHm.apk
+  name : OnStart_Notification_V30.apk
+  name : OneDrive_Samsung_v3.apk
+  name : OpenCalendar.apk
+  name : PhoneInfo2.apk
+  name : PowerPoint_SamsungStub.apk
+  name : PrefAct.apk
+  name : Push_To_Talk_BMC.apk
+  name : QoSIndicator_ATT.apk
+  name : RRO_AMX_stk1.apk
+  name : RRO_AMX_stk2.apk
+  name : RemoteSupport_ATT.apk
+  name : RetailMode_hvpl_ATT.apk
+  name : RogersNHL.apk
+  name : SYSdll.apk
+  name : SamsungCloudDreamNewIcon.apk
+  name : SecVVM_dream.apk
+  name : SecVVM_v2.apk
+  name : SecVVM_v3.apk
+  name : SelfCareMobile-6.0.3-prod-signed.apk
+  name : SimLock_TMO.apk
+  name : SmartHelp_ATT.apk
+  name : SmartWifi_Stub_ATT.apk
+  name : SpectrumCM.apk
+  name : SprWfc.apk
+  name : SprintAndroidExtension2.apk
+  name : SprintCallerID02.apk
+  name : SprintHub.apk
+  name : SprintZone.apk
+  name : TIGO_Sports_BO_v7.0719.apk
+  name : TelcelContenedor_Full.apk
+  name : Telus_MyAccount.apk
+  name : TmoVVM.apk
+  name : TmoWfcPrefV2.apk
+  name : UnifiedVVM.apk
+  name : Upday.apk
+  name : UserManual.apk
+  name : VZWAPNService_sku.apk
+  name : VisionCloudAgent.apk
+  name : VisualVoiceMail_CCT_stub.apk
+  name : VisualVoiceMail_CHA_stub.apk
+  name : VisualVoiceMail_TFN_stub.apk
+  name : VisualVoicemailSpr.apk
+  name : VivoAppsClube.apk
+  name : VivoMaisApps.apk
+  name : Voicemail_AIO.apk
+  name : WfcServiceV2.apk
+  name : WhatsAppDownloader.apk
+  name : Word_SamsungStub.apk
+  name : YelpPanel.apk
+  name : ZVV_STK2_RRO.apk
+  name : ZVV_STK_RRO.apk
+  name : altice_music_2.0.apk
+  name : apps_brasil_signed_aligned.apk
+  name : che_notification_6.apk
+  name : deezer_5.4.13.62.apk
+  name : entel_peru_7-6-1.apk
+  name : instagram-stub-30-0-1.apk
+  name : instagram-stub.apk
+  name : instagram-stub_45-1-22.apk
+  name : instagram-stub_52-0-3.apk
+  name : kolbi_5.0.19.apk
+  name : messenger-stub-30-0-1.apk
+  name : messenger-stub.apk
+  name : messenger-stub_45-1-22.apk
+  name : messenger-stub_52-0-3.apk
+  name : messenger_stub.apk
+  name : miTelcel_Stub.apk
+  name : mitigo-bolivia-release_3.0.1_rc1.apk
+  name : mySaskTel.apk
+  name : myflow_cww_6-9-0-174.apk
+  name : noticias_aro_146.apk
+  name : ready2Go_ATT.apk
+  name : rro_psn_stk1.apk
+  name : rro_uwt_srk1.apk
+  name : rro_uwt_stk2.apk
+  name : rro_ztm_stk1.apk
+  name : rro_ztm_stk2.apk
+  name : rro_ztr_stk1.apk
+  name : rro_ztr_stk2.apk
+  name : tickantel_1-8-1.apk
+  name : tigomoney_stub_signed_v1.1.apk
+  name : tigoshop-bv-v1.3.0.apk
+  name : trendy_aro_28.apk
+  name : tuapp_4-0-2-4.apk
+  name : veramas_1-17-5.apk
+  name : veratv_2-4-0.apk
+  name : videotron_usercentre_plus.apk
+  name : virginmobile_mybenefits.apk
+  name : wssyncmldm.apk
+  name : xtra_t_app.apk
+  name : SearchSelector.apk
+
+Package Changes:
+  Sequence number=1032
+  User 0:
+    seq=5, package=com.google.android.gms
+    seq=12, package=com.inspireui.fluxstore
+    seq=13, package=com.solidbundle.procorners
+    seq=238, package=com.instagram.android
+    seq=240, package=com.LogiaGroup.LogiaDeck
+    seq=265, package=com.stepfwd.talabya_customer
+    seq=419, package=com.smartapps.tawseel
+    seq=509, package=com.google.android.apps.bard
+    seq=595, package=com.mxtech.videoplayer.ad
+    seq=758, package=com.arabic.cartoonanime
+    seq=759, package=com.osansoft.baikal
+    seq=786, package=com.microsoft.copilot
+    seq=788, package=com.microsoft.office.word
+    seq=808, package=com.dywx.larkplayer
+    seq=855, package=video.downloader.videodownloader
+    seq=894, package=com.google.android.apps.docs
+    seq=919, package=com.catalinagroup.callrecorder
+    seq=937, package=com.android.vending
+    seq=954, package=com.google.android.trichromelibrary_744417133
+    seq=955, package=com.google.android.webview
+    seq=976, package=com.google.android.trichromelibrary_744410233
+    seq=983, package=com.samsung.android.game.gamehome
+    seq=991, package=com.samsung.android.forest
+    seq=1009, package=games.vaveda.militaryoverturn
+    seq=1010, package=com.unept.leveldevil
+    seq=1017, package=com.google.android.youtube
+    seq=1019, package=com.sec.unifiedwfc
+    seq=1023, package=com.catalinagroup.callrecorder.helper
+    seq=1025, package=com.verizon.mips.services
+    seq=1031, package=com.tinyteacher
+
+
+Dexopt state:
+  [com.tinyteacher]
+    path: /data/app/com.tinyteacher-SFzl4kTdvpYG30CjncGteA==/base.apk
+      arm64: [status=speed-profile] [reason=install]
+
+
+Compiler stats:
+  [com.tinyteacher]
+     base.apk - 6595
+
+Active APEX packages:
+
+
+Inactive APEX packages:
+
+
+Factory APEX packages:
+
+
+  APEX session state:
+
+Historical install Logging info(9/10):
+  [com.google.android.trichromelibrary]
+    1765262429504: "Ver":"744417133", "Session":"0", "Write":"17341", "Commit":"20132", "Stage":"35", "Init":"2407", "Ve
+    rified(Unknown)":"489", "Copy":"176", "Sign":"13", "DexOpt":"686", 
+  [com.tinyteacher]
+    1765397099782: "Ver":"2", "Session":"0", "Write":"22", "Commit":"4242", "Stage":"19", "Init":"840", "Verified(Unknow
+    n)":"1615", "Copy":"42", "Sign":"42", "DexOpt":"533", 
+  [com.android.vending]
+    1765233876355: "Ver":"84913220", "Session":"0", "Write":"23323", "Write":"407", "Write":"38798", "Write":"109466", "
+    Commit":"22839", "Stage":"30", "Init":"166", "Verified(Unknown)":"210", "Copy":"82", "Sign":"10", "DexOpt":"221", 
+  [com.google.android.webview]
+    1765262429345: "Ver":"744417133", "Session":"0", "Write":"5891", "Write":"1635", "Commit":"30126", "Stage":"15", "In
+    it":"2630", "Verified(Unknown)":"282", "Copy":"1017", "Sign":"17", "DexOpt":"451", 
+  [video.downloader.videodownloader]
+    1765164722573: "Ver":"149", "Session":"0", "Write":"1777", "Write":"583", "Write":"2067", "Commit":"2524", "Stage":"
+    29", "Init":"135", "Verified(Unknown)":"166", "Copy":"49", "Sign":"10", "DexOpt":"1382", 
+  [com.unept.leveldevil]
+    1765353000802: "Ver":"33", "Session":"0", "Write":"5475", "Write":"842", "Write":"373", "Write":"106265", "Write":"4
+    327", "Commit":"1396", "Stage":"23", "Init":"167", "Verified(Unknown)":"109", "Copy":"38", "Sign":"12", "DexOpt":"25
+    6", 

@@ -1,138 +1,148 @@
-# 🤖 Tiny Teacher - تطبيق تعليمي تفاعلي للأطفال
+# Tiny Teacher (المدرس الصغير) 🦁
 
-<div align="center">
+A fun, interactive, and AI-powered educational application designed to make learning Arabic engaging for children.
+Experience a magical classroom where the teacher talks to you, a smart whiteboard explains lessons, and learning feels like a game!
 
-![Tiny Teacher](./assets/icon.png)
+> **Note**: This application is built with **React Native** and features a custom **Web Simulator** (Webpack + React Native Web) for rapid development and testing without an Android emulator.
 
-**تطبيق تعليمي ذكي للأطفال (4-8 سنوات) مع معلم روبوت متحرك**
+## 🚀 Build Instructions (Important)
+Due to limited space on the C: drive, the Gradle cache must be redirected to `E:\.gradle`.
 
-[![React Native](https://img.shields.io/badge/React%20Native-0.73-blue.svg)](https://reactnative.dev/)
-[![Native Build](https://img.shields.io/badge/Build-Native_Android-green.svg)]()
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-[التحميل](#-التحميل) • [الميزات](#-الميزات) • [التثبيت](#-التثبيت) • [الاستخدام](#-الاستخدام) • [المساهمة](#-المساهمة)
-
-</div>
-
----
-
-## 📖 نظرة عامة
-
-**Tiny Teacher** هو تطبيق تعليمي تفاعلي مصمم خصيصاً للأطفال في مرحلة الروضة والصفوف الأولى (KG1-Grade3). يجمع التطبيق بين:
-
-- 🤖 **شخصية معلم روبوت متحركة** مع Lip-sync
-- 🎨 **سبورة تفاعلية** للرسم والكتابة
-- 🧠 **ذكاء اصطناعي** (OpenAI) للإجابة على الأسئلة
-- 🎯 **نظام نقاط ومكافآت** لتحفيز التعلم
-- 📚 **دروس متنوعة** (الحروف، الأرقام، الألوان، الأشكال، الحيوانات)
-
-تم تحديث التطبيق لبناؤه كنظام Android Native كامل بدون الاعتماد على خدمات Expo في بيئة التشغيل، مما يضمن أداء أفضل واستقراراً أعلى.
-
----
-
-## ✨ التحديثات والاصلالحات (Latest Fixes 🛠️)
-
-تم إجراء مجموعة شاملة من الإصلاحات لضمان عمل التطبيق بسلاسة وبناء ملف APK بنجاح:
-
-1.  **إصلاح بناء Android APK:**
-    *   تم حل مشكلة `AAPT: error: file failed to compile` من خلال تحويل جميع صور الـ Assets "المزيفة" (JPEG بامتداد PNG) إلى صور PNG حقيقية باستخدام سكريبت PowerShell مخصص.
-    *   تم تعطيل `ReactNativeFlipper` في `MainApplication.java` لحل مشاكل التوافق في البناء.
-    *   تم إضافة دالة `onCreate` المفقودة في `MainActivity.java` لمنع توقف التطبيق (Crash) عند استخدام `react-navigation`.
-
-2.  **إزالة الاعتماد على Expo:**
-    *   تم استبدال `expo-status-bar` بمكون `StatusBar` الأصلي من React Native.
-    *   تم إزالة `expo-localization` واستبداله بحل مخصص في `src/i18n/index.js`.
-    *   تم تعطيل `expo-image-picker` مؤقتاً لتجنب أخطاء الربط (Linking Errors) في البناء المحلي.
-
-3.  **تحسين واجهة المستخدم (UI/UX):**
-    *   **شريط الإشعارات (Status Bar):** تم ضبط الألوان ديناميكياً لتتناسب مع كل شاشة (داكن/فاتح) وتم توحيد خلفية الشريط مع تصميم التطبيق.
-    *   **التنقل (Navigation):** تم إعداد `React Navigation` بالكامل لربط جميع الشاشات (Login, Home, Lessons, Quiz, Classroom).
-
-4.  **إصلاحات أخرى:**
-    *   استخدام `require` بدلاً من `import` لملفات JSON في نظام الترجمة لتجنب مشاكل Metro Bundler.
-
----
-
-## 🚀 التثبيت والتشغيل
-
-### المتطلبات المسبقة
-*   Node.js (LTS version)
-*   JDK 17 or 11
-*   Android Studio & SDK
-*   React Native CLI
-
-### 1. إعداد البيئة وتثبيت الحزم
-```bash
-# اذهب لمجلد المشروع
-cd mobile
-
-# تثبيت الحزم
-npm install
+### Easy Way (Recommended)
+Run the helper script from the project root:
+```powershell
+.\build_release.ps1
 ```
 
-### 2. بناء التطبيق (APK)
-لبناء نسخة Release APK جاهزة للتثبيت على الهاتف:
-
-```bash
-# تشغيل أداة البناء من مجلد android
+### Manual Way
+If you prefer to run commands manually, always set the environment variable first:
+```powershell
+$env:GRADLE_USER_HOME='E:\.gradle'
 cd android
-./gradlew assembleRelease
+.\gradlew assembleRelease
 ```
-ستجد ملف الـ APK الناتج في:
-`mobile\android\app\build\outputs\apk\release\app-release.apk`
 
-### 3. حل مشاكل البناء (Troubleshooting)
-إذا واجهت أي مشاكل أثناء البناء، جرب تنظيف المشروع أولاً:
+## 🌟 Key Features
 
+### 🎮 Gamified UI/UX
+- **Vibrant Theme**: "Electric Blue" and "Sunshine Yellow" palette with rounded, bubble-like buttons using `BouncyButton`.
+- **Teacher Avatar**: A fully animated avatar (`TeacherAvatar`) that breathes, talks, and reacts emotionally (happy, thinking).
+- **Immersive Classroom**: A fixed, full-screen classroom environment where the teacher stands next to a real chalkboard.
+- **Gradient Cards**: Beautiful SVG-based cards for lessons and achievements.
+
+### 🤖 AI Classroom (The Core Experience)
+- **Interactive Teacher**: Chat with the teacher in Arabic using speech-to-text.
+- **Smart Responses**: The teacher uses AI to generate age-appropriate responses.
+- **Voice Interaction**: Full text-to-speech support (`ArabicVoiceService`) with lip-sync animation.
+- **Visual Learning**: The teacher can walk to the whiteboard and "draw" shapes or letters.
+- **Real-time Transcription**: See what the teacher says in a clear, white bubble at the bottom of the screen.
+
+### 👓 Immersive & VR-Ready (Coming Soon)
+- **Parallax Effect**: The classroom moves slightly as you tilt your phone or move your mouse, creating a 3D depth effect.
+- **VR Mode**: Planned support for a fully immersive virtual reality mode.
+
+### 📱 Screens
+1.  **Login Screen**: Visual avatar picker (Lion, Cat, etc.) for easy child login.
+2.  **Home Screen**: Dashboard showing progress, level, and quick actions.
+3.  **Classroom Screen**: The main interactive space with the Teacher and Blackboard.
+4.  **Profile Screen**: View achievements and collected badges.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js installed (v18+ recommended).
+- React Native CLI environment set up (for Android/iOS).
+- Python (for some build scripts).
+
+### Installation
+1.  **Clone the repository**:
+    ```bash
+    git clone <repository_url>
+    cd tiny-teacher/mobile
+    ```
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    # or
+    yarn install
+    ```
+
+---
+
+## 🌐 Running the Web Simulator
+
+We have configured a custom Webpack setup to run the React Native app in a web browser. This allows for fast UI iteration.
+
+### Command
 ```bash
-cd android
-./gradlew clean
-./gradlew assembleRelease
+node server.js
 ```
 
----
+### Access
+Open your browser to: **[http://localhost:9091](http://localhost:9091)**
 
-## 🏗️ هيكل المشروع
+### Supported Features on Web
+- **Rendering**: All screens (Login, Home, Classroom, Profile) render using `react-native-web`.
+- **Navigation**: Custom navigation shim allows moving between screens.
+- **Animations**: `react-native-reanimated` is fully configured.
+- **Native Modules**: Key modules are **mocked** in `web/mocks.js`:
+    - `react-native-tts`
+    - `react-native-voice`
+    - `react-native-sound-player`
+    - `react-native-fs`
+    - `AsyncStorage`
 
-```
-mobile/
-├── android/                 # ملفات مشروع أندرويد الأصلي (Gradle, Manifest, Java)
-├── src/
-│   ├── components/          # المكونات القابلة لإعادة الاستخدام (Buttons, Cards, Avatar)
-│   ├── screens/             # شاشات التطبيق الكاملة
-│   │   ├── LoginScreen.js
-│   │   ├── HomeScreen.js
-│   │   ├── ClassroomScreen.js  # شاشة المعلم الذكي
-│   │   └── ...
-│   ├── services/            # الخدمات (API, AI, Voice)
-│   │   └── ArabicVoiceService.js # خدمة الصوت العربي المتقدمة
-│   ├── config/              # الإعدادات (Theme, API Keys)
-│   ├── i18n/                # ملفات الترجمة (AR/EN)
-│   └── assets/              # الصور والأيقونات
-├── App.js                   # نقطة الدخول الرئيسية وإعدادات التنقل
-├── index.js                 # تسجيل التطبيق
-└── package.json             # تعريف المشروع والسكربتات
-```
+> **Tip**: If you see "Navigation not available" in the console, it's expected as some deep linking features are mocked.
 
 ---
 
-## 🎯 الاستخدام
+## 📱 Running on Android
 
-1.  **تسجيل الدخول:** استخدم أي بريد إلكتروني وكلمة مرور (لغرض التجربة والديمو) أو ادخل كـ "ضيف".
-2.  **لوحة التحكم:** ابدأ رحلة التعلم عبر الدروس، أو اذهب مباشرة إلى "المعلم".
-3.  **الفصل الذكي:** تحدث مع المعلم بالصوت، وسيرد عليك ويشرح لك ويرسم على السبورة.
-4.  **الاختبارات:** اختبر معلوماتك واحصل على نتائج فورية.
+To run on a real device or Android Emulator:
+
+1.  **Start Metro Bundler**:
+    ```bash
+    npx react-native start
+    ```
+2.  **Run on Android**:
+    ```bash
+    npx react-native run-android
+    ```
+
+> **Note**: Ensure you have an Android device connected or an emulator running.
 
 ---
 
-## 🔧 أدوات مفيدة (Scripts)
+## 🛠️ Project Structure
 
-تم إنشاء أدوات مساعدة أثناء عملية الإصلاح، تجدها في المجلد الرئيسي:
-*   `fix_assets.ps1`: لإصلاح صور الـ PNG التالفة أو المزيفة في مجلد `assets`.
-*   `rename_icons.ps1`: لإصلاح أيقونات التطبيق في مجلدات `android/app/src/main/res`.
+- `src/components`: Reusable UI components (`BouncyButton`, `GradientCard`, `TeacherAvatar`, `ChalkboardWhiteboard`).
+- `src/screens`: Main application screens (`ClassroomScreen.js`, `HomeScreen.js`, etc.).
+- `src/services`: Logic for AI, Voice, and Sound (`AIService`, `ArabicVoiceService`).
+- `src/config`: Theme and global constants (`theme.js`).
+- `web`: Webpack configuration and mocks (`mocks.js`, `index.html`) for the simulator.
+- `index.web.js`: Entry point for the web simulator.
 
 ---
 
-<div align="center">
-**صنع بـ ❤️ للأطفال في كل مكان**
-</div>
+## 🎨 Theme System
+The app uses a centralized theme in `src/config/theme.js`.
+- **Primary Color**: `#4CC9F0` (Sky Blue)
+- **Secondary Color**: `#FFD93D` (Yellow)
+- **Accent Color**: `#FF6B6B` (Red)
+
+---
+
+## 📸 Snapshots
+
+### Classroom Experience
+The classroom features a fixed layout with a transparent board overlay, allowing the teacher to write "directly" on the background. The transcript text appears clearly at the bottom for readability.
+
+---
+
+## 🤝 Contributing
+1.  Pick a task from `task.md`.
+2.  Create a branch.
+3.  Make your changes.
+4.  Test on the Web Simulator first!

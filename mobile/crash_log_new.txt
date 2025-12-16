@@ -1,0 +1,1017 @@
+--------- beginning of main
+--------- beginning of system
+12-10 22:55:54.912  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 778014720: Success
+12-10 22:55:54.970  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 778014720: Success
+12-10 22:55:59.162  1436  2363 E u4native: [InfoLevelMessage] [INFO:not_a_file.cc(0)] BrowserIOThread heartbeat, pid/tid: 1436/2363, interval/index: 30s/3515, ucCoreSoImplVersion: 5.6.0.11_231213160414
+12-10 22:55:59.176  1436  2385 E u4native: [InfoLevelMessage] [INFO:not_a_file.cc(0)] NetworkServiceThread heartbeat, pid/tid: 1436/2385, interval/index: 30s/3515
+12-10 22:55:59.187  1382  2939 E WindowManager: App trying to use insecure INPUT_FEATURE_NO_INPUT_CHANNEL flag. Ignoring
+12-10 22:55:59.375  1382  2939 E ActivityTaskManager: intent received is not valid or null
+12-10 22:55:59.399   848   875 E ANDR-PERF-UTIL: Failed to update node /proc/2082/sched_boost with value 2
+12-10 22:55:59.399   848   875 E ANDR-PERF-OPTSHANDLER: can't boost task 2082
+12-10 22:55:59.399   848   875 E ANDR-PERF-RESOURCEQS: Failed to apply optimization [3, 32]
+12-10 22:55:59.436  1083  1083 E audit   : type=1400 audit(1765396559.429:340695): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:55:59.436  1083  1083 E audit   : type=1300 audit(1765396559.429:340695): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bcdf48040 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:55:59.436  1083  1083 E audit   : type=1327 audit(1765396559.429:340695): proctitle="com.sec.android.sdhms"
+12-10 22:55:59.436  1083  1083 E audit   : type=1400 audit(1765396559.429:340696): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:55:59.436  1083  1083 E audit   : type=1300 audit(1765396559.429:340696): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bcdf48040 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:55:59.458  1382  2939 E WindowManager: App trying to use insecure INPUT_FEATURE_NO_INPUT_CHANNEL flag. Ignoring
+12-10 22:55:59.507  1382  1884 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.523  1382  1432 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.542  1382  1884 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.557  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.573  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.590  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.607  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.624  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.640  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.657  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.674  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.690  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.707  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.724  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.741  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.757  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.775  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.791  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.808  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:55:59.824  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:00.726  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:00.743  1382  2939 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:00.759  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:00.773  2082  2082 E ViewRootImpl: sendUserActionEvent() mView returned.
+12-10 22:56:00.911  1382  2939 E WifiService: 10396 has no permission about LOCAL_MAC_ADDRESS
+12-10 22:56:00.957  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:01.099  1382  1529 E Watchdog: !@Sync: 28337 heap: 132 / 135 [٢٠٢٥-١٢-١٠ ٢٢:٥٦:٠١.٠٩٩] sdogWay: softdog
+12-10 22:56:01.327  1382  3620 E WindowManager: win=Window{25e0e6d u0 com.sec.android.app.myfiles/com.sec.android.app.myfiles.external.ui.MainActivity} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.AppWindowToken.notifyAppStopped:1285 com.android.server.wm.ActivityRecord.activityStoppedLocked:2776 com.android.server.wm.ActivityTaskManagerService.activityStopped:2512 android.app.IActivityTaskManager$Stub.onTransact:2280 android.os.Binder.execTransactInternal:1056 
+12-10 22:56:01.329  1083  1083 E audit   : type=1400 audit(1765396561.319:340697): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:01.329  1083  1083 E audit   : type=1300 audit(1765396561.319:340697): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bcdf48180 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:01.329  1083  1083 E audit   : type=1327 audit(1765396561.319:340697): proctitle="com.sec.android.sdhms"
+12-10 22:56:01.329  1083  1083 E audit   : type=1400 audit(1765396561.319:340698): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:01.351 26519 26923 E libEGL  : call to OpenGL ES API with no current context (logged once per thread)
+12-10 22:56:01.414  1133 18034 E CameraService: setCompanionDisableSysFs : cc.disable property set to 0
+12-10 22:56:01.490   857  1761 E CHI     : [SS_ERR ]: [CHI         ]: chxextensionmodule.cpp: RemapCameraId: 578: cameraId 4 rawOTPDataSize : 4608
+12-10 22:56:01.500  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:01.501  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:01.512  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:01.518  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:01.665 26519 27072 E chromium: [1210/225601.665171:ERROR:quic_idle_network_detector.cc(102)] SetAlarm called after stopped
+12-10 22:56:01.681 26519 27072 E chromium: [1210/225601.681935:ERROR:quic_idle_network_detector.cc(102)] SetAlarm called after stopped
+12-10 22:56:01.698  1133 18034 E Camera2-FrameProcessorBase: FrameProcessorBase: created
+12-10 22:56:01.705  1133 18034 E Camera2-FrameProcessorBase: registerListener: Registering listener for frame id range 0 - 2147483647
+12-10 22:56:01.817   857 12434 E CHI     : [SS_ERR ]: [CHI_SINGLE  ]: chxseccamerausecase.cpp: Initialize: 1267: camera Id = 4, FastAec = 1
+12-10 22:56:01.837   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1643 SetMetadataByTag() Invalid slot 0; cannot set metadata for org.codeaurora.qcamera3.sensor_meta_data.integration_information (80070004)
+12-10 22:56:01.837   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1798 PublishMetadataList() Invalid slot 0, cannot publish metadata list
+12-10 22:56:01.877   857 12434 E CamX    : [ERROR][UTILS  ] camxosutilslinux.cpp:1180 InitializeFormatAlignment() <STARK> plane-0 wxh: 640x480, planestride 640, sliceHeight 480, format=4, impDefined 1
+12-10 22:56:01.877   857 12434 E CamX    : [ERROR][UTILS  ] camxosutilslinux.cpp:1180 InitializeFormatAlignment() <STARK> plane-1 wxh: 640x240, planestride 640, sliceHeight 240, format=4, impDefined 1
+12-10 22:56:01.974   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputScalerCropRegion (0x80d0000)
+12-10 22:56:01.974   857 12434 E SS_3A   : ERROR: AEC: TsAec_set_crop_roi: 575: Invalid sensor or crop window info 0 0 800 600
+12-10 22:56:01.974   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputScalerCropRegion (0x80d0000)
+12-10 22:56:01.975   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputScalerCropRegion (0x80d0000)
+12-10 22:56:01.981   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for (null).(null) (0x8836003c)
+12-10 22:56:01.981   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for (null).(null) (0x8836000d)
+12-10 22:56:01.981   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for (null).(null) (0x88360043)
+12-10 22:56:01.989   857 12434 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputControlAETargetFpsRange (0x8010005)
+12-10 22:56:02.151   857 12434 E CHI     : [SS_ERR ]: [CHI         ]: chxusecaseutils.cpp: Destroy: 1697: ImageBuffer 0xe294d550 is destroyed with reference count = 1
+12-10 22:56:02.151   857 12434 E CHI     : [SS_ERR ]: [CHI         ]: chxusecaseutils.cpp: Destroy: 1697: ImageBuffer 0xe294d560 is destroyed with reference count = 1
+12-10 22:56:02.151   857 12434 E CHI     : [SS_ERR ]: [CHI         ]: chxusecaseutils.cpp: Destroy: 1697: ImageBuffer 0xe294d580 is destroyed with reference count = 1
+12-10 22:56:02.151   857 12434 E CHI     : [SS_ERR ]: [CHI         ]: chxusecaseutils.cpp: Destroy: 1697: ImageBuffer 0xe294d590 is destroyed with reference count = 1
+12-10 22:56:02.151   857 12434 E CHI     : [SS_ERR ]: [CHI         ]: chxusecaseutils.cpp: Destroy: 1697: ImageBuffer 0xe294d598 is destroyed with reference count = 1
+12-10 22:56:02.170   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1643 SetMetadataByTag() Invalid slot 0; cannot set metadata for org.codeaurora.qcamera3.sensor_meta_data.integration_information (80070004)
+12-10 22:56:02.170   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1798 PublishMetadataList() Invalid slot 0, cannot publish metadata list
+12-10 22:56:02.174   857  1759 E CamX    : [ERROR][UTILS  ] camxosutilslinux.cpp:1180 InitializeFormatAlignment() <STARK> plane-0 wxh: 1920x1080, planestride 1920, sliceHeight 1088, format=4, impDefined 1
+12-10 22:56:02.174   857  1759 E CamX    : [ERROR][UTILS  ] camxosutilslinux.cpp:1180 InitializeFormatAlignment() <STARK> plane-1 wxh: 1920x540, planestride 1920, sliceHeight 544, format=4, impDefined 1
+12-10 22:56:02.198   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputScalerCropRegion (0x80d0000)
+12-10 22:56:02.198   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputScalerCropRegion (0x80d0000)
+12-10 22:56:02.198   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputScalerCropRegion (0x80d0000)
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF] AfLibFront_BootingInit (line 182) : Front Version: 0xf421 
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_FR_META] AfLibFront_BootingInit (line 232) : af cal data flag_no_far_value: 0, far: 168, middle: -1, near: 236, plus_offset: 65535, minus_offset: 65535
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_FR_META] set_g_lens_position_front (line 384) : bv (0) exp_t = (0) frame_t (0)
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_NOTI] UpdateReferenceDataFront (line 1842) : Sensor/Crop size is invalid!! sensor_w(3264) crop_w(0)
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_FR_META] UpdateAfMethodFront (line 284) : cur_af_method = 1
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_FR_META] UpdateAfModeFront (line 182) af_mode = 0, cur_mode = 0
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_FR_META] AF Mode: 0x0 AF_FRONT_LIB_MODE_NORMAL
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_FR_META] AfLibFront_AlgorithmInit (line 309) mode = 0
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [SY_TEST] RoiData 1392 984 1872 1464 
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 0 [1392 984 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 1 [1488 984 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 2 [1584 984 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.233   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 3 [1680 984 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 4 [1776 984 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 5 [1392 1080 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 6 [1488 1080 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 7 [1584 1080 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 8 [1680 1080 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 9 [1776 1080 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 10 [1392 1176 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 11 [1488 1176 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 12 [1584 1176 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 13 [1680 1176 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 14 [1776 1176 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 15 [1392 1272 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 16 [1488 1272 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 17 [1584 1272 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 18 [1680 1272 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 19 [1776 1272 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 20 [1392 1368 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 21 [1488 1368 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 22 [1584 1368 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 23 [1680 1368 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.234   857  1759 E AF_DEBUG: [CMG_AF_NOTI] numofROI 24 [1776 1368 95 95] [SetRegQcFront_Window (line 815)]
+12-10 22:56:02.235   857  1759 E AF_DEBUG: [CMG_AF_FR_META] UpdateAfStatusFront (line 238) : AF status 0x20  0x0  Pos 168  FdNum 0 Bv 0
+12-10 22:56:02.235   857  1759 E AF_DEBUG: [CMG_AF_NOTI] pBAFFilterConfig pBAFConfig 0xe1ed59fc [0xe1bdf990 0xe21a3d80]
+12-10 22:56:02.236   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for (null).(null) (0x8836003c)
+12-10 22:56:02.236   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for (null).(null) (0x8836000d)
+12-10 22:56:02.236   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for (null).(null) (0x88360043)
+12-10 22:56:02.297   857  1759 E CamX    : [ERROR][HAL    ] camxmetadatapool.cpp:1473 GetMetadataByTag() Invalid slot 0 to get metadata from for InputControlAETargetFpsRange (0x8010005)
+12-10 22:56:02.298   857  1759 E CHI     : [SS_ERR ]: [CHI         ]: chxusecaseutils.cpp: CreateUsecaseObject: 970: default usecase selected NOT advanced
+12-10 22:56:02.364  1133  1790 E CameraDeviceClient: Disconnect from CameraDeviceClient
+12-10 22:56:02.364  1133  1790 E Camera2-FrameProcessorBase: removeListener: 
+12-10 22:56:02.753   857  1761 E AF_DEBUG: FRLIBMSGF0A0 0 1000000 0 0 3003201 168 1 2000000 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 
+12-10 22:56:02.902  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:02.981   820 16821 E sdm845_platform: platform_check_backends_match: Invalid snd_device = 
+12-10 22:56:02.984   820 16821 E soundtrigger: audio_extn_sound_trigger_update_stream_status: invalid input device 0x0, for event 3
+12-10 22:56:02.986   820 16821 E voice   : voice_is_in_call_rec_stream: input stream is NULL
+12-10 22:56:02.989   820 16821 E ACDB-LOADER: Error: ACDB_CMD_GET_AFE_COMMON_TABLE_SIZE Returned = -19
+12-10 22:56:02.989   820 16821 E ACDB-LOADER: Error: ACDB AFE returned = -19
+12-10 22:56:03.034   820 16821 E sdm845_platform: platform_set_channel_map: Could not set ctl, error:-22 ch_count:2
+12-10 22:56:03.101 29822 29822 E BWU@DspControlUtil: Ph_OnServiceStateChanged 0 [main] 
+12-10 22:56:03.116   820   907 E         : gcs_get_sg_mod_conn_and_update_pld: subgraph mod conn size 0. Exiting
+12-10 22:56:03.116   820   907 E         : __gcs_get_sg_conn_and_update_pld: subgraph conn size 0. Exiting
+12-10 22:56:03.332  1083  1083 E audit   : type=1400 audit(1765396563.319:340705): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:03.332  1083  1083 E audit   : type=1300 audit(1765396563.319:340705): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bdb3202c0 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm="c.android.sdhms" exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:03.332  1083  1083 E audit   : type=1327 audit(1765396563.319:340705): proctitle="com.sec.android.sdhms"
+12-10 22:56:03.333  1083  1083 E audit   : type=1400 audit(1765396563.319:340706): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:03.368   820   907 E         : gcs_get_sg_mod_conn_and_update_pld: subgraph mod conn size 0. Exiting
+12-10 22:56:03.368   820   907 E         : __gcs_get_sg_conn_and_update_pld: subgraph conn size 0. Exiting
+12-10 22:56:04.104  1382  1539 E NotificationService: Suppressing notification from package by user request.
+12-10 22:56:04.399  1206 19406 E OMX-VDEC-1080P: Unsupported output color format for c2d (2141391876)
+12-10 22:56:04.399  1206 19406 E OMX-VDEC-1080P: Setting color format failed
+12-10 22:56:04.426  1206 19406 E OMX-VDEC-1080P: Unsupported output color format for c2d (2141391876)
+12-10 22:56:04.426  1206 19406 E OMX-VDEC-1080P: Setting color format failed
+12-10 22:56:04.440  1206 19840 E OMX-VDEC-1080P: Unsupported output color format for c2d (2141391876)
+12-10 22:56:04.440  1206 19840 E OMX-VDEC-1080P: Setting color format failed
+12-10 22:56:04.458  1206 19406 E OMX-VDEC-1080P: Unsupported output color format for c2d (2141391876)
+12-10 22:56:04.458  1206 19406 E OMX-VDEC-1080P: Setting color format failed
+12-10 22:56:07.177  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:15.782  2490  2490 E PackageLaunchUtils: getVersionCode:android.content.pm.PackageManager$NameNotFoundException: com.samsung.android.themestore
+12-10 22:56:15.783  2490  2490 E PackageLaunchUtils: com.samsung.android.themestore is not installed 
+12-10 22:56:15.784  2490  2490 E PackageLaunchUtils: getVersionCode:android.content.pm.PackageManager$NameNotFoundException: com.samsung.android.themestore
+12-10 22:56:15.784  2490  2490 E PackageLaunchUtils: com.samsung.android.themestore is not installed 
+12-10 22:56:15.785  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:56:15.858  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:56:15.916  1083  1083 E audit   : type=1400 audit(1765396575.909:340707): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:15.916  1083  1083 E audit   : type=1300 audit(1765396575.909:340707): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bcdf483c0 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:15.916  1083  1083 E audit   : type=1327 audit(1765396575.909:340707): proctitle="com.sec.android.sdhms"
+12-10 22:56:15.916  1083  1083 E audit   : type=1400 audit(1765396575.909:340708): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:16.307  1382  2271 E ActivityTaskManager: intent received is not valid or null
+12-10 22:56:16.324   848   875 E ANDR-PERF-UTIL: Failed to update node /proc/2082/sched_boost with value 2
+12-10 22:56:16.324   848   875 E ANDR-PERF-OPTSHANDLER: can't boost task 2082
+12-10 22:56:16.324   848   875 E ANDR-PERF-RESOURCEQS: Failed to apply optimization [3, 32]
+12-10 22:56:16.397  1382  2271 E WindowManager: App trying to use insecure INPUT_FEATURE_NO_INPUT_CHANNEL flag. Ignoring
+12-10 22:56:16.413  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:16.430  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:16.446  1382  3621 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:16.464  1382  2271 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:16.480  1382  3620 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:16.647  1382  3620 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.032  1382  1432 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.049  1382  1432 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.650  1382  3620 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.653  1382  2010 E ActivityTaskManager: TouchDown intent received, starting ActiveLaunch
+12-10 22:56:17.669  1382  1432 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.670 10571 10571 E Zygote  : isWhitelistProcess - Process is Whitelisted
+12-10 22:56:17.671 10571 10571 E Zygote  : accessInfo : 1
+12-10 22:56:17.685  1382  1432 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.693 10571 10571 E com.tinyteache: Not starting debugger since process cannot load the jdwp agent.
+12-10 22:56:17.718  1382  3620 E ActivityTaskManager: VZW Wifi offload starts. It is not activelaunch
+12-10 22:56:17.726  1382  3620 E ANDR-PERF-JNI: com_qualcomm_qtiperformance_native_perf_io_prefetch_start
+12-10 22:56:17.733  1382  1884 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.747   847   864 E ANDR-IOP: io prefetch is disabled
+12-10 22:56:17.750  1382  3620 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.758   848   875 E ANDR-PERF-UTIL: Failed to update node /proc/10571/sched_boost with value 2
+12-10 22:56:17.758   848   875 E ANDR-PERF-OPTSHANDLER: can't boost task 10571
+12-10 22:56:17.758   848   875 E ANDR-PERF-RESOURCEQS: Failed to apply optimization [3, 32]
+12-10 22:56:17.767  1382  1884 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.790  1382  1527 E system_server: Invalid ID 0x00000000.
+12-10 22:56:17.800  1382  1884 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.816  1382  1884 E InputDispatcher: Window handle pip_input_consumer has no registered input channel
+12-10 22:56:17.817  1382  1884 E InputDispatcher: Window handle Window{af5e07a u0 com.android.systemui/com.android.systemui.pip.phone.PipMenuActivity} has no registered input channel
+12-10 22:56:17.818  1382  1432 E WindowManager: win=Window{af5e07a u0 com.android.systemui/com.android.systemui.pip.phone.PipMenuActivity EXITING} destroySurfaces: appStopped=false win.mWindowRemovalAllowed=true win.mRemoveOnExit=true win.mViewVisibility=0 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.WindowState.onExitAnimationDone:5189 com.android.server.wm.-$$Lambda$01bPtngJg5AqEoOWfW3rWfV7MH4.accept:2 java.util.ArrayList.forEach:1262 com.android.server.wm.AppWindowToken.onAnimationFinished:3941 com.android.server.wm.AppWindowToken.commitVisibility:914 
+12-10 22:56:17.840  1382  1956 E PkgPredictorService-Collector: record changed bt=0  wifi=1 screen=0
+12-10 22:56:17.844  1382  1527 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:17.849  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:17.852  1083  1083 E audit   : type=1400 audit(1765396577.839:340711): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:17.852  1083  1083 E audit   : type=1300 audit(1765396577.839:340711): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7c6a20d940 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:17.852  1083  1083 E audit   : type=1327 audit(1765396577.839:340711): proctitle="com.sec.android.sdhms"
+12-10 22:56:17.852  1083  1083 E audit   : type=1400 audit(1765396577.839:340712): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:17.882  2082  2082 E ViewRootImpl: sendUserActionEvent() mView returned.
+12-10 22:56:18.136  1382  1884 E WindowManager: App trying to use insecure INPUT_FEATURE_NO_INPUT_CHANNEL flag. Ignoring
+12-10 22:56:18.234   920   920 E Layer   : [Surface(name=AppWindowToken{5d37415 token=Token{da0b9cc ActivityRecord{3db37ff u0 com.sec.android.app.launcher/.activities.LauncherActivity t7330}}})/@0xe5f3db0 - animation-leash#0] No local sync point found, barrierLayer : [com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity$_2490#0]
+12-10 22:56:18.234   920   920 E Layer   : [Surface(name=AppWindowToken{5d37415 token=Token{da0b9cc ActivityRecord{3db37ff u0 com.sec.android.app.launcher/.activities.LauncherActivity t7330}}})/@0xe5f3db0 - animation-leash#0] No local sync point found, barrierLayer : [com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity$_2490#0]
+12-10 22:56:18.234   920   920 E Layer   : [Surface(name=AppWindowToken{290936 token=Token{422dad1 ActivityRecord{c1ed5f8 u0 com.tinyteacher/.MainActivity t8509}}})/@0x6e92b68 - animation-leash#0] No local sync point found, barrierLayer : [com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity$_2490#0]
+12-10 22:56:18.234   920   920 E Layer   : [Surface(name=AppWindowToken{290936 token=Token{422dad1 ActivityRecord{c1ed5f8 u0 com.tinyteacher/.MainActivity t8509}}})/@0x6e92b68 - animation-leash#0] No local sync point found, barrierLayer : [com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity$_2490#0]
+12-10 22:56:18.234   920   920 E Layer   : [Surface(name=ed843a com.android.systemui.ImageWallpaper)/@0x196b444 - animation-leash#0] No local sync point found, barrierLayer : [com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity$_2490#0]
+12-10 22:56:18.234   920   920 E Layer   : [Surface(name=ed843a com.android.systemui.ImageWallpaper)/@0x196b444 - animation-leash#0] No local sync point found, barrierLayer : [com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity$_2490#0]
+12-10 22:56:18.420  1382  2271 E WindowManager: win=Window{befc232 u0 com.sec.android.app.launcher/com.sec.android.app.launcher.activities.LauncherActivity} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.AppWindowToken.notifyAppStopped:1285 com.android.server.wm.ActivityRecord.activityStoppedLocked:2776 com.android.server.wm.ActivityTaskManagerService.activityStopped:2512 android.app.IActivityTaskManager$Stub.onTransact:2280 android.os.Binder.execTransactInternal:1056 
+12-10 22:56:18.438  1382  1527 E WindowManager: win=Window{124e013 u0 Splash Screen com.tinyteacher EXITING} destroySurfaces: appStopped=false win.mWindowRemovalAllowed=true win.mRemoveOnExit=true win.mViewVisibility=0 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.WindowState.onExitAnimationDone:5189 com.android.server.wm.WindowStateAnimator.onAnimationFinished:320 com.android.server.wm.WindowState.onAnimationFinished:5630 com.android.server.wm.-$$Lambda$yVRF8YoeNdTa8GR1wDStVsHu8xM.run:2 com.android.server.wm.SurfaceAnimator.lambda$getFinishedCallback$0$SurfaceAnimator:100 
+12-10 22:56:18.454 10571 12535 E ReactNativeJS: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes
+12-10 22:56:18.456 10571 12535 E ReactNativeJS: Invariant Violation: "TinyTeacher" has not been registered. This can happen if:
+12-10 22:56:18.456 10571 12535 E ReactNativeJS: * Metro (the local dev server) is run from the wrong folder. Check if Metro is running, stop it and restart it in the current project.
+12-10 22:56:18.456 10571 12535 E ReactNativeJS: * A module failed to load due to an error and `AppRegistry.registerComponent` wasn't called., js engine: hermes
+12-10 22:56:18.457  1382  1432 E WifiService: 10396 has no permission about LOCAL_MAC_ADDRESS
+--------- beginning of crash
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: Process: com.tinyteacher, PID: 10571
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: anonymous@1:1044755
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: guardedLoadModule@1:34022
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: anonymous@1:941537
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: guardedLoadModule@1:34022
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: anonymous@1:40711
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: guardedLoadModule@1:33979
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: global@1:33180
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-10 22:56:18.486 10571 12536 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-10 22:56:18.567  2490  2490 E PackageLaunchUtils: getVersionCode:android.content.pm.PackageManager$NameNotFoundException: com.samsung.android.themestore
+12-10 22:56:18.568  2490  2490 E PackageLaunchUtils: com.samsung.android.themestore is not installed 
+12-10 22:56:18.569  2490  2490 E PackageLaunchUtils: getVersionCode:android.content.pm.PackageManager$NameNotFoundException: com.samsung.android.themestore
+12-10 22:56:18.569  2490  2490 E PackageLaunchUtils: com.samsung.android.themestore is not installed 
+12-10 22:56:18.570  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:56:18.594  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:56:18.600  1382  1868 E InputDispatcher: channel 'dabe3f3 com.tinyteacher/com.tinyteacher.MainActivity (server)' ~ Channel is unrecoverably broken and will be disposed!
+12-10 22:56:18.733 14061 14061 E Gallery : [ 536:     GalleryActivity] OnTrimMemory {60} VM(MB){U=25, F=3, T=512}, Native(MB){U=62, F=4, T=66}
+12-10 22:56:18.733 14061 14061 E Gallery : VM(MB){U=25, F=3, T=512}, Native(MB){U=62, F=4, T=66}
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: [AppErrors] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at dxnj.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):39)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at aboc.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at aboo.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):45)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at eujx.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at eujp.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at eujt.i(:com.google.android.gms@254534013@25.45.34 (100400-831602148):18)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at eukb.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at eujz.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at eukh.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):52)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at eukh.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):420)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.823 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.879 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.887 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.888 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.903 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.915 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.916 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.931 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.936 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.958 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.959 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:18.962 11387 12550 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:20.567 11136 12546 E BatteryFasDaoImpl: traverseFasDatabase : 10404 com.domobile.applockwatcheris active admin application now, so we skip !!
+12-10 22:56:20.659  1083  1083 E audit   : type=1400 audit(1765396580.649:340715): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:20.659  1083  1083 E audit   : type=1300 audit(1765396580.649:340715): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bdb3202c0 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm="c.android.sdhms" exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:20.659  1083  1083 E audit   : type=1327 audit(1765396580.649:340715): proctitle="com.sec.android.sdhms"
+12-10 22:56:20.659  1083  1083 E audit   : type=1400 audit(1765396580.649:340716): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:20.831 11136 12546 E BatteryFasDaoImpl: This app com.luckypatchers.installer is disabled now, so we do not insert this app to FAS table
+12-10 22:56:20.831 11136 12546 E BatteryFasDaoImpl: traverseFasDatabase : 10403 com.luckypatchers.installeris disabled now, so we skip !!
+12-10 22:56:22.374  1382  2010 E ActivityTaskManager: TouchDown intent received, starting ActiveLaunch
+12-10 22:56:22.383 12091 12091 E Zygote  : isWhitelistProcess - Process is Whitelisted
+12-10 22:56:22.384 12091 12091 E Zygote  : accessInfo : 1
+12-10 22:56:22.399 12091 12091 E com.tinyteache: Not starting debugger since process cannot load the jdwp agent.
+12-10 22:56:22.507  1382  2233 E ActivityTaskManager: VZW Wifi offload starts. It is not activelaunch
+12-10 22:56:22.513  1382  2233 E ANDR-PERF-JNI: com_qualcomm_qtiperformance_native_perf_io_prefetch_start
+12-10 22:56:22.516   847   864 E ANDR-IOP: io prefetch is disabled
+12-10 22:56:22.530   848   875 E ANDR-PERF-UTIL: Failed to update node /proc/12091/sched_boost with value 2
+12-10 22:56:22.530   848   875 E ANDR-PERF-OPTSHANDLER: can't boost task 12091
+12-10 22:56:22.530   848   875 E ANDR-PERF-RESOURCEQS: Failed to apply optimization [3, 32]
+12-10 22:56:22.579  1382  1956 E PkgPredictorService-Collector: record changed bt=0  wifi=1 screen=0
+12-10 22:56:22.582  1382  1527 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:22.584  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:22.605  1083  1083 E audit   : type=1400 audit(1765396582.599:340717): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:22.605  1083  1083 E audit   : type=1300 audit(1765396582.599:340717): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bcdf48580 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:22.605  1083  1083 E audit   : type=1327 audit(1765396582.599:340717): proctitle="com.sec.android.sdhms"
+12-10 22:56:22.605  1083  1083 E audit   : type=1400 audit(1765396582.599:340718): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:22.682  1382  2939 E WindowManager: App trying to use insecure INPUT_FEATURE_NO_INPUT_CHANNEL flag. Ignoring
+12-10 22:56:22.813  1382  1527 E WindowManager: win=Window{17d0a4e u0 Splash Screen com.tinyteacher EXITING} destroySurfaces: appStopped=false win.mWindowRemovalAllowed=true win.mRemoveOnExit=true win.mViewVisibility=0 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.WindowState.onExitAnimationDone:5189 com.android.server.wm.WindowStateAnimator.onAnimationFinished:320 com.android.server.wm.WindowState.onAnimationFinished:5630 com.android.server.wm.-$$Lambda$yVRF8YoeNdTa8GR1wDStVsHu8xM.run:2 com.android.server.wm.SurfaceAnimator.lambda$getFinishedCallback$0$SurfaceAnimator:100 
+12-10 22:56:22.926 12091 12594 E ReactNativeJS: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes
+12-10 22:56:22.927 12091 12594 E ReactNativeJS: Invariant Violation: "TinyTeacher" has not been registered. This can happen if:
+12-10 22:56:22.927 12091 12594 E ReactNativeJS: * Metro (the local dev server) is run from the wrong folder. Check if Metro is running, stop it and restart it in the current project.
+12-10 22:56:22.927 12091 12594 E ReactNativeJS: * A module failed to load due to an error and `AppRegistry.registerComponent` wasn't called., js engine: hermes
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: Process: com.tinyteacher, PID: 12091
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: anonymous@1:1044755
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: guardedLoadModule@1:34022
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: anonymous@1:941537
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: guardedLoadModule@1:34022
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: anonymous@1:40711
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: guardedLoadModule@1:33979
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: global@1:33180
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-10 22:56:22.931 12091 12595 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-10 22:56:22.979  1382  1432 E WindowManager: win=Window{29d657 u0 com.tinyteacher/com.tinyteacher.MainActivity EXITING} destroySurfaces: appStopped=false win.mWindowRemovalAllowed=true win.mRemoveOnExit=true win.mViewVisibility=0 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.WindowState.onExitAnimationDone:5189 com.android.server.wm.-$$Lambda$01bPtngJg5AqEoOWfW3rWfV7MH4.accept:2 java.util.ArrayList.forEach:1262 com.android.server.wm.AppWindowToken.onAnimationFinished:3941 com.android.server.wm.-$$Lambda$yVRF8YoeNdTa8GR1wDStVsHu8xM.run:2 
+12-10 22:56:22.979 12091 12091 E ViewRootImpl: sendUserActionEvent() mView returned.
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: [AppErrors] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at dxnj.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):39)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at aboc.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at aboo.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):45)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at eujx.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at eujp.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at eujt.i(:com.google.android.gms@254534013@25.45.34 (100400-831602148):18)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at eukb.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at eujz.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at eukh.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):52)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at eukh.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):420)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.036 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.075 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.079  1382  1524 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.087 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.088 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.102 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.125 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.132  1382  1524 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.141 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.145 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.177 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.179 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.184 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:23.186 11387 12607 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:24.022  1083  1083 E audit   : type=1400 audit(1765396584.009:340721): avc:  denied  { read } for  pid=26519 comm="CPU-0" name="devices" dev="proc" ino=4026532002 scontext=u:r:untrusted_app:s0:c140,c257,c512,c768 tcontext=u:object_r:proc:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:24.022  1083  1083 E audit   : type=1300 audit(1765396584.009:340721): arch=c00000b7 syscall=56 success=no exit=-13 a0=ffffffffffffff9c a1=7b1c0d9e60 a2=0 a3=0 items=0 ppid=1056 pid=26519 auid=4294967295 uid=10396 gid=10396 euid=10396 suid=10396 fsuid=10396 egid=10396 sgid=10396 fsgid=10396 tty=(none) ses=4294967295 comm="CPU-0" exe="/system/bin/app_process64" subj=u:r:untrusted_app:s0:c140,c257,c512,c768 key=(null)
+12-10 22:56:24.022  1083  1083 E audit   : type=1327 audit(1765396584.009:340721): proctitle="com.snapchat.android"
+12-10 22:56:24.022  1083  1083 E audit   : type=1400 audit(1765396584.009:340722): avc:  denied  { read } for  pid=26519 comm="CPU-0" name="devices" dev="proc" ino=4026532172 scontext=u:r:untrusted_app:s0:c140,c257,c512,c768 tcontext=u:object_r:proc:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:24.069 11136 12606 E BatteryFasDaoImpl: traverseFasDatabase : 10404 com.domobile.applockwatcheris active admin application now, so we skip !!
+12-10 22:56:24.226 11136 12606 E BatteryFasDaoImpl: This app com.luckypatchers.installer is disabled now, so we do not insert this app to FAS table
+12-10 22:56:24.226 11136 12606 E BatteryFasDaoImpl: traverseFasDatabase : 10403 com.luckypatchers.installeris disabled now, so we skip !!
+12-10 22:56:25.039  1083  1083 E audit   : type=1400 audit(1765396585.029:340725): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:25.040  1083  1083 E audit   : type=1300 audit(1765396585.029:340725): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bdb3202c0 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm="c.android.sdhms" exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:25.040  1083  1083 E audit   : type=1327 audit(1765396585.029:340725): proctitle="com.sec.android.sdhms"
+12-10 22:56:25.040  1083  1083 E audit   : type=1400 audit(1765396585.029:340726): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:25.142  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777535488: Success
+12-10 22:56:25.223  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777535488: Success
+12-10 22:56:25.373  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:56:25.379  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:25.467  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:56:25.515  3268 12358 E MMSDK-HttpUtils <296675:1765396585515>: Error occurred when trying to get response content.
+12-10 22:56:25.515  3268 12358 E MMSDK-HttpUtils <296675:1765396585515>: 	requestId: ١٧٦٥٣٩٦٥٨٥٣٧٥
+12-10 22:56:25.515  3268 12358 E MMSDK-HttpUtils <296675:1765396585515>: 	exception: java.net.UnknownHostException: Unable to resolve host "ads.nexage.com": No address associated with hostname
+12-10 22:56:25.515  3268  3362 E MMSDK-Handshake <296637:1765396585515>: Handshake request failed with HTTP response code: 400
+12-10 22:56:25.564  1382  1524 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:25.721  1382  2770 E InputDispatcher: Window handle Window{bd907f6 u0 Application Error: com.tinyteacher} has no registered input channel
+12-10 22:56:25.733  1382  1524 E ViewRootImpl: sendUserActionEvent() mView returned.
+12-10 22:56:29.173  1436  2363 E u4native: [InfoLevelMessage] [INFO:not_a_file.cc(0)] BrowserIOThread heartbeat, pid/tid: 1436/2363, interval/index: 30s/3516, ucCoreSoImplVersion: 5.6.0.11_231213160414
+12-10 22:56:29.187  1436  2385 E u4native: [InfoLevelMessage] [INFO:not_a_file.cc(0)] NetworkServiceThread heartbeat, pid/tid: 1436/2385, interval/index: 30s/3516
+12-10 22:56:30.357  1382  2010 E ActivityTaskManager: TouchDown intent received, starting ActiveLaunch
+12-10 22:56:30.366 12555 12555 E Zygote  : isWhitelistProcess - Process is Whitelisted
+12-10 22:56:30.368 12555 12555 E Zygote  : accessInfo : 1
+12-10 22:56:30.384 12555 12555 E com.tinyteache: Not starting debugger since process cannot load the jdwp agent.
+12-10 22:56:30.428  1382  4120 E ActivityTaskManager: VZW Wifi offload starts. It is not activelaunch
+12-10 22:56:30.436  1382  4120 E ANDR-PERF-JNI: com_qualcomm_qtiperformance_native_perf_io_prefetch_start
+12-10 22:56:30.438   847   864 E ANDR-IOP: io prefetch is disabled
+12-10 22:56:30.453   848   875 E ANDR-PERF-UTIL: Failed to update node /proc/12555/sched_boost with value 2
+12-10 22:56:30.454   848   875 E ANDR-PERF-OPTSHANDLER: can't boost task 12555
+12-10 22:56:30.454   848   875 E ANDR-PERF-RESOURCEQS: Failed to apply optimization [3, 32]
+12-10 22:56:30.502  1382  1527 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:30.505  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:56:30.521  1382  1956 E PkgPredictorService-Collector: record changed bt=0  wifi=1 screen=0
+12-10 22:56:30.525  1083  1083 E audit   : type=1400 audit(1765396590.519:340727): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:30.525  1083  1083 E audit   : type=1300 audit(1765396590.519:340727): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bcdf48900 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:30.525  1083  1083 E audit   : type=1327 audit(1765396590.519:340727): proctitle="com.sec.android.sdhms"
+12-10 22:56:30.525  1083  1083 E audit   : type=1400 audit(1765396590.519:340728): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:30.598  1382  1432 E WindowManager: App trying to use insecure INPUT_FEATURE_NO_INPUT_CHANNEL flag. Ignoring
+12-10 22:56:30.734  1382  1527 E WindowManager: win=Window{d7c0134 u0 Splash Screen com.tinyteacher EXITING} destroySurfaces: appStopped=false win.mWindowRemovalAllowed=true win.mRemoveOnExit=true win.mViewVisibility=0 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.WindowState.onExitAnimationDone:5189 com.android.server.wm.WindowStateAnimator.onAnimationFinished:320 com.android.server.wm.WindowState.onAnimationFinished:5630 com.android.server.wm.-$$Lambda$yVRF8YoeNdTa8GR1wDStVsHu8xM.run:2 com.android.server.wm.SurfaceAnimator.lambda$getFinishedCallback$0$SurfaceAnimator:100 
+12-10 22:56:30.834 12555 12657 E ReactNativeJS: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes
+12-10 22:56:30.836 12555 12657 E ReactNativeJS: Invariant Violation: "TinyTeacher" has not been registered. This can happen if:
+12-10 22:56:30.836 12555 12657 E ReactNativeJS: * Metro (the local dev server) is run from the wrong folder. Check if Metro is running, stop it and restart it in the current project.
+12-10 22:56:30.836 12555 12657 E ReactNativeJS: * A module failed to load due to an error and `AppRegistry.registerComponent` wasn't called., js engine: hermes
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: Process: com.tinyteacher, PID: 12555
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: anonymous@1:1044755
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: guardedLoadModule@1:34022
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: anonymous@1:941537
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: guardedLoadModule@1:34022
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: anonymous@1:40711
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: loadModuleImplementation@1:34498
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: guardedLoadModule@1:33979
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: metroRequire@1:33652
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: global@1:33180
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-10 22:56:30.839 12555 12658 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-10 22:56:30.891 12555 12555 E ViewRootImpl: sendUserActionEvent() mView returned.
+12-10 22:56:30.904  1382  2271 E WindowManager: win=Window{f672185 u0 com.tinyteacher/com.tinyteacher.MainActivity EXITING} destroySurfaces: appStopped=false win.mWindowRemovalAllowed=true win.mRemoveOnExit=true win.mViewVisibility=0 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.WindowState.onExitAnimationDone:5189 com.android.server.wm.-$$Lambda$01bPtngJg5AqEoOWfW3rWfV7MH4.accept:2 java.util.ArrayList.forEach:1262 com.android.server.wm.AppWindowToken.onAnimationFinished:3941 com.android.server.wm.-$$Lambda$yVRF8YoeNdTa8GR1wDStVsHu8xM.run:2 
+12-10 22:56:31.012  1382  1524 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: [AppErrors] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at dxnj.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):39)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at aboc.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at aboo.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):45)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at eujx.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at eujp.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at eujt.i(:com.google.android.gms@254534013@25.45.34 (100400-831602148):18)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at eukb.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at eujz.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at eukh.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):52)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at eukh.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):420)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.014 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.062  1382  1524 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.064 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.075 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.076 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.095 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.109  1382  1529 E Watchdog: !@Sync: 28338 heap: 125 / 135 [٢٠٢٥-١٢-١٠ ٢٢:٥٦:٣١.١٠٩] sdogWay: softdog
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.115 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.117 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.130 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.134 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.155 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.156 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.157 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.159 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: java.io.IOException: null InputStream
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:31.160 11387 12672 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:31.975 11136 12669 E BatteryFasDaoImpl: traverseFasDatabase : 10404 com.domobile.applockwatcheris active admin application now, so we skip !!
+12-10 22:56:32.129 11136 12669 E BatteryFasDaoImpl: This app com.luckypatchers.installer is disabled now, so we do not insert this app to FAS table
+12-10 22:56:32.129 11136 12669 E BatteryFasDaoImpl: traverseFasDatabase : 10403 com.luckypatchers.installeris disabled now, so we skip !!
+12-10 22:56:32.961  1083  1083 E audit   : type=1400 audit(1765396592.949:340731): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:32.961  1083  1083 E audit   : type=1300 audit(1765396592.949:340731): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7bdb3202c0 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm="c.android.sdhms" exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-10 22:56:32.961  1083  1083 E audit   : type=1327 audit(1765396592.949:340731): proctitle="com.sec.android.sdhms"
+12-10 22:56:32.961  1083  1083 E audit   : type=1400 audit(1765396592.949:340732): avc:  denied  { write } for  pid=3731 comm="c.android.sdhms" name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:33.623  1382  1524 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:33.742  1382  2939 E InputDispatcher: Window handle Window{9edcfec u0 Application Error: com.tinyteacher} has no registered input channel
+12-10 22:56:33.749  1382  1524 E ViewRootImpl: sendUserActionEvent() mView returned.
+12-10 22:56:34.190  1382  1539 E NotificationService: Suppressing notification from package by user request.
+12-10 22:56:40.296  1083  1083 E audit   : type=1400 audit(1765396600.289:340733): avc:  denied  { read } for  pid=1436 comm="CrashSDKBkgdHan" name="loadavg" dev="proc" ino=4026532105 scontext=u:r:untrusted_app:s0:c128,c257,c512,c768 tcontext=u:object_r:proc_loadavg:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:56:40.298  1083  1083 E audit   : type=1300 audit(1765396600.289:340733): arch=c00000b7 syscall=56 success=no exit=-13 a0=ffffff9c a1=7c6a198378 a2=0 a3=0 items=0 ppid=1056 pid=1436 auid=4294967295 uid=10384 gid=10384 euid=10384 suid=10384 fsuid=10384 egid=10384 sgid=10384 fsgid=10384 tty=(none) ses=4294967295 comm="CrashSDKBkgdHan" exe="/system/bin/app_process64" subj=u:r:untrusted_app:s0:c128,c257,c512,c768 key=(null)
+12-10 22:56:40.298  1083  1083 E audit   : type=1327 audit(1765396600.289:340733): proctitle="com.alibaba.aliexpresshd"
+12-10 22:56:45.236  2082  2082 E [IndicatorGarden]Presenter: onGardenApplyWindowInsets() New DisplayCutout is NULL!!
+12-10 22:56:45.281  2082  2082 E [IndicatorGarden]Presenter: onGardenApplyWindowInsets() New DisplayCutout is NULL!!
+12-10 22:56:45.290  1382  3620 E WindowManager: win=Window{ca22f1b u0 com.samsung.android.app.cocktailbarservice/com.samsung.android.app.cocktailbarservice.CocktailBarService} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.WindowManagerService.tryStartExitingAnimation:2815 com.android.server.wm.WindowManagerService.relayoutWindow:2548 com.android.server.wm.Session.relayout:202 android.view.IWindowSession$Stub.onTransact:716 com.android.server.wm.Session.onTransact:142 android.os.Binder.execTransactInternal:1056 android.os.Binder.execTransact:1029 
+12-10 22:56:46.021  2082  2082 E [IndicatorGarden]Presenter: onGardenApplyWindowInsets() New DisplayCutout is NULL!!
+12-10 22:56:46.032  2082  2082 E [IndicatorGarden]Presenter: onGardenApplyWindowInsets() New DisplayCutout is NULL!!
+12-10 22:56:46.064  9725  9725 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:46.078  9725  9725 E DecorView: mWindow.mActivityCurrentConfig is null
+12-10 22:56:46.820  1382  1854 E MotionRecognitionService: handleMessage: event 100 value : 2
+12-10 22:56:46.827  1382  1583 E libEGL  : eglCreateWindowSurfaceTmpl:894 error 300b (EGL_BAD_NATIVE_WINDOW)
+12-10 22:56:46.863  1382  1583 E libEGL  : eglDestroySurfaceImpl:1102 error 300d (EGL_BAD_SURFACE)
+12-10 22:56:46.874  1382  1583 E ColorFade: eglDestroySurface failed: error 12301
+12-10 22:56:46.874  1382  1583 E ColorFade: java.lang.Throwable
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.ColorFade.logEglError(ColorFade.java:836)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.ColorFade.destroyEglSurface(ColorFade.java:772)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.ColorFade.dismissResources(ColorFade.java:395)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.DisplayPowerState.dismissColorFadeResources(DisplayPowerState.java:252)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.DisplayPowerController.animateScreenStateChange(DisplayPowerController.java:2458)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.DisplayPowerController.updatePowerState(DisplayPowerController.java:1326)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.DisplayPowerController.access$1500(DisplayPowerController.java:118)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.display.DisplayPowerController$DisplayControllerHandler.handleMessage(DisplayPowerController.java:3347)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at android.os.Looper.loop(Looper.java:237)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-10 22:56:46.874  1382  1583 E ColorFade: 	at com.android.server.ServiceThread.run(ServiceThread.java:44)
+12-10 22:56:46.885   838   901 E sensors-hal: ~sns_wakelock:72, ~sns_wakelock sensor_ssc_worker/auto_rotation and  _heldwakelock 0
+12-10 22:56:46.906  1382  1555 E KernelCpuSpeedReader: Failed to read cpu-freq: /sys/devices/system/cpu/cpu٤/cpufreq/stats/time_in_state: open failed: ENOENT (No such file or directory)
+12-10 22:56:46.906  1382  1555 E KernelCpuSpeedReader: Failed to read cpu-freq: /sys/devices/system/cpu/cpu٠/cpufreq/stats/time_in_state: open failed: ENOENT (No such file or directory)
+12-10 22:56:48.609  1382  1854 E MotionRecognitionService: handleMessage: event 200 value : 2
+12-10 22:56:48.633  1382  1555 E KernelCpuSpeedReader: Failed to read cpu-freq: /sys/devices/system/cpu/cpu٤/cpufreq/stats/time_in_state: open failed: ENOENT (No such file or directory)
+12-10 22:56:48.634  1382  1555 E KernelCpuSpeedReader: Failed to read cpu-freq: /sys/devices/system/cpu/cpu٠/cpufreq/stats/time_in_state: open failed: ENOENT (No such file or directory)
+12-10 22:56:48.681   838   901 E sensors-hal: is_restrict_mode:164, fread fail
+12-10 22:56:48.744  1382  1432 E WifiService: 10396 has no permission about LOCAL_MAC_ADDRESS
+12-10 22:56:48.745  1382  1432 E WifiService: 10396 has no permission about LOCAL_MAC_ADDRESS
+12-10 22:56:48.747  2216  2821 E EPDG -- SIM0 [RILRECEIVER]: RX [NET_REGIST] -- RESPONSE -- not initialized
+12-10 22:56:48.762  2216  2821 E EPDG -- SIM0 [RILRECEIVER]: RX [NET_REGIST] -- RESPONSE -- not initialized
+12-10 22:56:55.376  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777527296: Success
+12-10 22:56:55.441  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777527296: Success

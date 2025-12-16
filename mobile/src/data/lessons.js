@@ -1,5 +1,17 @@
 export const lessons = [
     {
+        id: 'ar_letters_ai',
+        title: 'الحروف العربية (AI)',
+        titleEn: 'Arabic Alphabet (Smart)',
+        description: 'تعلم قراءة وكتابة الحروف العربية مع المعلمة الذكية.',
+        icon: 'ا',
+        level: 'beginner',
+        duration: 'مفتوح',
+        topics: [], // Handled by AI
+        mode: 'ai_classroom', // Special flag to use ClassroomScreen
+        prompt: 'أريد تعلم الحروف العربية. ابدئي بدرس تفاعلي لحرف الألف. اشرحي الحرف أولاً، ثم اطلبي مني ترديده، ثم اطلبي مني كتابته على الدفتر، ثم اختبريني فيه. كوني مثل المعلمة الحقيقية وشجعيني.'
+    },
+    {
         id: 1,
         title: 'الحروف الأبجدية',
         titleEn: 'Alphabet',

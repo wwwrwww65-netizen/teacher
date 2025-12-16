@@ -1,8 +1,21 @@
-node_modules
+# Node.js
+node_modules/
 npm-debug.log
-.env
-.DS_Store
-build
-dist
-coverage
 *.log
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+
+# Build outputs
+build/
+dist/
+coverage/
+# Android / Gradle
+.gradle/
+.gradle_home/
+gradle_cache/
+**/.gradle
+**/build

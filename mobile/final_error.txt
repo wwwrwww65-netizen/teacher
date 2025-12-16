@@ -1,0 +1,202 @@
+--------- beginning of system
+12-11 00:33:31.524  1382  3620 E ActivityTaskManager: intent received is not valid or null
+--------- beginning of main
+12-11 00:33:31.534  1382  3620 E ANDR-PERF-JNI: com_qualcomm_qtiperformance_native_perf_io_prefetch_start
+12-11 00:33:31.537   847   864 E ANDR-IOP: io prefetch is disabled
+12-11 00:33:31.558  1382  1527 E system_server: Invalid ID 0x00000000.
+12-11 00:33:31.563  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-11 00:33:31.571   848   875 E ANDR-PERF-UTIL: Failed to update node /proc/4206/sched_boost with value 2
+12-11 00:33:31.571   848   875 E ANDR-PERF-OPTSHANDLER: can't boost task 4206
+12-11 00:33:31.571   848   875 E ANDR-PERF-RESOURCEQS: Failed to apply optimization [3, 32]
+12-11 00:33:31.574  4206  4206 E Zygote  : isWhitelistProcess - Process is Whitelisted
+12-11 00:33:31.575  4206  4206 E Zygote  : accessInfo : 1
+12-11 00:33:31.582  1382  1527 E DecorView: mWindow.mActivityCurrentConfig is null
+12-11 00:33:31.590  4206  4206 E com.tinyteache: Not starting debugger since process cannot load the jdwp agent.
+12-11 00:33:31.606   848   875 E ANDR-PERF-UTIL: Failed to update node /proc/4206/sched_boost with value 2
+12-11 00:33:31.607   848   875 E ANDR-PERF-OPTSHANDLER: can't boost task 4206
+12-11 00:33:31.607   848   875 E ANDR-PERF-RESOURCEQS: Failed to apply optimization [3, 32]
+12-11 00:33:31.647  1382  1956 E PkgPredictorService-Collector: record changed bt=0  wifi=1 screen=0
+12-11 00:33:31.656  1083  1083 E audit   : type=1400 audit(1765402411.649:343111): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-11 00:33:31.656  1083  1083 E audit   : type=1300 audit(1765402411.649:343111): arch=c00000b7 syscall=48 success=no exit=-13 a0=ffffff9c a1=7c6a129dc0 a2=2 a3=0 items=0 ppid=1056 pid=3731 auid=4294967295 uid=1000 gid=1000 euid=1000 suid=1000 fsuid=1000 egid=1000 sgid=1000 fsgid=1000 tty=(none) ses=4294967295 comm=5344484D5320526573756D65204861 exe="/system/bin/app_process64" subj=u:r:system_app:s0 key=(null)
+12-11 00:33:31.656  1083  1083 E audit   : type=1327 audit(1765402411.649:343111): proctitle="com.sec.android.sdhms"
+12-11 00:33:31.656  1083  1083 E audit   : type=1400 audit(1765402411.649:343112): avc:  denied  { write } for  pid=3731 comm=5344484D5320526573756D65204861 name="clkscale_enable" dev="sysfs" ino=54511 scontext=u:r:system_app:s0 tcontext=u:object_r:sysfs:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-11 00:33:31.754  1382  3620 E WindowManager: App trying to use insecure INPUT_FEATURE_NO_INPUT_CHANNEL flag. Ignoring
+12-11 00:33:31.931  5862  5862 E Zygote  : isWhitelistProcess - Process is Whitelisted
+12-11 00:33:31.933  5862  5862 E Zygote  : accessInfo : 1
+12-11 00:33:31.963  5862  5862 E android:drmSer: Not starting debugger since process cannot load the jdwp agent.
+12-11 00:33:32.000  1382  1527 E WindowManager: win=Window{dfeb7e u0 Splash Screen com.tinyteacher EXITING} destroySurfaces: appStopped=false win.mWindowRemovalAllowed=true win.mRemoveOnExit=true win.mViewVisibility=0 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.WindowState.onExitAnimationDone:5189 com.android.server.wm.WindowStateAnimator.onAnimationFinished:320 com.android.server.wm.WindowState.onAnimationFinished:5630 com.android.server.wm.-$$Lambda$yVRF8YoeNdTa8GR1wDStVsHu8xM.run:2 com.android.server.wm.SurfaceAnimator.lambda$getFinishedCallback$0$SurfaceAnimator:100 
+12-11 00:33:32.022  4206  5855 E ReactNativeJS: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes
+12-11 00:33:32.024  4206  5855 E ReactNativeJS: Invariant Violation: "TinyTeacher" has not been registered. This can happen if:
+12-11 00:33:32.024  4206  5855 E ReactNativeJS: * Metro (the local dev server) is run from the wrong folder. Check if Metro is running, stop it and restart it in the current project.
+12-11 00:33:32.024  4206  5855 E ReactNativeJS: * A module failed to load due to an error and `AppRegistry.registerComponent` wasn't called., js engine: hermes
+--------- beginning of crash
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: FATAL EXCEPTION: mqt_native_modules
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: Process: com.tinyteacher, PID: 4206
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: com.facebook.react.common.JavascriptException: ReferenceError: Property 'StyleSheet' doesn't exist, js engine: hermes, stack:
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: anonymous@1:1044755
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: metroRequire@1:33652
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: anonymous@1:941537
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: guardedLoadModule@1:34022
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: metroRequire@1:33652
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: anonymous@1:40711
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: loadModuleImplementation@1:34498
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: guardedLoadModule@1:33979
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: metroRequire@1:33652
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: global@1:33180
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.modules.core.ExceptionsManagerModule.reportException(ExceptionsManagerModule.java:65)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at java.lang.reflect.Method.invoke(Native Method)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.JavaMethodWrapper.invoke(JavaMethodWrapper.java:372)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.JavaModuleWrapper.invoke(JavaModuleWrapper.java:149)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.jni.NativeRunnable.run(Native Method)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at android.os.Handler.handleCallback(Handler.java:883)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at android.os.Handler.dispatchMessage(Handler.java:100)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadHandler.dispatchMessage(MessageQueueThreadHandler.java:29)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at com.facebook.react.bridge.queue.MessageQueueThreadImpl$4.run(MessageQueueThreadImpl.java:234)
+12-11 00:33:32.031  4206  5857 E AndroidRuntime: 	at java.lang.Thread.run(Thread.java:919)
+12-11 00:33:32.079  1382  2319 E WindowManager: win=Window{6b03b76 u0 com.sec.android.app.myfiles/com.sec.android.app.myfiles.external.ui.MainActivity} destroySurfaces: appStopped=true win.mWindowRemovalAllowed=false win.mRemoveOnExit=false win.mViewVisibility=8 caller=com.android.server.wm.AppWindowToken.destroySurfaces:1249 com.android.server.wm.AppWindowToken.destroySurfaces:1230 com.android.server.wm.AppWindowToken.notifyAppStopped:1285 com.android.server.wm.ActivityRecord.activityStoppedLocked:2776 com.android.server.wm.ActivityTaskManagerService.activityStopped:2512 android.app.IActivityTaskManager$Stub.onTransact:2280 android.os.Binder.execTransactInternal:1056 
+12-11 00:33:32.150  1382  1868 E InputDispatcher: channel '9b959a9 com.tinyteacher/com.tinyteacher.MainActivity (server)' ~ Channel is unrecoverably broken and will be disposed!
+12-11 00:33:32.317  5934  5934 E Zygote  : isWhitelistProcess - Process is Whitelisted
+12-11 00:33:32.319  5934  5934 E Zygote  : accessInfo : 1
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: [AppErrors] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at dxnj.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):39)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at aboc.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at aboo.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):45)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at eujx.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at eujp.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at eujt.i(:com.google.android.gms@254534013@25.45.34 (100400-831602148):18)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at eukb.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at ffeu.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhw.d(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhy.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):38)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhy.g(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at eujz.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at ffet.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjr.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):20)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnlv.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):3)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnkw.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):19)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnlx.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):5)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjt.run(:com.google.android.gms@254534013@25.45.34 (100400-831602148):53)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjk.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjt.execute(:com.google.android.gms@254534013@25.45.34 (100400-831602148):76)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.f(:com.google.android.gms@254534013@25.45.34 (100400-831602148):1)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnhl.hw(:com.google.android.gms@254534013@25.45.34 (100400-831602148):41)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at fnjv.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):33)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at eukh.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):52)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at eukh.b(:com.google.android.gms@254534013@25.45.34 (100400-831602148):10)
+12-11 00:33:32.331 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):420)
+12-11 00:33:32.332 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.332 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.332 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.332 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.332 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.343  5934  5934 E oid.sm.provide: Not starting debugger since process cannot load the jdwp agent.
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.348 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.351 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.371 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.381 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.385 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: [AppDoctor] null InputStream [CONTEXT service_id=254 ]
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: java.io.IOException: null InputStream
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at dxpm.c(:com.google.android.gms@254534013@25.45.34 (100400-831602148):176)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at dxnu.l(:com.google.android.gms@254534013@25.45.34 (100400-831602148):4)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at dxnh.apply(:com.google.android.gms@254534013@25.45.34 (100400-831602148):37)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at com.google.android.gms.stats.service.DropBoxEntryAddedChimeraService.a(:com.google.android.gms@254534013@25.45.34 (100400-831602148):631)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at com.google.android.gms.framework.tracing.wrapper.TracingIntentService.onHandleIntent(:com.google.android.gms@254534013@25.45.34 (100400-831602148):13)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at wwv.handleMessage(:com.google.android.gms@254534013@25.45.34 (100400-831602148):7)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at android.os.Handler.dispatchMessage(Handler.java:107)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at android.os.Looper.loop(Looper.java:237)
+12-11 00:33:32.392 11387  5941 E DropBoxUtil: 	at android.os.HandlerThread.run(HandlerThread.java:67)
+12-11 00:33:32.776  1083  1083 E audit   : type=1400 audit(1765402412.769:343116): avc:  denied  { read } for  pid=1436 comm="CrashSDKBkgdHan" name="loadavg" dev="proc" ino=4026532105 scontext=u:r:untrusted_app:s0:c128,c257,c512,c768 tcontext=u:object_r:proc_loadavg:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-11 00:33:32.776  1083  1083 E audit   : type=1300 audit(1765402412.769:343116): arch=c00000b7 syscall=56 success=no exit=-13 a0=ffffff9c a1=7b5ffd30a8 a2=0 a3=0 items=0 ppid=1056 pid=1436 auid=4294967295 uid=10384 gid=10384 euid=10384 suid=10384 fsuid=10384 egid=10384 sgid=10384 fsgid=10384 tty=(none) ses=4294967295 comm="CrashSDKBkgdHan" exe="/system/bin/app_process64" subj=u:r:untrusted_app:s0:c128,c257,c512,c768 key=(null)
+12-11 00:33:32.776  1083  1083 E audit   : type=1327 audit(1765402412.769:343116): proctitle="com.alibaba.aliexpresshd"
+12-11 00:33:33.094  1382  1529 E Watchdog: !@Sync: 28532 heap: 138 / 138 [٢٠٢٥-١٢-١١ ٠٠:٣٣:٣٣.٠٩٣] sdogWay: softdog

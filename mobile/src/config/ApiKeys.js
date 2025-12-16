@@ -1,24 +1,16 @@
 // ==============================================================================
 // 🔑 API KEYS CONFIGURATION
 // ==============================================================================
-// ضع مفاتيح الـ API الخاصة بك هنا.
-// احرص على عدم مشاركة هذا الملف مع أحد إذا كان يحتوي على مفاتيح حقيقية.
+// مفاتيح الـ API للمشروع.
 // ==============================================================================
 
 export const API_KEYS = {
-    // 1. OpenAI API Key (للعقل المفكر وتوليد الرسم)
-    // احصل عليه من: https://platform.openai.com/api-keys
-    OPENAI_API_KEY: "sk-YOUR_OPENAI_KEY_HERE",
-
-    // 2. (اختياري) ElevenLabs API Key (إذا كنت تريد صوتاً أكثر واقعية بدلاً من صوت الهاتف الافتراضي)
-    // ELEVENLABS_API_KEY: "YOUR_KEY_HERE",
+    // 1. Google Cloud / Gemini API Key
+    // يستخدم للذكاء الاصطناعي (Gemini Pro) وتحويل النص لصوت (Google TTS)
+    GOOGLE_API_KEY: "AIzaSyCd4HQDcNeF6WztPhTOhUbcoiqZi79Q5ug",
 };
 
 export const API_CONFIG = {
-    // الموديل المستخدم (gpt-4o أو gpt-3.5-turbo)
-    // gpt-4o أفضل في توليد رسومات SVG دقيقة.
-    OPENAI_MODEL: "gpt-4o",
+    // الموديل المستخدم
+    AI_MODEL: "gemini-pro",
 };
-
-// Export for AIService compatibility
-export const API_KEY = API_KEYS.OPENAI_API_KEY;

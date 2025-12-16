@@ -1,0 +1,28 @@
+--------- beginning of system
+--------- beginning of main
+12-10 22:56:48.744  1382  1432 E WifiService: 10396 has no permission about LOCAL_MAC_ADDRESS
+12-10 22:56:48.745  1382  1432 E WifiService: 10396 has no permission about LOCAL_MAC_ADDRESS
+12-10 22:56:48.747  2216  2821 E EPDG -- SIM0 [RILRECEIVER]: RX [NET_REGIST] -- RESPONSE -- not initialized
+12-10 22:56:48.762  2216  2821 E EPDG -- SIM0 [RILRECEIVER]: RX [NET_REGIST] -- RESPONSE -- not initialized
+12-10 22:56:55.376  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777527296: Success
+12-10 22:56:55.441  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777527296: Success
+12-10 22:56:59.188  1436  2363 E u4native: [InfoLevelMessage] [INFO:not_a_file.cc(0)] BrowserIOThread heartbeat, pid/tid: 1436/2363, interval/index: 30s/3517, ucCoreSoImplVersion: 5.6.0.11_231213160414
+12-10 22:56:59.218  1436  2385 E u4native: [InfoLevelMessage] [INFO:not_a_file.cc(0)] NetworkServiceThread heartbeat, pid/tid: 1436/2385, interval/index: 30s/3517
+12-10 22:57:01.040  1382  3627 E WifiService: 10396 has no permission about LOCAL_MAC_ADDRESS
+12-10 22:57:01.117  1382  1529 E Watchdog: !@Sync: 28339 heap: 119 / 135 [٢٠٢٥-١٢-١٠ ٢٢:٥٧:٠١.١١٦] sdogWay: softdog
+12-10 22:57:01.135  1083  1083 E audit   : type=1400 audit(1765396621.129:340734): avc:  denied  { read } for  pid=26519 comm="CPU-3" name="devices" dev="proc" ino=4026532002 scontext=u:r:untrusted_app:s0:c140,c257,c512,c768 tcontext=u:object_r:proc:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:57:01.135  1083  1083 E audit   : type=1300 audit(1765396621.129:340734): arch=c00000b7 syscall=56 success=no exit=-13 a0=ffffffffffffff9c a1=7b10872340 a2=0 a3=0 items=0 ppid=1056 pid=26519 auid=4294967295 uid=10396 gid=10396 euid=10396 suid=10396 fsuid=10396 egid=10396 sgid=10396 fsgid=10396 tty=(none) ses=4294967295 comm="CPU-3" exe="/system/bin/app_process64" subj=u:r:untrusted_app:s0:c140,c257,c512,c768 key=(null)
+12-10 22:57:01.135  1083  1083 E audit   : type=1327 audit(1765396621.129:340734): proctitle="com.snapchat.android"
+12-10 22:57:01.135  1083  1083 E audit   : type=1400 audit(1765396621.129:340735): avc:  denied  { read } for  pid=26519 comm="CPU-3" name="devices" dev="proc" ino=4026532172 scontext=u:r:untrusted_app:s0:c140,c257,c512,c768 tcontext=u:object_r:proc:s0 tclass=file permissive=0 SEPF_SM-N960U_10_0030 audit_filtered
+12-10 22:57:01.135  1083  1083 E audit   : type=1300 audit(1765396621.129:340735): arch=c00000b7 syscall=56 success=no exit=-13 a0=ffffffffffffff9c a1=7af686cc19 a2=0 a3=0 items=0 ppid=1056 pid=26519 auid=4294967295 uid=10396 gid=10396 euid=10396 suid=10396 fsuid=10396 egid=10396 sgid=10396 fsgid=10396 tty=(none) ses=4294967295 comm="CPU-3" exe="/system/bin/app_process64" subj=u:r:untrusted_app:s0:c140,c257,c512,c768 key=(null)
+12-10 22:57:02.985  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:57:04.234  1382  1539 E NotificationService: Suppressing notification from package by user request.
+12-10 22:57:25.553  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777510912: Success
+12-10 22:57:25.595  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:57:25.609  1154  1154 E installd: Failed to free up 1048576000 on /data; final free space 777510912: Success
+12-10 22:57:25.619  1161  1309 E Netd    : getNetworkForDns: getNetId from enterpriseCtrl is netid 0
+12-10 22:57:25.629  2490  2490 E libprocessgroup: set_timerslack_ns write failed: Operation not permitted
+12-10 22:57:25.755  3268 12729 E MMSDK-HttpUtils <296676:1765396645755>: Error occurred when trying to get response content.
+12-10 22:57:25.755  3268 12729 E MMSDK-HttpUtils <296676:1765396645755>: 	requestId: ١٧٦٥٣٩٦٦٤٥٦١٦
+12-10 22:57:25.755  3268 12729 E MMSDK-HttpUtils <296676:1765396645755>: 	exception: java.net.UnknownHostException: Unable to resolve host "ads.nexage.com": No address associated with hostname
+12-10 22:57:25.757  3268  3362 E MMSDK-Handshake <296637:1765396645756>: Handshake request failed with HTTP response code: 400

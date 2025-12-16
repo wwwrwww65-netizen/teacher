@@ -5,8 +5,7 @@ import axios from 'axios';
 import RNFS from 'react-native-fs';
 import SoundPlayer from 'react-native-sound-player';
 import { analyzeArabicText, generateVisemeTimeline } from '../utils/arabicVisemes';
-
-const GOOGLE_API_KEY = 'AIzaSyCd4HQDcNeF6WztPhTOhUbcoiqZi79Q5ug';
+import { GOOGLE_API_KEY, ANDROID_PACKAGE_NAME, ANDROID_CERT_FINGERPRINT } from '../config/constants';
 
 /**
  * خدمة الصوت العربي الاحترافي
@@ -79,22 +78,30 @@ class ArabicVoiceService {
             input: { text: text },
             voice: {
                 languageCode: 'ar-XA',
-                name: 'ar-XA-Wavenet-A', // WaveNet voice (A is typically female/neutral, good for kids)
+                name: 'ar-XA-Wavenet-A', // Standard, reliable Arabic Voice
                 ssmlGender: 'FEMALE'
             },
             audioConfig: {
                 audioEncoding: 'MP3',
-                speakingRate: 0.85, // أبطأ قليلاً للأطفال
+                speakingRate: 1.1, // سرعة طبيعية (كانت 0.85 وسريعة جداً للمستخدم)
                 pitch: 0.0
             }
         };
 
-        const response = await axios.post(url, body);
+        const response = await axios.post(url, body, {
+            headers: {
+                'X-Android-Package': ANDROID_PACKAGE_NAME,
+                'X-Android-Cert': ANDROID_CERT_FINGERPRINT
+            }
+        });
         return response.data.audioContent;
     }
 
     /**
      * نطق نص عربي مع مخارج الحروف
+     */
+    /**
+     * نطق نص عربي مع مخارج الحروف - ينتظر انتهاء الصوت
      */
     async speak(text, options = {}) {
         const {
@@ -102,50 +109,121 @@ class ArabicVoiceService {
             rate = 0.85,
             pitch = 1.0,
             onVisemeChange = null,
+            onPlayStart = null,
         } = options;
 
-        try {
-            // 1. إيقاف أي صوت حالي
-            await this.stop();
-
-            // 2. تحليل النص للحصول على مخارج الحروف (Animation)
-            const { timeline, totalDuration } = generateVisemeTimeline(text);
-
-            // 3. جلب الصوت من Google Cloud
-            console.log('🔄 Fetching audio from Google Cloud...');
-            const audioData = await this.fetchGoogleTTS(text);
-
-            // 4. حفظ الملف محلياً
-            const path = `${RNFS.CachesDirectoryPath}/speech_${Date.now()}.mp3`;
-            await RNFS.writeFile(path, audioData, 'base64');
-
-            // 5. تشغيل الصوت
-            console.log('🔊 Playing audio:', path);
-
-            // حفظ callback لتغيير الفم
-            if (onVisemeChange) {
-                this.currentVisemeCallback = onVisemeChange;
-                this.currentTimeline = timeline;
-                this.startVisemeAnimation();
-            }
-
+        return new Promise(async (resolve) => {
             try {
-                // SoundPlayer takes file path directly
-                // Note: For Android 'loadUrl' or 'playUrl' with file:// might be needed
-                SoundPlayer.playUrl('file://' + path);
+                // 1. إيقاف أي صوت حالي
+                await this.stop();
 
-                return { timeline, totalDuration };
-            } catch (e) {
-                console.error('❌ SoundPlayer Error:', e);
-                this.stopVisemeAnimation();
-                return null;
+                // WEB SUPPORT: Use Real Google Cloud TTS for Quality
+                if (Platform.OS === 'web') {
+                    console.log('🌐 Web platform detected, fetching Google Cloud TTS for quality...');
+                    try {
+                        const audioData = await this.fetchGoogleTTS(text);
+                        const snd = new Audio("data:audio/mp3;base64," + audioData);
+
+                        // Animation Trigger
+                        if (onVisemeChange) {
+                            this.currentVisemeCallback = onVisemeChange;
+                            this.currentTimeline = generateVisemeTimeline(text).timeline;
+                            this.startVisemeAnimation();
+                        }
+
+                        await new Promise((resolvePlay) => {
+                            snd.onended = () => resolvePlay();
+                            snd.onerror = (e) => {
+                                console.error("Audio Playback Error", e);
+                                resolvePlay();
+                            };
+
+                            // SYNC POINT: Audio is ready, about to play
+                            if (onPlayStart) onPlayStart();
+
+                            snd.play();
+                        });
+
+                        this.stopVisemeAnimation();
+                        resolve(true);
+                        return;
+
+                    } catch (e) {
+                        console.error("Web Google TTS Error, falling back to system:", e);
+
+                        // Fallback to browser native TTS which works on Simulator/Web
+                        if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+                            const utterance = new SpeechSynthesisUtterance(text);
+                            utterance.lang = 'ar-SA';
+                            utterance.rate = rate;
+                            await new Promise(resolveSynth => {
+                                utterance.onend = () => resolveSynth();
+                                utterance.onerror = (err) => { console.warn('Synth error', err); resolveSynth(); };
+
+                                if (onPlayStart) onPlayStart();
+                                window.speechSynthesis.speak(utterance);
+
+                                // Failsafe timeout in case onend never fires
+                                setTimeout(resolveSynth, (text.length * 100) + 5000);
+                            });
+                        } else {
+                            // Just simulate delay if no TTS available
+                            await new Promise(r => setTimeout(r, 2000 + text.length * 50));
+                        }
+
+                        resolve(true);
+                        return;
+                    }
+                }
+
+                // 2. تحليل النص للحصول على مخارج الحروف (Animation)
+                const { timeline, totalDuration } = generateVisemeTimeline(text);
+
+                // 3. جلب الصوت من Google Cloud
+                console.log('🔄 Fetching audio from Google Cloud...');
+                const audioData = await this.fetchGoogleTTS(text);
+
+                // 4. حفظ الملف محلياً
+                const path = `${RNFS.CachesDirectoryPath}/speech_${Date.now()}.mp3`;
+                await RNFS.writeFile(path, audioData, 'base64');
+
+                // 5. إعداد مستمع الانتهاء
+                const onFinish = ({ success }) => {
+                    console.log('✅ Finished playing:', success);
+                    this.stopVisemeAnimation();
+                    if (this.finishListener) this.finishListener.remove();
+                    resolve(true);
+                };
+
+                this.finishListener = SoundPlayer.addEventListener('FinishedPlaying', onFinish);
+
+                // 6. تشغيل الصوت
+                console.log('🔊 Playing audio:', path);
+
+                // حفظ callback لتغيير الفم
+                if (onVisemeChange) {
+                    this.currentVisemeCallback = onVisemeChange;
+                    this.currentTimeline = timeline;
+                    this.startVisemeAnimation();
+                }
+
+                try {
+                    // SYNC POINT: File exists, player ready
+                    if (onPlayStart) onPlayStart();
+
+                    SoundPlayer.playUrl('file://' + path);
+                } catch (e) {
+                    console.error('❌ SoundPlayer Error:', e);
+                    this.stopVisemeAnimation();
+                    if (this.finishListener) this.finishListener.remove();
+                    resolve(false);
+                }
+
+            } catch (error) {
+                console.error('❌ Error in speak:', error);
+                resolve(false);
             }
-
-        } catch (error) {
-            console.error('❌ Error in speak:', error);
-            // Fallback to console log or silent fail, user experience matters
-            return null;
-        }
+        });
     }
 
     /**
@@ -243,15 +321,15 @@ class ArabicVoiceService {
                     });
             });
 
-            // Timeout
+            // Timeout - Auto stop silence
             setTimeout(() => {
                 if (!hasResolved) {
-                    console.log('🎤 Timeout');
+                    console.log('🎤 Timeout - Silence detected');
                     cleanup();
                     hasResolved = true;
-                    resolve(''); // Empty result on timeout
+                    resolve(null); // Return null to indicate silence
                 }
-            }, 10000); // 10 seconds
+            }, 5000); // 5 seconds listening window
         });
     }
 
