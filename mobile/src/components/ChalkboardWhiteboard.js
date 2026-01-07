@@ -1,55 +1,132 @@
 import React, { forwardRef, useImperativeHandle, useState, useRef } from 'react';
-import { View, StyleSheet, ImageBackground, Image, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Image, Animated, Easing, I18nManager } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 // إنشاء مكون Path قابل للتحريك
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
 const ChalkboardWhiteboard = forwardRef((props, ref) => {
-    const [currentPath, setCurrentPath] = useState('');
-    const [imageUri, setImageUri] = useState(null); // صورة الواجب
+    const [drawings, setDrawings] = useState([]); // List of { content, offset, type }
+    const [imageUri, setImageUri] = useState(null);
 
     // قيمة الحركة للرسم
     const progress = useRef(new Animated.Value(0)).current;
 
     useImperativeHandle(ref, () => ({
-        write: (svgPath, duration = 3000) => {
-            setImageUri(null); // إخفاء الصورة عند الكتابة
-            setCurrentPath(svgPath);
-            progress.setValue(0);
+        write: (content, options = {}) => {
+            const { count = 1, duration = 1500, type = 'any' } = options;
+            setImageUri(null);
 
+            // Detection Logic: Is it a word/number or an SVG path?
+            const isSvgPath = typeof content === 'string' &&
+                content.trim().startsWith('M') &&
+                content.includes(' ');
+
+            const determinedIsText = type === 'text' || !isSvgPath;
+            const finalContentType = determinedIsText ? 'text' : 'path';
+
+            setDrawings([{
+                content,
+                count,
+                type: finalContentType,
+                key: Date.now()
+            }]);
+
+            progress.setValue(0);
             Animated.timing(progress, {
                 toValue: 1,
                 duration: duration,
-                easing: Easing.linear,
-                useNativeDriver: true, // استخدام Native Driver للأداء
+                easing: Easing.out(Easing.ease),
+                useNativeDriver: true,
             }).start();
         },
         showImage: (uri) => {
-            setCurrentPath(''); // مسح الكتابة عند عرض الصورة
+            setDrawings([]);
             setImageUri(uri);
         },
         clear: () => {
-            setCurrentPath('');
+            setDrawings([]);
             setImageUri(null);
             progress.setValue(0);
         },
     }));
 
-    // تحريك strokeDashoffset لمحاكاة حركة الكتابة
-    // بما أننا لا نستطيع معرفة طول المسار بدقة بدون `getTotalLength` (الذي يحتاج DOM)،
-    // سنستخدم قيمة كبيرة تقديرية (1000) ونحركها.
-    const pathLength = 1000;
-    const strokeDashoffset = progress.interpolate({
-        inputRange: [0, 1],
-        outputRange: [pathLength, 0],
+    // دالة مساعدة لحساب مواضع الشبكة (Grid Layout)
+    const calculateGridPositions = (count, startX = 150, startY = 160, spacing = 80) => {
+        const positions = [];
+        if (count === 1) return [{ x: startX, y: startY }];
+
+        const cols = count > 3 ? 3 : count;
+        const rows = Math.ceil(count / cols);
+
+        for (let i = 0; i < count; i++) {
+            const r = Math.floor(i / cols);
+            const c = i % cols;
+
+            positions.push({
+                x: startX + (c - (cols - 1) / 2) * spacing,
+                y: startY + (r - (rows - 1) / 2) * spacing
+            });
+        }
+        return positions;
+    };
+
+    // تحويل مدخلات الرسم إلى كائنات قابلة للعرض
+    const drawingsToRender = drawings.flatMap((draw, idx) => {
+        const itemIsText = draw.type === 'text';
+        const count = draw.count || 1;
+        const baseKey = draw.key || `draw-${idx}`;
+
+        const positions = calculateGridPositions(count);
+
+        return positions.map((pos, subIdx) => ({
+            type: itemIsText ? 'text' : 'path',
+            content: draw.content,
+            offset: pos,
+            scale: count > 3 ? 0.5 : (count > 1 ? 0.7 : 1.0),
+            key: `${baseKey}-${subIdx}`
+        }));
     });
+
+    const renderTextDrawings = () => {
+        return drawingsToRender
+            .filter(d => d.type === 'text')
+            .map((drawItem) => (
+                <View
+                    key={drawItem.key}
+                    style={{
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                        top: (drawItem.offset.y / 300) * 100 + '%',
+                        transform: [
+                            { translateY: -25 }  // Fine-tuned vertical alignment
+                        ],
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                    }}
+                >
+                    <Animated.Text
+                        style={{
+                            fontSize: Math.max(30, Math.min(55, 280 / (drawItem.content?.toString().length || 1))) * drawItem.scale,
+                            fontWeight: 'bold',
+                            color: 'white',
+                            textAlign: 'center',
+                            opacity: progress,
+                            textShadowColor: 'rgba(255, 255, 255, 0.4)',
+                            textShadowOffset: { width: 0, height: 0 },
+                            textShadowRadius: 8,
+                        }}
+                    >
+                        {drawItem.content}
+                    </Animated.Text>
+                </View>
+            ));
+    };
 
     return (
         <View style={styles.container}>
-            {/* Transparent Overlay - Drawing Only */}
             <View style={styles.drawingArea}>
-                {/* عرض صورة الواجب إذا وجدت */}
                 {imageUri ? (
                     <Image
                         source={{ uri: imageUri }}
@@ -57,20 +134,36 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
                         resizeMode="contain"
                     />
                 ) : (
-                    <Svg width="100%" height="100%" viewBox="0 0 300 300">
-                        {currentPath && (
-                            <AnimatedPath
-                                d={currentPath}
-                                stroke="#FFFFFF"
-                                strokeWidth="8"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeDasharray={[pathLength, pathLength]}
-                                strokeDashoffset={strokeDashoffset}
-                            />
-                        )}
-                    </Svg>
+                    <>
+                        <Svg
+                            width="100%"
+                            height="100%"
+                            viewBox="0 0 300 300"
+                        >
+                            {drawingsToRender
+                                .filter(d => d.type === 'path')
+                                .map((drawItem) => (
+                                    <AnimatedPath
+                                        key={drawItem.key}
+                                        d={drawItem.content}
+                                        stroke="#F9F9F9"
+                                        strokeWidth={12 * drawItem.scale}
+                                        fill="none"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeDasharray={[2000, 2000]}
+                                        strokeDashoffset={progress.interpolate({
+                                            inputRange: [0, 1],
+                                            outputRange: [2000, 0],
+                                        })}
+                                        transform={`translate(${drawItem.offset.x - 150}, ${drawItem.offset.y - 150}) scale(${drawItem.scale})`}
+                                    />
+                                ))
+                            }
+                        </Svg>
+                        {/* Text must be sibling to Svg to render correctly in React Native */}
+                        {renderTextDrawings()}
+                    </>
                 )}
             </View>
         </View>
@@ -80,12 +173,11 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
 const styles = StyleSheet.create({
     container: {
         width: '100%',
-        height: '100%', // Flexible
-        backgroundColor: 'transparent', // Explicitly transparent
+        height: '100%',
+        backgroundColor: 'transparent',
     },
     drawingArea: {
         flex: 1,
-        // padding: 20, // Optional padding inside board
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -93,7 +185,7 @@ const styles = StyleSheet.create({
         width: '90%',
         height: '90%',
         borderRadius: 5,
-        transform: [{ rotate: '-2deg' }], // لمسة جمالية كأنها معلقة
+        transform: [{ rotate: '-2deg' }],
     },
 });
 

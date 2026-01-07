@@ -1,155 +1,185 @@
-import React from 'react';
+console.log('🗺️ LessonsScreen Module Loaded');
+import React, { useRef, useEffect } from 'react';
 import {
     View,
     Text,
     StyleSheet,
-    // SafeAreaView, // Use from context
+    ImageBackground,
     ScrollView,
     TouchableOpacity,
-    StatusBar
+    Dimensions,
+    Alert
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-// import { StatusBar } from 'expo-status-bar';
-import Card from '../components/Card';
 import { theme } from '../config/theme';
-import { lessons } from '../data/lessons';
+import Svg, { Path, Line } from 'react-native-svg';
+import SmartBackground from '../components/SmartBackground';
+
+const { width } = Dimensions.get('window');
+
+// --- LEVEL DATA (The Map) ---
+const LEVELS = [
+    { id: 1, type: 'game', label: '1', title: 'صياد الحروف', target: 'أ', icon: '🎈', locked: false, x: 50, y: 50 },
+    { id: 2, type: 'game', label: '2', title: 'فقع البالون', target: 'ب', icon: '🎪', locked: false, x: 200, y: 150 },
+    { id: 3, type: 'game', label: '3', title: 'حرف التاء', target: 'ت', icon: '🐣', locked: true, x: 100, y: 300 },
+    { id: 4, type: 'game', label: '4', title: 'قلعة الثاء', target: 'ث', icon: '🏰', locked: true, x: 250, y: 450 },
+    { id: 5, type: 'game', label: '5', title: 'كنز الجيم', target: 'ج', icon: '💎', locked: true, x: 80, y: 600 },
+];
 
 const LessonsScreen = ({ navigation }) => {
-    console.log('📚 LessonsScreen Rendered');
-    return (
-        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-            <StatusBar barStyle="dark-content" />
+    console.log('🗺️ LessonsScreen Rendering...');
 
+    useEffect(() => {
+        console.log('🗺️ LessonsScreen Mounted');
+    }, []); const handleLevelPress = (level) => {
+        console.log('📍 Level Pressed:', level.id, 'Locked:', level.locked);
+        if (level.locked) {
+            console.log('🔒 Level is locked');
+            Alert.alert('🔒 مقفل', 'أكمل المراحل السابقة لفتح هذه المرحلة!');
+            return;
+        }
+
+        if (level.type === 'game') {
+            console.log('🎮 Navigating to MiniGame with params:', {
+                targetLetter: level.target,
+                level: level.id
+            });
+            navigation.navigate('MiniGame', {
+                targetLetter: level.target,
+                distractors: ['س', 'ش', 'ص', 'ع'], // Randomize later
+                level: level.id
+            });
+        }
+    };
+
+    // Draw paths between nodes
+    const renderPaths = () => {
+        return (
+            <Svg height={1500} width={width} style={styles.pathsLayer} pointerEvents="none">
+                {LEVELS.map((level, index) => {
+                    if (index === LEVELS.length - 1) return null;
+                    const next = LEVELS[index + 1];
+                    return (
+                        <Line
+                            key={`path-${index}`}
+                            x1={level.x + 35} y1={level.y + 35}
+                            x2={next.x + 35} y2={next.y + 35}
+                            stroke={level.locked ? '#B0BEC5' : '#FFF176'} // Lighter colors for contrast on grass
+                            strokeWidth="8"
+                            strokeDasharray={level.locked ? "10, 5" : "0"}
+                            strokeLinecap="round" // Nicer ends
+                        />
+                    );
+                })}
+            </Svg>
+        );
+    };
+
+    return (
+        <SmartBackground type="map">
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Text style={styles.backButton}>←</Text>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Text style={styles.backIcon}>⬅️</Text>
                 </TouchableOpacity>
-                <Text style={styles.title}>الدروس المتاحة</Text>
-                <View style={{ width: 40 }} />
+                <Text style={styles.headerTitle}>خريطة المغامرات 🗺️</Text>
             </View>
 
-            <ScrollView
-                style={styles.content}
-                showsVerticalScrollIndicator={false}
-            >
-                {lessons.map((lesson) => (
-                    <Card
-                        key={lesson.id}
-                        style={styles.lessonCard}
-                        onPress={() => {
-                            if (lesson.mode === 'ai_classroom') {
-                                console.log('🚀 Navigating to AI Classroom Lesson:', lesson.id);
-                                navigation.navigate('Classroom', {
-                                    mode: 'lesson',
-                                    prompt: lesson.prompt
-                                });
-                            } else {
-                                navigation.navigate('LessonDetail', { lesson });
+            <ScrollView contentContainerStyle={styles.mapContainer}>
+                {renderPaths()}
+
+                {LEVELS.map((level) => (
+                    <TouchableOpacity
+                        key={level.id}
+                        style={[
+                            styles.levelNode,
+                            {
+                                left: level.x,
+                                top: level.y,
+                                backgroundColor: level.locked ? '#CFD8DC' : theme.colors.secondary // Use Yellow/Orange for active levels
                             }
-                        }}
+                        ]}
+                        onPress={() => handleLevelPress(level)}
+                        activeOpacity={0.8}
                     >
-                        <View style={styles.lessonContent}>
-                            <Text style={styles.lessonIcon}>{lesson.icon}</Text>
-                            <View style={styles.lessonInfo}>
-                                <Text style={styles.lessonTitle}>{lesson.title}</Text>
-                                <Text style={styles.lessonTitleEn}>{lesson.titleEn}</Text>
-                                <Text style={styles.lessonDescription}>{lesson.description}</Text>
-                                <View style={styles.lessonMeta}>
-                                    <Text style={styles.lessonDuration}>⏱️ {lesson.duration}</Text>
-                                    <Text style={styles.lessonLevel}>
-                                        {lesson.level === 'beginner' ? '🟢 مبتدئ' : '🟡 متوسط'}
-                                    </Text>
-                                    {lesson.topics && (
-                                        <Text style={styles.lessonTopics}>
-                                            📝 {lesson.topics.length} موضوع
-                                        </Text>
-                                    )}
-                                </View>
+                        <Text style={styles.levelIcon}>{level.locked ? '🔒' : level.icon}</Text>
+                        {!level.locked && (
+                            <View style={styles.starBadge}>
+                                <Text style={styles.starText}>⭐⭐⭐</Text>
                             </View>
-                            <Text style={styles.arrow}>→</Text>
-                        </View>
-                    </Card>
+                        )}
+                    </TouchableOpacity>
                 ))}
+
+                {/* Extra space at bottom */}
+                <View style={{ height: 200 }} />
             </ScrollView>
-        </SafeAreaView>
+        </SmartBackground>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: theme.colors.background,
+        backgroundColor: '#Dcedc8',
     },
     header: {
+        padding: 20,
+        paddingTop: 50,
+        backgroundColor: 'rgba(255,255,255,0.8)',
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        padding: theme.spacing.lg,
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+        ...theme.shadows.md
     },
     backButton: {
-        fontSize: 30,
-        color: theme.colors.text,
+        marginRight: 15,
     },
-    title: {
-        fontSize: theme.fontSize.xl,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
-    },
-    content: {
-        flex: 1,
-        padding: theme.spacing.lg,
-    },
-    lessonCard: {
-        marginBottom: theme.spacing.md,
-    },
-    lessonContent: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    lessonIcon: {
-        fontSize: 50,
-        marginRight: theme.spacing.md,
-    },
-    lessonInfo: {
-        flex: 1,
-    },
-    lessonTitle: {
-        fontSize: theme.fontSize.lg,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
-    },
-    lessonTitleEn: {
-        fontSize: theme.fontSize.sm,
-        color: theme.colors.textSecondary,
-        marginBottom: theme.spacing.xs,
-    },
-    lessonDescription: {
-        fontSize: theme.fontSize.sm,
-        color: theme.colors.textSecondary,
-        marginBottom: theme.spacing.sm,
-    },
-    lessonMeta: {
-        flexDirection: 'row',
-        gap: theme.spacing.md,
-        flexWrap: 'wrap',
-    },
-    lessonDuration: {
-        fontSize: theme.fontSize.xs,
-        color: theme.colors.textSecondary,
-    },
-    lessonLevel: {
-        fontSize: theme.fontSize.xs,
-        color: theme.colors.textSecondary,
-    },
-    lessonTopics: {
-        fontSize: theme.fontSize.xs,
-        color: theme.colors.textSecondary,
-    },
-    arrow: {
+    backIcon: {
         fontSize: 24,
-        color: theme.colors.textSecondary,
-        marginLeft: theme.spacing.sm,
     },
+    headerTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: theme.colors.text,
+    },
+    mapContainer: {
+        minHeight: 1000,
+        paddingVertical: 50,
+        position: 'relative'
+    },
+    pathsLayer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        zIndex: 0
+    },
+    levelNode: {
+        position: 'absolute',
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 4,
+        borderColor: 'white',
+        ...theme.shadows.lg,
+        zIndex: 1
+    },
+    levelIcon: {
+        fontSize: 30,
+    },
+    starBadge: {
+        position: 'absolute',
+        bottom: -20,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        paddingHorizontal: 5,
+        paddingVertical: 2,
+        ...theme.shadows.sm
+    },
+    starText: {
+        fontSize: 10
+    }
 });
 
 export default LessonsScreen;

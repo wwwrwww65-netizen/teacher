@@ -2,6 +2,7 @@ import React, { useEffect, useImperativeHandle, forwardRef, useRef, useState } f
 import { View, StyleSheet, Animated, Easing, ImageBackground, Platform, Image } from 'react-native';
 import Svg, { Ellipse } from 'react-native-svg';
 import Tts from 'react-native-tts';
+import arabicVoiceService from '../../services/ArabicVoiceService';
 
 // إنشاء مكونات SVG قابلة للتحريك
 const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
@@ -56,26 +57,8 @@ const TeacherAvatar = forwardRef((props, ref) => {
 
     // 2. إعداد الحركة عند التحميل
     useEffect(() => {
-        // Chroma Key for Web
-        // Chroma Key for Web
-        if (Platform.OS === 'web') {
-            // const originalImage = require('../../../assets/teacher_idle.png');
-            let uri = null;
-            // let uri = originalImage;
-
-            // Handle different Webpack asset loading behaviors
-            if (typeof originalImage === 'object') {
-                if (originalImage.default) uri = originalImage.default; // ES Module
-                else if (originalImage.uri) uri = originalImage.uri; // RN Asset
-                else if (originalImage.src) uri = originalImage.src;
-            }
-
-            // If we have a string URI, process it. Otherwise fallback to using the require directly.
-            if (typeof uri === 'string') {
-                removeGreenScreen(uri).then(newSrc => setAvatarSource({ uri: newSrc }));
-            }
-        }
-
+        // Web chroma key processing is disabled for now since no teacher image is loaded
+        // Just start the breathing animation
         startBreathing();
     }, []);
 
@@ -155,8 +138,15 @@ const TeacherAvatar = forwardRef((props, ref) => {
     };
 
     useImperativeHandle(ref, () => ({
-        speakArabic: async (text) => { console.warn("Deprecated"); },
-        startTalking: () => { startTalkingAnimation(); },
+        speakArabic: async (text) => {
+            startTalkingAnimation();
+            const success = await arabicVoiceService.speak(text, {
+                onVisemeChange: null, // We use simple animation for now
+                onPlayStart: () => { }
+            });
+            stopTalkingAnimation();
+            return success;
+        },
         stopTalking: () => { stopTalkingAnimation(); },
         pointToBoard: () => { },
         resetPosition: () => { },

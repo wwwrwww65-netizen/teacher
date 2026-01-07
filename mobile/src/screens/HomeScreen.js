@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import SmartBackground from '../components/SmartBackground';
 import Card from '../components/Card';
 import { theme } from '../config/theme';
 import { lessons } from '../data/lessons';
@@ -9,6 +10,7 @@ const HomeScreen = ({ navigation }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
+        console.log('🏠 HomeScreen Mounted');
         loadUser();
     }, []);
 
@@ -25,8 +27,8 @@ const HomeScreen = ({ navigation }) => {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+        <SmartBackground type="sky">
+            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
 
             {/* Header */}
             <View style={styles.header}>
@@ -62,34 +64,38 @@ const HomeScreen = ({ navigation }) => {
             <ScrollView
                 style={styles.content}
                 showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingBottom: 50 }}
             >
                 {/* Quick Actions */}
                 <View style={styles.section}>
                     <Text style={styles.sectionTitle}>ابدأ التعلم</Text>
                     <View style={styles.quickActions}>
+
+                        {/* New Lessons Button */}
                         <TouchableOpacity
                             style={[styles.quickAction, { backgroundColor: theme.colors.primary }]}
-                            onPress={() => navigation.navigate('Lessons')}
+                            onPress={() => navigation.navigate('Curriculum')}
                         >
                             <Text style={styles.quickActionIcon}>📚</Text>
                             <Text style={styles.quickActionText}>الدروس</Text>
                         </TouchableOpacity>
 
+                        {/* Renamed Adventure Map Button */}
+                        <TouchableOpacity
+                            style={[styles.quickAction, { backgroundColor: '#FFB74D' }]} // Orange for adventure
+                            onPress={() => navigation.navigate('Lessons')}
+                        >
+                            <Text style={styles.quickActionIcon}>🗺️</Text>
+                            <Text style={styles.quickActionText}>الخريطة</Text>
+                        </TouchableOpacity>
+
+                        {/* Teacher Button (Classroom) - kept for free talk? or maybe secondary? */}
                         <TouchableOpacity
                             style={[styles.quickAction, { backgroundColor: theme.colors.secondary }]}
                             onPress={() => navigation.navigate('Classroom')}
                         >
                             <Text style={styles.quickActionIcon}>🤖</Text>
                             <Text style={styles.quickActionText}>المعلم</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            style={[styles.quickAction, { backgroundColor: theme.colors.accent }]}
-                            aria-label="اختبار"
-                            onPress={() => navigation.navigate('Quiz', { quizId: '1' })}
-                        >
-                            <Text style={styles.quickActionIcon}>🎯</Text>
-                            <Text style={styles.quickActionText}>اختبار</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -120,20 +126,17 @@ const HomeScreen = ({ navigation }) => {
                     ))}
                 </View>
             </ScrollView>
-        </SafeAreaView>
+        </SmartBackground>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.colors.background,
-    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: theme.spacing.lg,
+        paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 20 : 50,
     },
     greeting: {
         fontSize: theme.fontSize.xl,
@@ -152,6 +155,9 @@ const styles = StyleSheet.create({
         backgroundColor: theme.colors.primary,
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: '#fff',
+        elevation: 5
     },
     avatarText: {
         fontSize: 24,
@@ -159,6 +165,7 @@ const styles = StyleSheet.create({
     progressCard: {
         marginHorizontal: theme.spacing.lg,
         marginBottom: theme.spacing.lg,
+        backgroundColor: 'rgba(255,255,255,0.95)'
     },
     progressHeader: {
         flexDirection: 'row',
@@ -220,6 +227,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         ...theme.shadows.md,
+        borderWidth: 2,
+        borderColor: '#fff'
     },
     quickActionIcon: {
         fontSize: 40,
@@ -233,6 +242,7 @@ const styles = StyleSheet.create({
     lessonCard: {
         marginHorizontal: theme.spacing.lg,
         marginBottom: theme.spacing.md,
+        backgroundColor: 'rgba(255,255,255,0.95)'
     },
     lessonContent: {
         flexDirection: 'row',

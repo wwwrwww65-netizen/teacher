@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Card from '../components/Card';
-import Button from '../components/Button';
+import SmartBackground from '../components/SmartBackground';
 import { theme } from '../config/theme';
+import BouncyButton from '../components/BouncyButton';
+
+const { width } = Dimensions.get('window');
 
 const ProfileScreen = ({ navigation }) => {
     const [user, setUser] = useState(null);
@@ -20,262 +22,242 @@ const ProfileScreen = ({ navigation }) => {
     };
 
     const handleLogout = async () => {
-        await AsyncStorage.removeItem('token');
-        await AsyncStorage.removeItem('user');
-        navigation.replace('Login');
+        Alert.alert('تسجيل الخروج', 'هل أنت متأكد؟', [
+            { text: 'إلغاء', style: 'cancel' },
+            {
+                text: 'نعم',
+                onPress: async () => {
+                    await AsyncStorage.removeItem('user');
+                    navigation.replace('StudentSetup');
+                }
+            }
+        ]);
     };
 
-    const stats = [
-        { label: 'الدروس المكتملة', value: '12', icon: '📚' },
-        { label: 'الاختبارات', value: '8', icon: '🎯' },
-        { label: 'الوقت المستغرق', value: '2.5 ساعة', icon: '⏱️' },
-        { label: 'النجوم', value: '45', icon: '⭐' },
+    // Mock Data for "Sticker Book"
+    const stickers = [
+        { id: 1, icon: '🦁', name: 'الأسد الشجاع', unlocked: true },
+        { id: 2, icon: '🚀', name: 'رائد الفضاء', unlocked: true },
+        { id: 3, icon: '🎨', name: 'الفنان الصغير', unlocked: false },
+        { id: 4, icon: '👑', name: 'ملك الحروف', unlocked: false },
+        { id: 5, icon: '🌟', name: 'النجم الساطع', unlocked: true },
+        { id: 6, icon: '🐢', name: 'السلحفاة الحكيمة', unlocked: false },
     ];
 
-    const achievements = [
-        { title: 'مبتدئ', description: 'أكمل أول درس', icon: '🎖️', unlocked: true },
-        { title: 'متعلم سريع', description: 'أكمل 5 دروس', icon: '🚀', unlocked: true },
-        { title: 'خبير الحروف', description: 'أتقن جميع الحروف', icon: '🏆', unlocked: false },
-        { title: 'عبقري الأرقام', description: 'أتقن جميع الأرقام', icon: '🧮', unlocked: false },
-    ];
+    const renderShelf = (items) => (
+        <View style={styles.shelfContainer}>
+            <View style={styles.shelfContent}>
+                {items.map((item, index) => (
+                    <View key={index} style={[styles.stickerSlot, !item.unlocked && styles.lockedSlot]}>
+                        <Text style={styles.stickerIcon}>{item.unlocked ? item.icon : '🔒'}</Text>
+                        {item.unlocked && <View style={styles.shine} />}
+                    </View>
+                ))}
+            </View>
+            <View style={styles.shelfBoard} />
+        </View>
+    );
 
     return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
-
+        <SmartBackground type="room">
+            {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <Text style={styles.backButton}>←</Text>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Text style={styles.backIcon}>⬅️</Text>
                 </TouchableOpacity>
-                <Text style={styles.title}>الملف الشخصي</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
-                    <Text style={styles.settingsButton}>⚙️</Text>
+                <Text style={styles.title}>غرفتي 🏠</Text>
+                <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+                    <Text style={styles.logoutIcon}>🚪</Text>
                 </TouchableOpacity>
             </View>
 
-            <ScrollView
-                style={styles.content}
-                showsVerticalScrollIndicator={false}
-            >
-                {/* Profile Card */}
-                <Card style={styles.profileCard}>
-                    <View style={styles.profileHeader}>
-                        <View style={styles.avatarLarge}>
-                            <Text style={styles.avatarLargeText}>{user?.avatar || '👤'}</Text>
-                        </View>
-                        <Text style={styles.name}>{user?.name || 'مستخدم'}</Text>
-                        <Text style={styles.email}>{user?.email}</Text>
+            <ScrollView contentContainerStyle={styles.scrollContent}>
 
-                        <View style={styles.levelBadge}>
-                            <Text style={styles.levelBadgeText}>المستوى {user?.level || 1}</Text>
+                {/* Avatar Frame */}
+                <View style={styles.avatarSection}>
+                    <View style={styles.frame}>
+                        <View style={styles.avatarBg}>
+                            <Text style={styles.avatarEmoji}>{user?.avatar || '👤'}</Text>
                         </View>
-
-                        <View style={styles.pointsContainer}>
-                            <Text style={styles.pointsLabel}>النقاط الكلية</Text>
-                            <Text style={styles.pointsValue}>{user?.points || 0}</Text>
+                        <Text style={styles.heroName}>{user?.name || 'البطل'}</Text>
+                        <View style={styles.levelTag}>
+                            <Text style={styles.levelText}>المستوى {user?.level || 1}</Text>
                         </View>
-                    </View>
-                </Card>
-
-                {/* Stats */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>الإحصائيات</Text>
-                    <View style={styles.statsGrid}>
-                        {stats.map((stat, index) => (
-                            <Card key={index} style={styles.statCard}>
-                                <Text style={styles.statIcon}>{stat.icon}</Text>
-                                <Text style={styles.statValue}>{stat.value}</Text>
-                                <Text style={styles.statLabel}>{stat.label}</Text>
-                            </Card>
-                        ))}
                     </View>
                 </View>
 
-                {/* Achievements */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>الإنجازات</Text>
-                    {achievements.map((achievement, index) => (
-                        <Card
-                            key={index}
-                            style={[
-                                styles.achievementCard,
-                                !achievement.unlocked && styles.achievementLocked
-                            ]}
-                        >
-                            <Text style={styles.achievementIcon}>{achievement.icon}</Text>
-                            <View style={styles.achievementInfo}>
-                                <Text style={styles.achievementTitle}>{achievement.title}</Text>
-                                <Text style={styles.achievementDescription}>
-                                    {achievement.description}
-                                </Text>
-                            </View>
-                            {achievement.unlocked && (
-                                <Text style={styles.checkmark}>✓</Text>
-                            )}
-                        </Card>
-                    ))}
+                {/* Shelves Section */}
+                <Text style={styles.sectionTitle}>مجموعة الملصقات 🏆</Text>
+                {renderShelf(stickers.slice(0, 3))}
+                {renderShelf(stickers.slice(3, 6))}
+
+                {/* Stats as "Posters" on the wall */}
+                <Text style={styles.sectionTitle}>إحصائياتي 📊</Text>
+                <View style={styles.statsWall}>
+                    <View style={[styles.poster, { backgroundColor: '#FF8A80', transform: [{ rotate: '-2deg' }] }]}>
+                        <Text style={styles.posterTitle}>النقاط</Text>
+                        <Text style={styles.posterValue}>{user?.points || 0}</Text>
+                    </View>
+                    <View style={[styles.poster, { backgroundColor: '#80D8FF', transform: [{ rotate: '2deg' }] }]}>
+                        <Text style={styles.posterTitle}>نجوم</Text>
+                        <Text style={styles.posterValue}>45</Text>
+                    </View>
+                    <View style={[styles.poster, { backgroundColor: '#CCFF90', transform: [{ rotate: '-1deg' }] }]}>
+                        <Text style={styles.posterTitle}>دروس</Text>
+                        <Text style={styles.posterValue}>12</Text>
+                    </View>
                 </View>
 
-                {/* Logout Button */}
-                <Button
-                    title="تسجيل الخروج"
-                    onPress={handleLogout}
-                    variant="outline"
-                    fullWidth
-                    style={styles.logoutButton}
-                />
+                <View style={{ height: 100 }} />
+
             </ScrollView>
-        </SafeAreaView>
+        </SmartBackground>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: theme.colors.background,
-    },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: theme.spacing.lg,
+        padding: 20,
+        paddingTop: 40
     },
-    backButton: {
-        fontSize: 30,
-        color: theme.colors.text,
-    },
+    backIcon: { fontSize: 30 },
+    logoutIcon: { fontSize: 25 },
     title: {
-        fontSize: theme.fontSize.xl,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
-    },
-    settingsButton: {
         fontSize: 24,
+        fontWeight: 'bold',
+        color: '#5D4037',
+        backgroundColor: 'rgba(255,255,255,0.6)',
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        borderRadius: 15
     },
-    content: {
-        flex: 1,
-        padding: theme.spacing.lg,
+    scrollContent: {
+        padding: 20
     },
-    profileCard: {
-        marginBottom: theme.spacing.lg,
-    },
-    profileHeader: {
+    avatarSection: {
         alignItems: 'center',
+        marginBottom: 40
     },
-    avatarLarge: {
-        width: 100,
-        height: 100,
-        borderRadius: theme.borderRadius.round,
-        backgroundColor: theme.colors.primary,
+    frame: {
+        width: 180,
+        height: 180,
+        backgroundColor: '#FFF',
+        borderRadius: 90,
+        borderWidth: 8,
+        borderColor: '#FFD700',
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: theme.spacing.md,
+        elevation: 10,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5
     },
-    avatarLargeText: {
-        fontSize: 50,
+    avatarEmoji: { fontSize: 80 },
+    heroName: {
+        marginTop: 15,
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#3E2723',
+        textShadowColor: 'rgba(255, 255, 255, 0.5)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 1
     },
-    name: {
-        fontSize: theme.fontSize.xl,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
-        marginBottom: theme.spacing.xs,
+    levelTag: {
+        position: 'absolute',
+        bottom: -15,
+        backgroundColor: theme.colors.primary,
+        paddingHorizontal: 15,
+        paddingVertical: 5,
+        borderRadius: 10,
+        borderWidth: 2,
+        borderColor: '#FFF'
     },
-    email: {
-        fontSize: theme.fontSize.sm,
-        color: theme.colors.textSecondary,
-        marginBottom: theme.spacing.md,
+    levelText: { color: 'white', fontWeight: 'bold' },
+
+    // Shelf Styles
+    shelfContainer: {
+        marginBottom: 30,
+        alignItems: 'center'
     },
-    levelBadge: {
-        backgroundColor: theme.colors.secondary,
-        paddingHorizontal: theme.spacing.lg,
-        paddingVertical: theme.spacing.sm,
-        borderRadius: theme.borderRadius.round,
-        marginBottom: theme.spacing.md,
+    shelfContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+        paddingHorizontal: 20,
+        marginBottom: -5, // Sit on shelf
+        zIndex: 1
     },
-    levelBadgeText: {
-        color: theme.colors.textLight,
-        fontSize: theme.fontSize.sm,
-        fontWeight: theme.fontWeight.bold,
+    shelfBoard: {
+        width: '100%',
+        height: 15,
+        backgroundColor: '#8D6E63',
+        borderRadius: 5,
+        borderBottomWidth: 5,
+        borderBottomColor: '#5D4037'
     },
-    pointsContainer: {
-        alignItems: 'center',
+    stickerSlot: {
+        width: 70,
+        height: 70,
+        justifyContent: 'center',
+        alignItems: 'center'
     },
-    pointsLabel: {
-        fontSize: theme.fontSize.sm,
-        color: theme.colors.textSecondary,
+    stickerIcon: { fontSize: 50 },
+    lockedSlot: { opacity: 0.3, transform: [{ scale: 0.8 }] },
+    shine: {
+        position: 'absolute',
+        top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        borderRadius: 35,
+        transform: [{ rotate: '45deg' }]
     },
-    pointsValue: {
-        fontSize: theme.fontSize.xxl,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.primary,
-    },
-    section: {
-        marginBottom: theme.spacing.xl,
-    },
+
+    // Stats Wall
     sectionTitle: {
-        fontSize: theme.fontSize.lg,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
-        marginBottom: theme.spacing.md,
-    },
-    statsGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: theme.spacing.md,
-    },
-    statCard: {
-        flex: 1,
-        minWidth: '45%',
-        alignItems: 'center',
-        padding: theme.spacing.md,
-    },
-    statIcon: {
-        fontSize: 30,
-        marginBottom: theme.spacing.sm,
-    },
-    statValue: {
-        fontSize: theme.fontSize.xl,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
-        marginBottom: theme.spacing.xs,
-    },
-    statLabel: {
-        fontSize: theme.fontSize.xs,
-        color: theme.colors.textSecondary,
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#5D4037',
+        marginBottom: 15,
         textAlign: 'center',
+        backgroundColor: 'rgba(255,255,255,0.5)',
+        alignSelf: 'center',
+        paddingHorizontal: 20,
+        borderRadius: 10
     },
-    achievementCard: {
+    statsWall: {
         flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 15,
+        flexWrap: 'wrap'
+    },
+    poster: {
+        width: 90,
+        height: 110,
+        backgroundColor: 'white',
+        padding: 10,
         alignItems: 'center',
-        marginBottom: theme.spacing.md,
+        justifyContent: 'center',
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        // Tape effect?
     },
-    achievementLocked: {
-        opacity: 0.5,
+    posterTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#333'
     },
-    achievementIcon: {
-        fontSize: 40,
-        marginRight: theme.spacing.md,
-    },
-    achievementInfo: {
-        flex: 1,
-    },
-    achievementTitle: {
-        fontSize: theme.fontSize.md,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
-        marginBottom: theme.spacing.xs,
-    },
-    achievementDescription: {
-        fontSize: theme.fontSize.sm,
-        color: theme.colors.textSecondary,
-    },
-    checkmark: {
+    posterValue: {
         fontSize: 24,
-        color: theme.colors.success,
-    },
-    logoutButton: {
-        marginBottom: theme.spacing.xl,
-    },
+        fontWeight: 'bold',
+        color: '#333',
+        marginTop: 5
+    }
 });
 
 export default ProfileScreen;

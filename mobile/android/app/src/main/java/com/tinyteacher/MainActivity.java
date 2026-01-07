@@ -6,12 +6,22 @@ import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint;
 import com.facebook.react.defaults.DefaultReactActivityDelegate;
 
 import android.os.Bundle;
+import android.media.AudioManager;
+import android.content.Context;
 
 public class MainActivity extends ReactActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(null);
+    try {
+      AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+      // Mute Notification stream (Source of SpeechRec Beep)
+      audioManager.setStreamVolume(AudioManager.STREAM_NOTIFICATION, 0, 0);
+      // audioManager.setStreamVolume(AudioManager.STREAM_SYSTEM, 0, 0); // Risky but effective if needed
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   /**

@@ -159,11 +159,35 @@ npm run seed
 npm run dev
 ```
 
-### 3. Frontend Setup
+### 3. Frontend Setup (التشغيل)
 ```bash
-cd ../mobile
-npm install
-npx expo start
+cd mobile
+# 1. تنظيف الكاش (خطوة مهمة لتفادي الأخطاء)
+npm start -- --reset-cache
+
+# 2. تشغيل التطبيق على الأندرويد
+npm run android
+```
+
+### 🔧 أوامر مفيدة (Troubleshooting)
+
+**إذا ظهر خطأ "Network Request Failed" أو "غير متصل":**
+```bash
+# 1. تأكد من ربط المنافذ (ADB Reverse)
+# هذا الأمر يربط منفذ الكمبيوتر بمنفذ الهاتف
+adb reverse tcp:8081 tcp:8081
+
+# 2. التحقق من حالة الخادم
+curl http://localhost:8081/status
+```
+
+**إعادة تشغيل التطبيق بالقوة (Restart App):**
+```bash
+# PowerShell
+adb shell am force-stop com.tinyteacher; adb shell am start -n com.tinyteacher/.MainActivity
+
+# CMD / Bash
+adb shell am force-stop com.tinyteacher && adb shell am start -n com.tinyteacher/.MainActivity
 ```
 
 ### 4. أو استخدم Docker 🐳

@@ -22,7 +22,28 @@ cd android
 .\gradlew assembleRelease
 ```
 
-## 🌟 Key Features
+## � Environment & Paths Setup
+
+To run this project smoothly, ensure your environment is configured correctly:
+
+### 1. 📁 Critical Paths
+-   **Gradle Cache**: MUST be redirected to `E:\.gradle` (due to low disk space on C:).
+-   **Android SDK**: `C:\Users\lenovo\AppData\Local\Android\Sdk`
+-   **ADB Tool**: Ensure `platform-tools` is in your System Path, or use the full path:
+    -   `C:\Users\lenovo\AppData\Local\Android\Sdk\platform-tools\adb.exe`
+
+### 2. 🔌 Ports & Network
+-   **Metro Bundler**: Runs on port **8081**.
+-   **Reverse Proxies**: React Native needs local ports reversed to the device:
+    -   `adb reverse tcp:8081 tcp:8081` (For JS Bundle)
+    -   `adb reverse tcp:9090 tcp:9090` (If using Reactotron)
+
+### 3. 🛠️ Dependencies
+-   **Node.js**: v18.0.0+
+-   **Java JDK**: Version 17 (Required for React Native 0.73+)
+-   **Python**: Version 3.10+ (For build scripts)
+
+## �🌟 Key Features
 
 ### 🎮 Gamified UI/UX
 - **Vibrant Theme**: "Electric Blue" and "Sunshine Yellow" palette with rounded, bubble-like buttons using `BouncyButton`.
@@ -98,22 +119,64 @@ Open your browser to: **[http://localhost:9091](http://localhost:9091)**
 
 ---
 
-## 📱 Running on Android
+## 📱 Running on Android (Advanced Guide)
 
-To run on a real device or Android Emulator:
+### 1. Start Metro Bundler (Clear Cache)
+It is highly recommended to start the bundler with cache reset to avoid styling or module graph errors:
+```bash
+npm start -- --reset-cache
+```
 
-1.  **Start Metro Bundler**:
-    ```bash
-    npx react-native start
-    ```
-2.  **Run on Android**:
-    ```bash
-    npx react-native run-android
-    ```
+### 2. Install/Run on Device
+Use the gradle wrapper directly for a reliable install:
+```bash
+cd android
+.\gradlew.bat installDebug
+```
 
-> **Note**: Ensure you have an Android device connected or an emulator running.
+### 3. Connection Issues?
+If the app cannot connect to the Metro server (Red Screen or Network Error), run this to reverse ports:
+```bash
+adb reverse tcp:8081 tcp:8081
+```
+
+### 4. Force Restart (If Stuck)
+If the app crashes or behaves oddly, force stop it and restart:
+```bash
+adb shell am force-stop com.tinyteacher
+adb shell monkey -p com.tinyteacher -c android.intent.category.LAUNCHER 1
+```
+
+### 5. Debugging with Logs
+To see what's happening (Voice, AI, Music), use Logcat:
+```bash
+# Clear logs first
+adb logcat -c
+# View React Native Logs
+adb logcat ReactNativeJS:* *:S
+```
+
+### 6. 🚇 Metro Bundler Troubleshooting
+-   **Check Status**: To see if Metro is running, open `http://localhost:8081/status` in your browser. It should say "packager-status:running".
+-   **Port In Use**: If you see `EADDRINUSE: address already in use :::8081`, kill the process:
+    -   **Windows**: `netstat -ano | findstr :8081` then `taskkill /PID <PID> /F`
+-   **Stuck/Frozen**: If Metro stops responding, simply close the terminal and run `npm start -- --reset-cache` again.
 
 ---
+
+## 🎧 Audio & Live Mode Diagnostics
+
+The app now features "Gemini Live"-like continuous interaction.
+
+### ✅ Key Behaviors
+1.  **Continuous Music**: Background music plays via `SoundPlayer` (Native) and stays on during speech.
+2.  **No System Beep**: The annoying "Beep" sound is muted via `MainActivity.java` (System Notification Stream Muted).
+3.  **Mute Button**: The microphone button acts as a **Mute Toggle** (Gray = Muted, Active = Listening).
+4.  **Auto-Loop**: If you stop speaking, the app automatically retries listening.
+
+### ⚠️ Troubleshooting Audio
+-   **If Music is Too Loud**: The app tries to set volume to `0.02` (2%). If it's loud, it means `SoundPlayer` hasn't applied the volume yet. Restart the app.
+-   **If App Crashes on Start**: Check for `StyleSheet` errors using `adb logcat`. Usually fixed by `npm start -- --reset-cache`.
 
 ## 🛠️ Project Structure
 

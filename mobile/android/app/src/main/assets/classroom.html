@@ -90,23 +90,15 @@
             createBackground();
 
             // --- SETUP VIDEOS ---
-            videoTalking = createVideoElement(TEACHER_TALKING, false); // No loop for talking (optional)
+            videoTalking = createVideoElement(TEACHER_TALKING, true); // Loop talking to match unlimited speech duration
             videoIdle = createVideoElement(TEACHER_IDLE, true); // Loop idle
 
             // --- SETUP TEXTURES ---
             textureTalking = createVideoTexture(videoTalking);
             textureIdle = createVideoTexture(videoIdle);
 
-            // --- SETUP MUSIC (Low & Calm) ---
-            bgMusic = new Audio(BACKGROUND_MUSIC);
-            bgMusic.loop = true;
-            bgMusic.volume = 0.02; // Very low volume as requested
-            bgMusic.play().catch(e => console.log('Music Autoplay blocked', e));
-
-            // Ensure music starts on first interaction if blocked
-            window.addEventListener('click', () => {
-                if (bgMusic.paused) bgMusic.play();
-            }, { once: true });
+            // --- SETUP MUSIC (DISABLED) ---
+            // Using Independent BackgroundMusic.js component
 
             // Create Teacher with Initial Texture (Idle)
             createTeacherVideoSprite();
@@ -257,6 +249,14 @@
                 case 'walkToCenter': targetPosition.x = CENTER_X; break;
                 case 'viseme': break;
                 case 'playAnimation': break;
+                case 'pauseMusic':
+                    // Handled by BackgroundMusic.js component
+                    break;
+                case 'resumeMusic':
+                    // Handled by BackgroundMusic.js component
+                    if (isTalking && videoTalking) videoTalking.play();
+                    else if (!isTalking && videoIdle) videoIdle.play();
+                    break;
             }
         }
 
@@ -284,9 +284,18 @@
                 if (screenAspect > imgAspect) {
                     scaleX = visibleWidth;
                     scaleY = visibleWidth / imgAspect;
+                    backgroundMesh.position.set(0, 0, -5); // Reset to center
                 } else {
                     scaleY = visibleHeight;
                     scaleX = visibleHeight * imgAspect;
+
+                    // FIX FOR MOBILE PORTRAIT: Align Blackboard
+                    // The blackboard is on the RIGHT side of the image.
+                    // In portrait, the image zooms in. We need to shift the image LEFT
+                    // so the Right edge aligns with the Screen Right edge.
+
+                    const shiftX = (scaleX - visibleWidth) / 2;
+                    backgroundMesh.position.set(-shiftX, 0, -5);
                 }
                 backgroundMesh.scale.set(scaleX, scaleY, 1);
             }

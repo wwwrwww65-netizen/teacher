@@ -1,0 +1,127 @@
+// ===== SSML HANDLING FIX =====
+// Replace lines 636-723 in ClassroomScreen.js with this code:
+
+        // CHECK FOR SSML TAGS
+        let rawVoiceText = response.voiceText || response.text || "";
+        rawVoiceText = rawVoiceText.replace(/^\s*<speak>/i, '').replace(/<\/speak>\s*$/i, '').trim();
+        
+        const hasSSML = /<break|<prosody|<emphasis/.test(rawVoiceText);
+        let sentences = [];
+        let audioPaths = [];
+
+        if (hasSSML) {
+            // ⚡ SSML MODE: Send ENTIRE text as ONE audio file for smooth flow
+            console.log('⚡ SSML Mode - Single audio with subtitle chunks');
+            
+            // Extract subtitle chunks (remove SSML tags for display only)
+            sentences = rawVoiceText
+                .split(/<break\s+[^>]*\/>/i)
+                .map(s => s.replace(/<[^>]+>/g, '').trim())
+                .filter(s => s.length > 0);
+
+            console.log(`📝 ${sentences.length} subtitle chunks`);
+
+            // Generate ONE audio file with full SSML
+            try {
+                const cleanAudioText = arabicVoiceService.cleanTextForTTS(rawVoiceText);
+                if (cleanAudioText) {
+                    const base64 = await arabicVoiceService.fetchGoogleTTS(cleanAudioText);
+                    const audioPath = await arabicVoiceService.prepareAudioFile(base64);
+                    audioPaths = [audioPath]; // Single file!
+                } else {
+                    audioPaths = [null];
+                }
+            } catch (e) {
+                console.error('❌ SSML Audio Error:', e);
+                updateStatus('idle');
+                return;
+            }
+        } else {
+            // NORMAL MODE: Split by sentences for streaming
+            sentences = (response.voiceText || response.text || "")
+                .split(/([.!؟]+)/)
+                .reduce((acc, part, i, arr) => {
+                    if (i % 2 === 0) acc.push(part + (arr[i + 1] || ''));
+                    return acc;
+                }, [])
+                .map(s => s.trim())
+                .filter(s => s.length > 1);
+
+            console.log(`🗣️ Pre-fetching ${sentences.length} segments...`);
+
+            try {
+                const conversionPromises = sentences.map(async (s) => {
+                    try {
+                        const cleanAudioText = arabicVoiceService.cleanTextForTTS(s);
+                        if (!cleanAudioText) return null;
+
+                        const base64 = await arabicVoiceService.fetchGoogleTTS(cleanAudioText);
+                        return await arabicVoiceService.prepareAudioFile(base64);
+                    } catch (e) {
+                        console.warn('⚠️ Segment failed:', s, e);
+                        return null;
+                    }
+                });
+
+                audioPaths = await Promise.all(conversionPromises);
+            } catch (e) {
+                console.error('❌ Bulk Fetch Error:', e);
+                updateStatus('idle');
+                return;
+            }
+        }
+
+// ===== PLAYBACK LOOP FIX =====
+// Also update the playback loop (around line 740-775) to handle single audio with multiple subtitles:
+
+        // 2. PLAY SEQUENTIALLY 🎵
+        if (hasSSML && audioPaths.length === 1) {
+            // SSML MODE: Play single audio while cycling through subtitles
+            const audioPath = audioPaths[0];
+            const estimatedDurationPerSubtitle = 3000; // 3 seconds per subtitle (adjust as needed)
+            
+            if (audioPath) {
+                // Start playing the full audio
+                const playPromise = arabicVoiceService.playAudioFile(audioPath, rawVoiceText, {
+                    onPlayStart: () => avatarRef.current?.startTalking(),
+                    onVisemeChange: (viseme) => avatarRef.current?.speakVisually(viseme)
+                });
+
+                // Cycle through subtitles while audio plays
+                for (let i = 0; i < sentences.length; i++) {
+                    if (statusRef.current !== 'speaking') break;
+                    
+                    const subtitle = sentences[i];
+                    if (subtitle) setTranscript(subtitle);
+                    
+                    await new Promise(r => setTimeout(r, estimatedDurationPerSubtitle));
+                }
+
+                // Wait for audio to finish
+                await playPromise;
+            }
+        } else {
+            // NORMAL MODE: Play each audio segment with its subtitle
+            for (let i = 0; i < sentences.length; i++) {
+                if (statusRef.current !== 'speaking') {
+                    console.log('🚫 Speech interrupted.');
+                    break;
+                }
+
+                const sentence = sentences[i];
+                const path = audioPaths[i];
+                
+                if (sentence) setTranscript(sentence);
+
+                if (path) {
+                    const success = await arabicVoiceService.playAudioFile(path, sentence, {
+                        onPlayStart: () => avatarRef.current?.startTalking(),
+                        onVisemeChange: (viseme) => avatarRef.current?.speakVisually(viseme)
+                    });
+
+                    if (!success) console.log('⚠️ Segment skipped');
+                } else {
+                    await new Promise(r => setTimeout(r, 500));
+                }
+            }
+        }

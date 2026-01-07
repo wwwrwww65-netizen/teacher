@@ -8,11 +8,14 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import StudentSetupScreen from './src/screens/StudentSetupScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import LessonsScreen from './src/screens/LessonsScreen';
 import LessonDetailScreen from './src/screens/LessonDetailScreen';
 import ClassroomScreen from './src/screens/ClassroomScreen';
+import MiniGameScreen from './src/screens/MiniGameScreen';
 import QuizScreen from './src/screens/QuizScreen';
+import CurriculumScreen from './src/screens/CurriculumScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 
 const Stack = createNativeStackNavigator();
@@ -92,12 +95,14 @@ function App() {
             <SafeAreaProvider>
                 <NavigationContainer>
                     <Stack.Navigator
-                        initialRouteName="Login"
+                        initialRouteName="StudentSetup"
                         screenOptions={{
                             headerShown: false,
                             contentStyle: { backgroundColor: '#fff' }
                         }}
                     >
+                        <Stack.Screen name="StudentSetup" component={StudentSetupScreen} />
+
                         {/* Auth */}
                         <Stack.Screen name="Login" component={LoginScreen} />
                         <Stack.Screen name="Register" component={RegisterScreen} />
@@ -108,9 +113,11 @@ function App() {
                         <Stack.Screen name="Profile" component={ProfileScreen} />
 
                         {/* Features */}
+                        <Stack.Screen name="Curriculum" component={CurriculumScreen} />
                         <Stack.Screen name="Lessons" component={LessonsScreen} />
                         <Stack.Screen name="LessonDetail" component={LessonDetailScreen} />
                         <Stack.Screen name="Classroom" component={ClassroomScreen} />
+                        <Stack.Screen name="MiniGame" component={MiniGameScreen} />
                         <Stack.Screen name="Quiz" component={QuizScreen} />
                     </Stack.Navigator>
                 </NavigationContainer>

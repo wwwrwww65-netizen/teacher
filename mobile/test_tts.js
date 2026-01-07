@@ -1,33 +1,52 @@
-const axios = require('axios');
 
-const API_KEY = 'AIzaSyC-xdocKTINJOPZLllWBaAkLvTA1UY33z0'; // New Key
-const PACKAGE_NAME = 'com.tinyteacher';
-const CERT_SHA1 = '6A:A3:03:D2:43:58:19:DD:63:18:CD:F7:DB:CD:97:DF:F0:C2:60:23';
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
 
 async function testTTS() {
-    console.log("Testing Google Cloud TTS...");
+    console.log('🔍 Testing connection to Google Cloud TTS (Neural2)...');
+
+    const configPath = path.resolve('e:/jjj/mobile/src/config/constants.js');
+    const configContent = fs.readFileSync(configPath, 'utf8');
+    const keyMatch = configContent.match(/export const GOOGLE_API_KEY = ['"]([^'"]+)['"]/);
+
+    if (!keyMatch) {
+        console.error('❌ Could not find API Key.');
+        return;
+    }
+
+    const apiKey = keyMatch[1];
+    const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`;
+
+    const body = {
+        input: { text: "مرحباً بكم، أنا معلمتكم تيني. كيف حالكم اليوم؟" },
+        voice: {
+            languageCode: 'ar-XA',
+            name: 'ar-XA-Chirp3-HD-Achernar',
+            ssmlGender: 'FEMALE'
+        },
+        audioConfig: {
+            audioEncoding: 'MP3',
+            speakingRate: 1.0,
+            pitch: 0.0
+        }
+    };
+
     try {
-        const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
-        const body = {
-            input: { text: "Hello, can you hear me?" },
-            voice: { languageCode: 'en-US', ssmlGender: 'NEUTRAL' },
-            audioConfig: { audioEncoding: 'MP3' }
-        };
-
-        const response = await axios.post(url, body, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        console.log("✅ Success! TTS Audio Content received (Length: " + response.data.audioContent.length + ")");
-    } catch (error) {
-        console.error("❌ Error:");
-        if (error.response) {
-            console.error(`Status: ${error.response.status}`);
-            console.error(JSON.stringify(error.response.data, null, 2));
+        const response = await axios.post(url, body);
+        if (response.data && response.data.audioContent) {
+            console.log('✅ TTS Success! Audio content received.');
+            console.log('Audio Data Length:', response.data.audioContent.length);
         } else {
-            console.error(error.message);
+            console.error('⚠️ Success but no audio content?');
+        }
+    } catch (error) {
+        console.error('❌ TTS Connection Failed.');
+        if (error.response) {
+            console.error('Status:', error.response.status);
+            console.error('Data:', JSON.stringify(error.response.data));
+        } else {
+            console.error('Msg:', error.message);
         }
     }
 }

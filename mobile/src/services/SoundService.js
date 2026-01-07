@@ -43,6 +43,10 @@ class SoundService {
     playWrong() {
         this.play('wrong');
     }
+
+    playFailure() {
+        this.play('wrong');
+    }
 }
 
 export const soundService = new SoundService();

@@ -27,7 +27,7 @@ const LessonDetailScreen = ({ route, navigation }) => {
     const avatarRef = useRef(null);
     const whiteboardRef = useRef(null);
 
-    const currentTopic = lesson.topics[currentTopicIndex];
+    const currentTopic = lesson.topics?.[currentTopicIndex] || {};
 
     useEffect(() => {
         // Initialize voice service

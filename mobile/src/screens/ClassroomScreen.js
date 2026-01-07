@@ -13,28 +13,60 @@ import {
     Dimensions,
     TextInput,
     KeyboardAvoidingView,
-    Modal
+    Modal,
+    I18nManager,
+    Animated,
+    ScrollView
 } from 'react-native';
 import { launchCamera } from 'react-native-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Teacher3D from '../components/avatar/Teacher3D';
 import ChalkboardWhiteboard from '../components/ChalkboardWhiteboard';
 import HandwritingModal from '../components/HandwritingModal';
+import Tts from 'react-native-tts'; // Import TTS for event listeners
 import { aiService } from '../services/AIService';
 import arabicVoiceService from '../services/ArabicVoiceService';
+import { musicService } from '../services/MusicService';
+import { soundService } from '../services/SoundService';
 import { theme } from '../config/theme';
 import BouncyButton from '../components/BouncyButton';
+import BackgroundMusic from '../components/BackgroundMusic';
 
 const { width, height } = Dimensions.get('window');
+
+// Helper function to normalize Arabic text for comparison
+const normalize = (text) => {
+    if (!text) return '';
+    return text
+        .replace(/[ًٌٍَُِّْ]/g, '') // Remove diacritics
+        .replace(/[أإآ]/g, 'ا') // Normalize alif
+        .replace(/ة/g, 'ه') // Normalize taa marbuta
+        .replace(/ى/g, 'ي') // Normalize alif maqsura
+        .toLowerCase()
+        .trim();
+};
 
 const ClassroomScreen = ({ navigation, route }) => {
     const avatarRef = useRef(null);
     const whiteboardRef = useRef(null);
 
-    const [status, setStatus] = useState('idle');
+    const [status, setStatus] = useState('initializing');
+    const statusRef = useRef('initializing');
     const [transcript, setTranscript] = useState('');
     const [isMicActive, setIsMicActive] = useState(false);
     const [userName, setUserName] = useState('يا بطل');
+
+    const updateStatus = (newStatus) => {
+        console.log(`📡 Status Transition: ${statusRef.current} -> ${newStatus}`);
+        statusRef.current = newStatus;
+        setStatus(newStatus);
+    };
+
+    // Mute/Listen State
+    const [isMuted, setIsMuted] = useState(false);
+    const isMutedRef = useRef(false);
+
+    useEffect(() => { isMutedRef.current = isMuted; }, [isMuted]);
 
     // Keyboard State
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
@@ -42,7 +74,204 @@ const ClassroomScreen = ({ navigation, route }) => {
 
     // Handwriting Modal State
     const [isWritingModalVisible, setIsWritingModalVisible] = useState(false);
+    const isWritingModalRef = useRef(false);
     const [writingLetter, setWritingLetter] = useState('أ');
+
+    // Sync Ref with State
+    useEffect(() => { isWritingModalRef.current = isWritingModalVisible; }, [isWritingModalVisible]);
+
+    const [drawingIntent, setDrawingIntent] = useState(null);
+    const lastQuizOptionsRef = useRef(null);
+    const pendingQuizRef = useRef(false);
+    const pendingWritingRef = useRef(false);
+
+    // --- TTS Synchronization Listener ---
+    useEffect(() => {
+        const onFinish = () => {
+            console.log('✅ TTS Finished speaking.');
+            // Only update status if consistent
+            if (statusRef.current === 'speaking') {
+                updateStatus('listening');
+
+                // Writing Modal Check
+                if (pendingWritingRef.current) {
+                    console.log('✨ TTS done -> Revealing Writing Modal now.');
+                    setIsWritingModalVisible(true);
+                    pendingWritingRef.current = false;
+                    return;
+                }
+
+                // If we were waiting to show a quiz, show it now
+                if (pendingQuizRef.current) {
+                    console.log('✨ TTS done -> Revealing Quiz Modal now.');
+                    setIsSelectionModalVisible(true);
+                    pendingQuizRef.current = false;
+                }
+            }
+        };
+
+        // Add listeners
+        const finishListener = Tts.addEventListener('tts-finish', onFinish);
+        const cancelListener = Tts.addEventListener('tts-cancel', onFinish); // Handle cancel as finish too
+
+        return () => {
+            finishListener.remove();
+            cancelListener.remove();
+        };
+    }, []);
+
+    // --- Interactive Selection Choice Logic ---
+    const [isSelectionModalVisible, setIsSelectionModalVisible] = useState(false);
+    const [selectionOptions, setSelectionOptions] = useState([]);
+    const [correctAnswer, setCorrectAnswer] = useState(null);
+
+    // NEW: Track status of EACH option individually { "OptionA": "wrong", "OptionB": "idle" }
+    const [optionStates, setOptionStates] = useState({});
+    const quizErrorCounter = useRef(0);
+
+    // --- Analytics Logging (Placeholder) ---
+    const logAnalyticsEvent = (eventName, payload) => {
+        const event = {
+            event: eventName,
+            timestamp: Date.now(),
+            studentId: "local-student-1", // Placeholder
+            grade: "KG1", // Should ideally come from props or context
+            ...payload
+        };
+        console.log('📊 ANALYTICS EVENT:', JSON.stringify(event, null, 2));
+        // TODO: Send to backend (e.g., Api.post('/events', event))
+    };
+
+    const handleOptionSelect = (option) => {
+        // QUIZ MODE VALIDATION
+        if (correctAnswer) {
+            if (option === correctAnswer) {
+                // ✅ CORRECT
+                setOptionStates(prev => ({ ...prev, [option]: 'correct' }));
+                soundService.playSuccess();
+
+                logAnalyticsEvent('choice_selected', {
+                    questionId: 'current-quiz', // Placeholder ID
+                    selected: option,
+                    correct: true,
+                    attempts: quizErrorCounter.current + 1
+                });
+
+                quizErrorCounter.current = 0; // Reset counter
+
+                setTimeout(() => {
+                    setIsSelectionModalVisible(false);
+                    setCorrectAnswer(null);
+                    setOptionStates({}); // Clear states
+                    processUserMessage(`لقد اخترت "${option}" وهي إجابة صحيحة! احتفلي بي!`);
+                }, 1000);
+            } else {
+                // ❌ WRONG (Persistent Red)
+                setOptionStates(prev => ({ ...prev, [option]: 'wrong' }));
+                soundService.playFailure();
+                quizErrorCounter.current += 1;
+
+                logAnalyticsEvent('choice_selected', {
+                    questionId: 'current-quiz',
+                    selected: option,
+                    correct: false,
+                    attempts: quizErrorCounter.current
+                });
+
+                // 🧠 Smart Error Handler: If 2 consecutive errors -> Trigger Explain
+                if (quizErrorCounter.current >= 2) {
+                    console.log('🚨 2 Consecutive Errors - Triggering Breakdown...');
+
+                    logAnalyticsEvent('explain_triggered', {
+                        reason: 'two_wrong_attempts',
+                        questionId: 'current-quiz'
+                    });
+
+                    setTimeout(() => {
+                        setIsSelectionModalVisible(false);
+                        setCorrectAnswer(null);
+                        setOptionStates({});
+                        quizErrorCounter.current = 0;
+                        processUserMessage("لقد أخطأ الطفل مرتين متتاليتين في الاختبار. من فضلك اشرحي له الدرس مجدداً وارسمي له على السبورة ليفهم (action: explain_board).");
+                    }, 500);
+                }
+            }
+            return;
+        }
+
+        // NORMAL SELECTION MODE (Generic)
+        setOptionStates(prev => ({ ...prev, [option]: 'selected' }));
+        soundService.playPop();
+        setTimeout(() => {
+            setIsSelectionModalVisible(false);
+            setOptionStates({});
+            processUserMessage(`لقد اخترت: ${option}`);
+        }, 500);
+    };
+
+    const renderSelectionModal = () => {
+        if (!isSelectionModalVisible) return null;
+
+        return (
+            <Modal
+                transparent={true}
+                visible={isSelectionModalVisible}
+                animationType="fade"
+                onRequestClose={() => { }}
+            >
+                <View style={styles.selectionOverlay}>
+                    <View style={styles.selectionContainer}>
+                        <Text style={styles.selectionTitle}>
+                            {correctAnswer ? "اختبر ذكاءك! أين الإجابة؟ 🧐" : "اختر ماذا تريد يا بطل! 🤔"}
+                        </Text>
+                        <View style={styles.optionsWrapper}>
+                            {selectionOptions.map((opt, index) => {
+                                const status = optionStates[opt] || 'idle';
+                                let cardStyle = styles.optionCard;
+                                let icon = null;
+
+                                if (status === 'correct') {
+                                    cardStyle = [styles.optionCard, { backgroundColor: '#C8E6C9', borderColor: '#4CAF50' }];
+                                    icon = <Text style={{ fontSize: 24, marginLeft: 10 }}>✅</Text>;
+                                } else if (status === 'wrong') {
+                                    cardStyle = [styles.optionCard, { backgroundColor: '#FFCDD2', borderColor: '#F44336' }];
+                                    icon = <Text style={{ fontSize: 24, marginLeft: 10 }}>❌</Text>;
+                                } else if (status === 'selected') {
+                                    cardStyle = [styles.optionCard, { backgroundColor: '#FFF9C4', borderColor: '#FFEB3B' }];
+                                }
+
+                                return (
+                                    <BouncyButton
+                                        key={index}
+                                        onPress={() => handleOptionSelect(opt)}
+                                        style={[cardStyle, { flexDirection: 'row', justifyContent: 'center' }]}
+                                    >
+                                        <Text style={styles.optionText}>{opt}</Text>
+                                        {icon}
+                                    </BouncyButton>
+                                );
+                            })}
+                        </View>
+                    </View>
+                </View>
+            </Modal>
+        );
+    };
+
+    useEffect(() => {
+        isWritingModalRef.current = isWritingModalVisible;
+        if (isWritingModalVisible) {
+            console.log('✍️ Writing Modal Open: Pausing Voice Listening...');
+            arabicVoiceService.cancel(); // Stop any active listening
+            updateStatus('idle'); // Ensure status is idle so we can resume later
+            setIsMicActive(false);
+        } else {
+            console.log('✍️ Writing Modal Closed: Resuming check...');
+            if (!isMutedRef.current && statusRef.current === 'idle') {
+                setTimeout(startListening, 500);
+            }
+        }
+    }, [isWritingModalVisible]);
 
     useEffect(() => {
         initializeClassroom();
@@ -68,137 +297,499 @@ const ClassroomScreen = ({ navigation, route }) => {
 
     const initializeClassroom = async () => {
         await requestPermissions();
-        let name = 'بَطَل';
+        let name = 'بَطَل'; // Default
+
         try {
             const userDataStr = await AsyncStorage.getItem('userProfile');
             if (userDataStr) {
                 const userData = JSON.parse(userDataStr);
-                if (userData.name) name = userData.name;
-                aiService.setUserProfile(userData.name, userData.grade, userData.interests);
-            }
-        } catch (e) { console.log('No user profile'); }
+                console.log('📂 Loaded User Profile (Raw):', userData);
 
-        setUserName(name);
+                // 1. Sanitize Name immediately
+                if (userData.name) {
+                    name = userData.name.replace(/[^\u0621-\u064A\u064B-\u065F\u0671-\u06D3\u06F0-\u06F9a-zA-Z\s]/g, '').trim();
+                }
+
+                // 2. Resolve Grade
+                const grade = userData.grade || 'KG1';
+
+                // 3. Update AI Service with verification status
+                // We assume if a grade exists in storage and is not default KG1 (or if we explicitly saved it), it's verified.
+                // Better: Check a boolean flag if we saved it.
+                const isVerified = userData.gradeVerified || (grade !== 'KG1');
+
+                aiService.setUserProfile(name, grade, userData.interests);
+
+                // Force set verification status in AI Service (we need to add this method or property setter)
+                aiService.userProfile.gradeVerified = isVerified;
+
+                // 4. Save back cleaned version if changed
+                if (name !== userData.name) {
+                    console.log('🧹 Cleaned name on load:', userData.name, '->', name);
+                    AsyncStorage.setItem('userProfile', JSON.stringify({ ...userData, name, gradeVerified: isVerified }));
+                }
+            }
+        } catch (e) { console.log('No user profile found', e); }
+
+        setUserName(name); // Update State
         await arabicVoiceService.initialize();
 
         // Greeting with delay to ensure ready
-        setTimeout(() => startGreeting(name), 1500);
+        setTimeout(async () => {
+            console.log('👋 Starting Greeting for:', name);
+            await startGreeting(name);
+            // After greeting, start the continuous live loop
+            console.log('🚀 Entering Live Mode...');
+            startListening();
+        }, 1500);
     };
 
     const startGreeting = async (name) => {
-        setStatus('speaking');
+        updateStatus('speaking');
 
-        // Handle Lesson Mode
-        if (route?.params?.mode === 'lesson' && route?.params?.prompt) {
-            console.log('🎓 Starting Lesson Mode...');
-            await processUserMessage(route.params.prompt);
-            return; // Skip standard greeting
+        // Handle Lesson Mode - INSTANT START (No AI Delay)
+        if (route?.params?.mode === 'lesson' && route?.params?.initialMessage) {
+            console.log('🎓 Starting Lesson Mode (Instant)...');
+
+            let msg = route.params.initialMessage;
+            const target = route.params.targetItem;
+
+            // Personalize the greeting if we have a name
+            if (name && name !== 'بَطَل' && name !== 'صديقي') {
+                msg = msg.replace('يا بطل', `يا ${name}`);
+            }
+
+            // Construct simulated AI response
+            const instantResponse = {
+                text: msg,
+                voiceText: msg,
+                action: target ? 'explain_board' : 'speaking',
+                draw: target ? aiService.getDrawData(target) : null,
+                emotion: 'happy'
+            };
+
+            // Manually update Memory so context is preserved
+            aiService.context.push({ role: 'assistant', content: msg });
+            aiService.saveMemory();
+
+            // Execute immediately
+            await speakResponse(instantResponse);
+            return;
         }
 
         // Standard Greeting
-        const welcomeText = `أَهْلاً بِكَ يَا ${name} فِي فَصْلِنَا الدِّرَاسِيّْ! كَيْفَ حَالُكَ الْيَوْمْ؟ هَلْ أَنْتَ مُسْتَعِدٌّ لِلتَّعَلُّمْ؟`;
+        // Dynamic Greeting Logic (Updated for Teacher Nora)
+        let welcomeText;
+        if (name && name !== 'بَطَل' && name !== 'يا بطل') {
+            const grade = aiService.userProfile.grade || 'الصف';
+            // Returning User
+            welcomeText = `أَهْلاً بِكَ مُجَدَّدًا يَا ${name}! أَنَا الْمُعَلِّمَة نُورَا. هَلْ أَنْتَ مُسْتَعِدٌّ لِلدِّرَاسَةِ فِي ${grade} الْيَوْم؟`;
+        } else {
+            // New User / First Time
+            welcomeText = `أَهْلًا بِكَ يَا بَطَلْ! أَنَا الْمُعَلِّمَة نُورَا. مَا اسْمُكَ وَفِي أَيِّ صَفٍّ أَنْتْ؟`;
+        }
+
+        console.log('🗣️ Speaking Greeting:', welcomeText);
         setTranscript(welcomeText);
 
-        // avatarRef.current?.startTalking(); // REMOVED: Wait for sync
         await arabicVoiceService.speak(welcomeText, {
             onPlayStart: () => avatarRef.current?.startTalking()
         });
         avatarRef.current?.stopTalking();
 
-        setStatus('idle');
+        updateStatus('idle');
+    };
+
+    const silenceCounterRef = useRef(0);
+
+    const toggleMute = () => {
+        const newMuteState = !isMuted;
+        setIsMuted(newMuteState);
+
+        if (newMuteState) {
+            // MUTE ENABLED: Stop listening immediately
+            console.log('🔇 Muting...');
+            arabicVoiceService.cancel();
+            updateStatus('idle');
+            setIsMicActive(false);
+        } else {
+            // MUTE DISABLED: Start listening
+            console.log('🎤 Unmuting...');
+            if (statusRef.current !== 'thinking' && statusRef.current !== 'speaking') {
+                updateStatus('idle');
+            }
+            setTimeout(startListening, 300);
+        }
     };
 
     const startListening = async () => {
-        if (status === 'speaking' || status === 'thinking') return;
+        // PREVENT OVERLAP
+        if (statusRef.current === 'listening' ||
+            statusRef.current === 'thinking' ||
+            statusRef.current === 'speaking' ||
+            isMutedRef.current ||
+            isWritingModalRef.current ||
+            arabicVoiceService.isPlaying) {
+            console.log('🚫 startListening blocked (already active/modal open/audio playing):', statusRef.current);
+            return;
+        }
 
-        setStatus('listening');
+        updateStatus('listening');
         setIsMicActive(true);
-        setTranscript("أستمع إليك... 🎤");
         avatarRef.current?.setEmotion('neutral');
 
         try {
-            const userText = await arabicVoiceService.listen('ar-SA');
+            const userText = await arabicVoiceService.listen();
 
-            if (userText) {
+            if (userText && userText.trim().length > 0) {
                 // Speech detected
+                console.log('🎤 User Text Detected:', userText);
                 setTranscript(`أنت: ${userText}`);
                 setIsMicActive(false);
+                silenceCounterRef.current = 0; // Reset counter on success
                 processUserMessage(userText);
             } else {
-                // Silence detected - RESTART LOOP
-                console.log('🔄 Silence... listening again');
-                // Keep status as 'listening' but maybe blink or just wait
-                setTimeout(startListening, 500);
-            }
-        } catch (error) {
-            // Error (No match / Network / Cancel) - RESTART LOOP
-            console.warn("Speech Error (Looping):", error);
-            setIsMicActive(false);
+                // Silence or Session closed
+                console.log('🔄 Silence detected/Session Ended.');
 
-            // Retry after short delay
-            setTimeout(() => {
-                if (status !== 'speaking') startListening();
-            }, 1000);
+                if (statusRef.current !== 'listening') {
+                    console.log('🛑 Listen Loop Aborted: Status changed externally to:', statusRef.current);
+                    return;
+                }
+
+                console.log('🔄 Resetting for next window...');
+                updateStatus('idle');
+                setIsMicActive(false);
+
+                if (!isMutedRef.current) {
+                    setTimeout(startListening, 400);
+                }
+            }
+        } catch (e) {
+            console.log('❌ Voice Critical Error (Looping):', e);
+
+            if (statusRef.current !== 'listening') {
+                console.log('🛑 Listen Loop Aborted (Error path): Status changed externally to:', statusRef.current);
+                return;
+            }
+
+            if (!isMutedRef.current) {
+                updateStatus('idle');
+                setIsMicActive(false);
+                setTimeout(startListening, 1000);
+            } else {
+                updateStatus('idle');
+                setIsMicActive(false);
+            }
         }
     };
 
     const processUserMessage = async (text, base64Image = null) => {
-        setStatus('thinking');
-        avatarRef.current?.setEmotion('thinking');
+        try {
+            updateStatus('thinking');
+            avatarRef.current?.setEmotion('thinking');
 
-        const response = await aiService.chat(text, base64Image);
-        await speakResponse(response);
+            const response = await aiService.chat(text, base64Image);
 
-        if (response.action === 'practice_writing') {
-            setWritingLetter(response.data || 'أ');
-            setTimeout(() => setIsWritingModalVisible(true), 1500);
+            // 🔍 DEEP DEBUG: Raw Response Inspection
+            console.log('═══════════════════════════════════════════════════════');
+            console.log('🔍 DEEP DEBUG: RAW AI RESPONSE');
+            console.log('═══════════════════════════════════════════════════════');
+
+            if (response.voiceText) {
+                const rawVoice = response.voiceText;
+                const visibleVoice = rawVoice
+                    .replace(/\n/g, '\\n')
+                    .replace(/\r/g, '\\r')
+                    .replace(/\t/g, '\\t')
+                    .replace(/\s/g, '·'); // Show spaces as dots
+
+                console.log(`📝 RAW voiceText: "${rawVoice}"`);
+                console.log(`👁️ VISIBLE voiceText: "${visibleVoice}"`);
+                console.log(`📏 Length: ${rawVoice.length} characters`);
+                console.log(`🔢 Char codes (first 50): ${rawVoice.substring(0, 50).split('').map(c => c.charCodeAt(0)).join(',')}`);
+
+                // Check for hidden problems
+                const hasNewlines = /\n/.test(rawVoice);
+                const hasCarriageReturn = /\r/.test(rawVoice);
+                const hasMultipleSpaces = /\s{2,}/.test(rawVoice);
+                const startsWithSpace = /^\s/.test(rawVoice);
+                const endsWithDot = /\.$/.test(rawVoice.trim());
+
+                console.log(`⚠️ Issues Found:`);
+                console.log(`   - Has newlines (\\n): ${hasNewlines ? '❌ YES' : '✅ NO'}`);
+                console.log(`   - Has carriage return (\\r): ${hasCarriageReturn ? '❌ YES' : '✅ NO'}`);
+                console.log(`   - Has multiple spaces: ${hasMultipleSpaces ? '⚠️ YES' : '✅ NO'}`);
+                console.log(`   - Starts with space: ${startsWithSpace ? '❌ YES' : '✅ NO'}`);
+                console.log(`   - Ends with dot: ${endsWithDot ? '⚠️ YES' : '✅ NO'}`);
+            }
+
+            if (response.text) {
+                const rawText = response.text;
+                const visibleText = rawText
+                    .replace(/\n/g, '\\n')
+                    .replace(/\r/g, '\\r')
+                    .replace(/\t/g, '\\t');
+
+                console.log(`📝 RAW text: "${rawText}"`);
+                console.log(`👁️ VISIBLE text: "${visibleText}"`);
+                console.log(`📏 Length: ${rawText.length} characters`);
+            }
+
+            console.log('═══════════════════════════════════════════════════════\n');
+
+            console.log('🧠 AI BRAIN DECISION:', {
+                Action: response.action || 'speaking',
+                Emotion: response.emotion || 'neutral',
+                Intent: response.intent?.type || 'none',
+                ResponseText: response.text?.substring(0, 50) + '...'
+            });
+
+            if (response.action === 'ignore') {
+                console.log('🔇 AI DECISION: Ignoring as Echo/Noise');
+                updateStatus('idle');
+                setTimeout(startListening, 1000);
+                return;
+            }
+
+            // EXTRACT & SAVE USER INFO (from JSON)
+            if (response.user_info && response.user_info.name) {
+                console.log('📝 Saving User Profile (JSON):', response.user_info);
+                setUserName(response.user_info.name);
+
+                // Preserve existing grade if AI sends null/undefined, otherwise use new grade, otherwise default to KG1
+                const existingGrade = aiService.userProfile.grade;
+                const newGrade = response.user_info.grade || existingGrade || 'KG1';
+
+                // Mark as verified if we have a real name and valid grade
+                const isVerified = true;
+
+                const finalProfile = { ...response.user_info, name: response.user_info.name, grade: newGrade, gradeVerified: isVerified };
+
+                AsyncStorage.setItem('userProfile', JSON.stringify(finalProfile));
+
+                aiService.setUserProfile(response.user_info.name, newGrade, null);
+                aiService.userProfile.gradeVerified = true;
+            }
+            // FALLBACK: Extract Name from Text if JSON failed
+            else if (!userName || userName === 'بَطَل') {
+                // 1. Strip Diacritics/Tashkeel for easier regex matching
+                const cleanText = response.text.replace(/[\u064B-\u065F]/g, '');
+
+                // 2. Define Patterns: "Ya [Name]", "Ana [Name]", "Ismi [Name]"
+                const namePatterns = [
+                    /يا\s+([^\s!?.،:"]+)/,
+                    /أنا\s+([^\s!?.،:"]+)/,
+                    /اسمي\s+([^\s!?.،:"]+)/
+                ];
+
+                let extractedName = null;
+                for (let pattern of namePatterns) {
+                    const match = cleanText.match(pattern);
+                    if (match && match[1]) {
+                        extractedName = match[1].replace(/[!?.،:"]/g, '').trim(); // Double clean
+                        break;
+                    }
+                }
+
+                const ignoredNames = ['بطل', 'صغيري', 'تيني', 'معلمتي', 'حبيبي', 'صديقي', 'سعيد', 'تلميذ'];
+
+                if (extractedName && !ignoredNames.includes(extractedName) && extractedName.length > 2) {
+                    console.log('📝 Saving User Profile (Robust Regex Fallback):', extractedName);
+                    const newProfile = { name: extractedName, grade: 'KG1' };
+                    setUserName(extractedName);
+                    AsyncStorage.setItem('userProfile', JSON.stringify(newProfile));
+                    aiService.setUserProfile(extractedName, 'KG1', null);
+                }
+            }
+
+            // Capture Quiz/Choice Options
+            if ((response.action === 'quiz' || response.action === 'ask_choice') && response.options && response.options.length > 0) {
+                console.log('🤔 AI Quiz/Choice detected:', response.options);
+                setSelectionOptions(response.options);
+                setCorrectAnswer(response.answer || null);
+            }
+
+            await speakResponse(response);
+
+            if (response.intent && response.intent.type === 'letter') {
+                const drawPath = aiService.getDrawData(response.intent.shape);
+                if (drawPath) {
+                    setWritingLetter(response.intent.shape);
+                    // Also trigger the board write!
+                    whiteboardRef.current?.write(drawPath, { count: 1, duration: 3000 });
+                }
+            } else if (response.draw) {
+                // Check if it's a key or a raw path (raw paths are long strings)
+                let drawContent = response.draw;
+                let key = typeof response.draw === 'string' && response.draw.length < 10 ? response.draw : null;
+
+                // Try to resolve key if it's short
+                if (key) {
+                    const resolved = aiService.getDrawData(key);
+                    if (resolved) drawContent = resolved;
+                }
+
+                // If we found valid content, set it
+                if (drawContent) {
+                    setWritingLetter(key || 'أ'); // For modal default
+                    // Ensure whiteboard gets the full path!
+                    whiteboardRef.current?.write(drawContent, { count: 1, duration: 3000 });
+                }
+            }
+
+            if (response.action === 'practice_writing') {
+                const targetLetter = response.data || (response.intent?.shape) || (response.draw && typeof response.draw === 'string' && response.draw.length < 5 ? response.draw : 'أ');
+                setWritingLetter(targetLetter);
+                setTimeout(() => setIsWritingModalVisible(true), 500);
+            }
+        } catch (error) {
+            console.error('❌ Critical error in processUserMessage:', error);
+            updateStatus('idle');
+            setTimeout(startListening, 1000);
         }
     };
 
     const speakResponse = async (response) => {
-        setStatus('speaking');
-        setTranscript(response.text);
+        await arabicVoiceService.cancel();
+        updateStatus('speaking');
+
+        // 1. Prepare UI Components (Quiz/Board/Emotion)
+        if (response.action === 'quiz' && Array.isArray(response.options) && response.options.length > 0) {
+            const optionsStr = JSON.stringify(response.options);
+            const isDuplicate = lastQuizOptionsRef.current === optionsStr && isSelectionModalVisible;
+
+            if (!isDuplicate) {
+                console.log('✨ Quiz Modal Opening (Deferred)', response.options);
+                setSelectionOptions(response.options);
+                pendingQuizRef.current = true;
+                lastQuizOptionsRef.current = optionsStr;
+            }
+        }
 
         if (response.emotion) {
             avatarRef.current?.setEmotion(response.emotion);
             if (response.emotion === 'happy') avatarRef.current?.laugh();
         }
 
-        // Drawing Logic
-        if (response.action === 'explain_board' && response.draw) {
-            // Point to board (left side usually)
+        if (response.draw) {
             avatarRef.current?.walkToBoard();
-            await new Promise(r => setTimeout(r, 1000));
-            if (response.draw) {
-                whiteboardRef.current?.write(response.draw, 3000);
+            setTimeout(() => {
+                const count = response.intent?.count || 1;
+                const drawContent = typeof response.draw === 'string' ? response.draw : '';
+                whiteboardRef.current?.write(drawContent, {
+                    count,
+                    duration: drawContent.length > 50 ? 4000 : 2500
+                });
+            }, 1200);
+        } else if (response.action !== 'practice_writing') {
+            whiteboardRef.current?.clear();
+        }
+
+        // 2. UNIFIED GAPLESS SPEECH 🎤 (Single-Shot Mode)
+        // Using "Smart Timer" for Cinema-Style Subtitles (Robust & Fast)
+        let ttsText = (response.voiceText || response.text || "").trim();
+        ttsText = ttsText.replace(/^\s*<speak>/i, '').replace(/<\/speak>\s*$/i, '').trim();
+
+        // Prepare Subtitles
+        const cleanFullText = ttsText.replace(/<[^>]+>/g, '');
+        // Split by punctuation for readable chunks
+        const rawSubs = cleanFullText.split(/([.؟!،,]+\s+)/).filter(s => s.trim().length > 0);
+        const subtitles = [];
+        let temp = "";
+
+        // Group short segments
+        rawSubs.forEach(seg => {
+            temp += seg;
+            if (temp.length > 40 || /[.؟!]/.test(seg)) {
+                subtitles.push(temp.trim());
+                temp = "";
+            }
+        });
+        if (temp.trim()) subtitles.push(temp.trim());
+
+        try {
+            await arabicVoiceService.cancel();
+
+            // Start Cinema Subtitles (Parallel Task)
+            const runCinemaSubtitles = async () => {
+                // If it's a short one-liner, just show it
+                if (subtitles.length <= 1) {
+                    setTranscript(cleanFullText);
+                    return;
+                }
+
+                for (let i = 0; i < subtitles.length; i++) {
+                    if (statusRef.current !== 'speaking') break;
+
+                    const sub = subtitles[i];
+                    setTranscript(sub);
+
+                    // Smart Duration Calculation:
+                    // Base time (500ms) + 105ms per character (calibrated for natural Arabic)
+                    const duration = 500 + (sub.length * 105);
+
+                    if (i < subtitles.length - 1) {
+                        await new Promise(r => setTimeout(r, duration));
+                    }
+                }
+            };
+            runCinemaSubtitles();
+
+            console.log('🎬 Executing Unified Gapless Playback (Smart Timer)...');
+
+            // Just speak the clean text (google handles pauses naturally)
+            // No marks needed for audio, simpler request
+            await arabicVoiceService.speak(ttsText, {
+                onPlayStart: () => avatarRef.current?.startTalking(),
+                onVisemeChange: (viseme) => avatarRef.current?.speakVisually(viseme),
+                emotion: response.emotion
+            });
+
+        } catch (speechError) {
+            console.error('❌ Speech Error:', speechError);
+            setTranscript(cleanFullText);
+            await new Promise(r => setTimeout(r, 2000));
+        }
+
+        avatarRef.current?.speakVisually('silence');
+        avatarRef.current?.stopTalking();
+
+        if (statusRef.current === 'speaking') {
+            updateStatus('idle');
+        }
+
+        // 3. MAGIC PEN DETECTION (Trigger writing modal if keywords detected)
+        const magicPenKeywords = ['دورك', 'بقلمك', 'اصبعك', 'إصبعك', 'جرب أن ترسم', 'جرب رسم', 'بيدك', 'شكل الحرف بيدك'];
+        // For detection, use the full clean text
+        const fullCleanText = ttsText.replace(/<[^>]+>/g, '');
+        const normText = normalize(fullCleanText);
+        let shouldTriggerWriting = false;
+
+        if (magicPenKeywords.some(kw => normText.includes(normalize(kw)))) {
+            if (response.action !== 'practice_writing' && response.action !== 'quiz' && !response.draw) {
+                shouldTriggerWriting = true;
+                pendingWritingRef.current = true;
             }
         }
 
-        // avatarRef.current?.startTalking(); // REMOVED: Wait for sync
+        // 4. POST-SPEECH ACTIONS
+        if (response.action === 'quiz' && response.options && response.options.length > 0) {
+            setIsSelectionModalVisible(true);
+            return;
+        }
 
-        await arabicVoiceService.speak(response.text, {
-            onPlayStart: () => {
-                avatarRef.current?.startTalking();
-            },
-            onVisemeChange: (viseme, path) => {
-                if (avatarRef.current) {
-                    avatarRef.current.speakVisually(viseme);
-                }
-            }
-        });
+        if (shouldTriggerWriting && !isWritingModalVisible) {
+            setIsWritingModalVisible(true);
+            return;
+        }
 
-        avatarRef.current?.speakVisually('silence'); // Close mouth
-        avatarRef.current?.stopTalking();
-
-        // After speaking, reset position
-        // avatarRef.current?.walkToCenter(); // REMOVED: Stay at board if there
-        setStatus('idle');
-
-        // AUTO-LISTEN: Continuous Conversation Mode
-        console.log('🔄 Auto-listening...');
+        console.log('🔄 Auto-listening check...');
         setTimeout(() => {
-            startListening();
-        }, 800);
+            const isIdle = statusRef.current === 'idle';
+            const isRefHidden = !isWritingModalRef.current;
+            if (isIdle && isRefHidden) startListening();
+        }, 2500);
     };
 
     const pickImage = async () => {
@@ -224,15 +815,102 @@ const ClassroomScreen = ({ navigation, route }) => {
         }
     };
 
+    // Confetti State
+    const [showConfetti, setShowConfetti] = useState(false);
+    const confettiAnim = useRef(new Animated.Value(0)).current;
+
     const handleWritingSuccess = async () => {
+        // Block auto-listeners immediately
+        updateStatus('thinking');
+
         setIsWritingModalVisible(false);
-        // Feedback to user immediately
+
+        // KILL VOICE to prevent self-echo of the congratulations message
+        await arabicVoiceService.cancel();
+        // Wait a bit to ensure system acknowledges cancellation
+        await new Promise(r => setTimeout(r, 500));
+
         avatarRef.current?.setEmotion('happy');
         avatarRef.current?.laugh();
 
-        // Let AI know about the success to continue the lesson flow
-        // "I wrote the letter [Letter] correctly!"
-        await processUserMessage(`لقد كتبت حرف ${writingLetter} بشكل صحيح! ماذا نفعل الآن؟`);
+        setShowConfetti(true);
+        Animated.sequence([
+            Animated.timing(confettiAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+            Animated.delay(2000),
+            Animated.timing(confettiAnim, { toValue: 0, duration: 1000, useNativeDriver: true })
+        ]).start(() => setShowConfetti(false));
+
+        // Let AI know about success
+        setTimeout(() => {
+            processUserMessage("✅ لقد نجح الطفل في كتابة الحرف بشكل صحيح! احتفلي به!", null, true);
+        }, 1000);
+    };
+
+    const handleWritingFailure = async () => {
+        updateStatus('thinking');
+        setIsWritingModalVisible(false);
+
+        // Notify AI of failure
+        await arabicVoiceService.cancel();
+        avatarRef.current?.setEmotion('sad');
+
+        setTimeout(() => {
+            processUserMessage("❌ لقد حاول الطفل الكتابة ولكن لم ينجح (الرسم غير واضح أو خاطئ). شجعيه وحاولي معه مرة أخرى.", null, true);
+        }, 1000);
+    };
+
+    const renderConfetti = () => {
+        if (!showConfetti) return null;
+
+        const particles = Array.from({ length: 20 }).map((_, i) => ({
+            id: i,
+            left: Math.random() * width,
+            top: Math.random() * height * 0.5,
+            scale: Math.random() * 0.8 + 0.5,
+            delay: Math.random() * 500
+        }));
+
+        return (
+            <View style={styles.confettiContainer} pointerEvents="none">
+                {particles.map((p) => (
+                    <Animated.Text
+                        key={p.id}
+                        style={{
+                            position: 'absolute',
+                            left: p.left,
+                            top: p.top,
+                            fontSize: 30,
+                            transform: [
+                                {
+                                    scale: confettiAnim.interpolate({
+                                        inputRange: [0, 0.5, 1],
+                                        outputRange: [0, p.scale * 1.5, p.scale]
+                                    })
+                                },
+                                {
+                                    translateY: confettiAnim.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: [0, 300 + Math.random() * 200]
+                                    })
+                                },
+                                {
+                                    rotate: confettiAnim.interpolate({
+                                        inputRange: [0, 1],
+                                        outputRange: ['0deg', `${Math.random() * 360}deg`]
+                                    })
+                                }
+                            ],
+                            opacity: confettiAnim.interpolate({
+                                inputRange: [0, 0.2, 0.8, 1],
+                                outputRange: [0, 1, 1, 0]
+                            })
+                        }}
+                    >
+                        {['⭐', '✨', '🌟', '🎉'][p.id % 4]}
+                    </Animated.Text>
+                ))}
+            </View>
+        );
     };
 
     const handleSendText = async () => {
@@ -251,89 +929,89 @@ const ClassroomScreen = ({ navigation, route }) => {
             <SafeAreaView style={styles.safeArea}>
                 <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
-                {/* 1. Header (Floating on top) */}
                 <View style={styles.header}>
                     <BouncyButton onPress={() => navigation.goBack()} style={styles.backButton}>
                         <Text style={styles.backButtonText}>←</Text>
                     </BouncyButton>
                     <View style={styles.statusBadge}>
-                        <Text style={styles.statusText}>{status === 'listening' ? '🎤 أستمع' : '😊 جاهزة'}</Text>
+                        <Text style={styles.statusText}>
+                            {status === 'listening' ? '🎤 أستمع' :
+                                status === 'speaking' ? '🗣️ تَتَحَدَّثْ' :
+                                    status === 'thinking' ? '🤔 أُفَكِّرْ...' :
+                                        '😊 جَاهِزَة'}
+                        </Text>
                     </View>
                 </View>
 
-                {/* 2. Main Full Screen Layer (Teacher/Image) */}
                 <View style={styles.fullScreenLayer}>
                     <Teacher3D ref={avatarRef} />
                 </View>
 
-                {/* 3. Chalkboard Overlay (Optional, if we want to draw on top of the image) */}
                 <View style={styles.boardOverlay}>
-                    {/* Pass true to make it transparent until drawn on */}
                     <ChalkboardWhiteboard ref={whiteboardRef} />
                 </View>
 
-                {/* 4. Transcript Text */}
                 <View style={styles.transcriptContainer}>
-                    <Text style={styles.transcriptText}>{transcript}</Text>
+                    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+                        <Text style={styles.transcriptText}>{transcript}</Text>
+                    </ScrollView>
                 </View>
 
-                {/* 5. Footer Controls */}
                 <View style={styles.controls}>
-                    {/* Camera */}
                     <BouncyButton
                         onPress={pickImage}
-                        disabled={status === 'speaking'}
+                        disabled={status === 'thinking'}
                         style={[styles.controlButton, { backgroundColor: '#E0F7FA' }]}
                     >
                         <Text style={styles.controlIcon}>📷</Text>
                     </BouncyButton>
 
-                    {/* Microphone (Main) */}
                     <BouncyButton
-                        onPress={startListening}
-                        disabled={status === 'thinking' || status === 'speaking'}
+                        soundName={null}
+                        onPress={toggleMute}
+                        disabled={status === 'thinking'}
                         style={[
                             styles.micButton,
-                            isMicActive && styles.micButtonActive,
-                            status === 'thinking' && styles.micButtonThinking
+                            isMuted && { backgroundColor: '#B0BEC5', borderColor: '#CFD8DC' },
+                            isMicActive && !isMuted && styles.micButtonActive,
+                            status === 'thinking' && styles.micButtonThinking,
+                            status === 'speaking' && !isMuted && styles.micButtonInterrupt
                         ]}
                     >
                         {status === 'thinking' ? (
                             <ActivityIndicator color="white" size="large" />
+                        ) : isMuted ? (
+                            <Text style={styles.micIcon}>🔇</Text>
+                        ) : status === 'speaking' ? (
+                            <Text style={styles.micIcon}>✋</Text>
                         ) : (
                             <Text style={styles.micIcon}>{isMicActive ? '👂' : '🎤'}</Text>
                         )}
                     </BouncyButton>
 
-                    {/* Write */}
                     <BouncyButton
                         onPress={() => {
-                            setWritingLetter('أ');
                             setIsWritingModalVisible(true);
                         }}
-                        disabled={status === 'speaking'}
+                        disabled={status === 'thinking'}
                         style={[styles.controlButton, { backgroundColor: '#F3E5F5' }]}
                     >
                         <Text style={styles.controlIcon}>✏️</Text>
                     </BouncyButton>
 
-                    {/* Keyboard Input */}
                     <BouncyButton
                         onPress={() => setIsKeyboardOpen(true)}
-                        disabled={status === 'speaking'}
+                        disabled={status === 'thinking'}
                         style={[styles.controlButton, { backgroundColor: '#E1BEE7' }]}
                     >
                         <Text style={styles.controlIcon}>⌨️</Text>
                     </BouncyButton>
 
-                    {/* DEBUG: Test Drawing Button */}
                     <BouncyButton
                         onPress={async () => {
-                            // Manual trigger to verify drawing works
                             const mockResponse = {
                                 text: "انظر، سأرسم لك دائرة جميلة!",
                                 action: 'explain_board',
-                                // Circle centered at 150,150 with radius 70
                                 draw: "M 150, 75 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0",
                                 emotion: 'happy'
                             };
@@ -346,7 +1024,6 @@ const ClassroomScreen = ({ navigation, route }) => {
                     </BouncyButton>
                 </View>
 
-                {/* Keyboard Input Modal */}
                 <Modal
                     animationType="slide"
                     transparent={true}
@@ -385,20 +1062,36 @@ const ClassroomScreen = ({ navigation, route }) => {
                     </KeyboardAvoidingView>
                 </Modal>
 
-                {/* Handwriting Modal */}
                 <HandwritingModal
                     visible={isWritingModalVisible}
                     letter={writingLetter}
                     onClose={() => setIsWritingModalVisible(false)}
                     onSuccess={handleWritingSuccess}
+                    onFailure={handleWritingFailure}
                 />
+
+                {renderSelectionModal()}
+
+                <BackgroundMusic volume={0.002} playing={true} />
+                {renderConfetti()}
             </SafeAreaView >
         </View >
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: 'white' }, // Clean white container, image will cover
+    confettiContainer: {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        zIndex: 200,
+        elevation: 200,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    container: { flex: 1, backgroundColor: 'white' },
     safeArea: { flex: 1 },
     header: {
         position: 'absolute',
@@ -424,20 +1117,18 @@ const styles = StyleSheet.create({
     fullScreenLayer: {
         position: 'absolute',
         top: 0, bottom: 0, left: 0, right: 0,
-        zIndex: 0, // Behind everything
+        zIndex: 0,
     },
 
     boardOverlay: {
         position: 'absolute',
-        top: '22%', // Push down further to match the green board
-        right: '5%', // Push to the right side where the board is
-        width: '45%', // Limit width to the board itself (approx half screen)
-        height: '40%', // Cover board height
+        top: '22%',
+        left: '10%',
+
+        width: width * 0.35,
+        height: width * 0.35,
         zIndex: 5,
         backgroundColor: 'rgba(30, 58, 47, 0.0)',
-
-        // DEBUG: Uncomment strict border to see exactly where the drawing layer is
-        // borderWidth: 2, borderColor: 'red', 
 
         borderRadius: 8,
         elevation: 0
@@ -445,51 +1136,65 @@ const styles = StyleSheet.create({
 
     transcriptContainer: {
         position: 'absolute',
-        bottom: '18%', // Above controls
+        bottom: '18%',
         alignSelf: 'center',
         backgroundColor: '#FFFFFF',
         paddingHorizontal: 20, paddingVertical: 12,
         borderRadius: 25,
-        minWidth: '60%', maxWidth: '90%',
+        width: '90%',
         alignItems: 'center', justifyContent: 'center',
         ...theme.shadows.md,
         zIndex: 40,
         elevation: 5,
-        borderWidth: 2, borderColor: '#F0F0F0'
+        borderWidth: 2, borderColor: '#F0F0F0',
+        minHeight: 60,
+        maxHeight: 120
     },
     transcriptText: {
-        fontSize: 18, color: '#2D3436', textAlign: 'center',
+        fontSize: 16, color: '#2D3436', textAlign: 'center',
         fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium',
-        lineHeight: 26, fontWeight: 'bold'
+        lineHeight: 28,
+        fontWeight: 'bold',
+        flexWrap: 'wrap'
     },
 
     controls: {
         position: 'absolute',
-        bottom: 20, left: 20, right: 20,
-        flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center',
-        backgroundColor: 'white',
-        paddingVertical: 15, borderRadius: 40,
-        ...theme.shadows.lg,
+        bottom: 30,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        gap: 15,
         zIndex: 50
     },
     micButton: {
         width: 80, height: 80, borderRadius: 40,
         backgroundColor: theme.colors.primary,
-        alignItems: 'center', justifyContent: 'center',
-        borderWidth: 4, borderColor: '#E0F7FA', marginTop: -30,
-        ...theme.shadows.lg
+        justifyContent: 'center', alignItems: 'center',
+        ...theme.shadows.lg,
+        borderWidth: 4, borderColor: 'white'
     },
-    micButtonActive: { backgroundColor: theme.colors.error, borderColor: '#FFEBEE', transform: [{ scale: 1.05 }] },
-    micButtonThinking: { backgroundColor: theme.colors.secondary },
-    micIcon: { fontSize: 40 },
-    controlButton: {
-        width: 55, height: 55, borderRadius: 28,
-        alignItems: 'center', justifyContent: 'center',
-        borderWidth: 2, borderColor: '#F7F9FC'
+    micButtonActive: {
+        backgroundColor: '#F44336',
+        transform: [{ scale: 1.1 }]
     },
-    controlIcon: { fontSize: 26 },
+    micButtonThinking: {
+        backgroundColor: '#FF9800',
+    },
+    micButtonInterrupt: {
+        backgroundColor: '#D32F2F',
+    },
+    micIcon: { fontSize: 32, color: 'white' },
 
-    // Keyboard Modal Styles
+    controlButton: {
+        width: 50, height: 50, borderRadius: 25,
+        justifyContent: 'center', alignItems: 'center',
+        ...theme.shadows.md,
+        backgroundColor: 'white'
+    },
+    controlIcon: { fontSize: 24 },
+
     keyboardModalWrapper: {
         flex: 1,
         justifyContent: 'flex-end',
@@ -500,8 +1205,7 @@ const styles = StyleSheet.create({
         borderTopLeftRadius: 25,
         borderTopRightRadius: 25,
         padding: 20,
-        paddingBottom: 40,
-        ...theme.shadows.lg
+        minHeight: 300
     },
     keyboardHeader: {
         flexDirection: 'row',
@@ -512,25 +1216,24 @@ const styles = StyleSheet.create({
     keyboardTitle: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: theme.colors.text
+        color: '#333'
     },
     closeButton: {
         padding: 5
     },
     closeButtonText: {
         fontSize: 20,
-        color: theme.colors.textSecondary
+        color: '#999'
     },
     textInput: {
         backgroundColor: '#F5F5F5',
         borderRadius: 15,
         padding: 15,
         fontSize: 16,
-        color: '#333',
         minHeight: 100,
         textAlignVertical: 'top',
-        textAlign: 'right', // Arabic alignment
-        marginBottom: 15
+        marginBottom: 15,
+        color: '#333'
     },
     sendButton: {
         backgroundColor: theme.colors.primary,
@@ -543,6 +1246,68 @@ const styles = StyleSheet.create({
         color: 'white',
         fontSize: 16,
         fontWeight: 'bold'
+    },
+    debugBadge: {
+        position: 'absolute',
+        top: -30,
+        alignSelf: 'center',
+        backgroundColor: 'rgba(255, 235, 59, 0.9)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 10,
+        zIndex: 100
+    },
+    debugText: {
+        fontSize: 12,
+        color: '#000',
+        fontWeight: 'bold'
+    },
+    // NEW SELECTION STYLES
+    selectionOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.6)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000
+    },
+    selectionContainer: {
+        width: '85%',
+        backgroundColor: 'white',
+        borderRadius: 25,
+        padding: 25,
+        alignItems: 'center',
+        ...theme.shadows.lg,
+        elevation: 100
+    },
+    selectionTitle: {
+        fontSize: 22,
+        fontWeight: 'bold',
+        color: theme.colors.primary,
+        marginBottom: 20,
+        textAlign: 'center',
+        fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium',
+    },
+    optionsWrapper: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        gap: 15
+    },
+    optionCard: {
+        backgroundColor: '#E3F2FD',
+        paddingVertical: 15,
+        paddingHorizontal: 25,
+        borderRadius: 20,
+        borderWidth: 2,
+        borderColor: '#BBDEFB',
+        minWidth: 100,
+        alignItems: 'center',
+        margin: 5
+    },
+    optionText: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#1565C0'
     }
 });
 

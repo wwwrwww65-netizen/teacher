@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useImperativeHandle, forwardRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Platform, AppState } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 const Teacher3D = forwardRef((props, ref) => {
@@ -42,10 +42,30 @@ const Teacher3D = forwardRef((props, ref) => {
         walkToBoard: () => sendMessage('walkToBoard'),
         walkToCenter: () => sendMessage('walkToCenter'),
         lookAtUser: () => sendMessage('lookAtUser'),
-        speakVisually: (viseme) => sendMessage('viseme', { value: viseme })
+        speakVisually: (viseme) => sendMessage('viseme', { value: viseme }),
+        pauseMusic: () => sendMessage('pauseMusic'),
+        resumeMusic: () => sendMessage('resumeMusic')
     }));
 
-    // Web Implementation
+    // Native Implementation
+    useEffect(() => {
+        if (Platform.OS === 'web') return;
+
+        const subscription = AppState.addEventListener('change', nextAppState => {
+            if (nextAppState === 'background' || nextAppState === 'inactive') {
+                console.log('📱 App backgrounded, pausing music...');
+                sendMessage('pauseMusic');
+            } else if (nextAppState === 'active') {
+                console.log('📱 App foregrounded, resuming music...');
+                sendMessage('resumeMusic');
+            }
+        });
+
+        return () => {
+            subscription.remove();
+        };
+    }, []);
+
     if (Platform.OS === 'web') {
         useEffect(() => {
             const handleMessage = (event) => {
@@ -77,7 +97,6 @@ const Teacher3D = forwardRef((props, ref) => {
         );
     }
 
-    // Native Implementation
     return (
         <View style={styles.container}>
             <WebView
@@ -89,6 +108,7 @@ const Teacher3D = forwardRef((props, ref) => {
                 allowFileAccess={true}
                 allowFileAccessFromFileURLs={true}
                 allowingReadAccessToURL={true}
+                mediaPlaybackRequiresUserAction={false} // FIX: Enable Auto-Play Audio/Video on Android
                 // onLoadEnd={() => setIsLoaded(true)} // REMOVED: Wait for READY message
                 onMessage={(event) => {
                     const data = JSON.parse(event.nativeEvent.data);

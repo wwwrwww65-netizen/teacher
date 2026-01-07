@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     View,
     Text,
@@ -6,96 +6,63 @@ import {
     Modal,
     TouchableOpacity,
     PanResponder,
-    Dimensions
+    Dimensions,
+    Animated,
+    ActivityIndicator
 } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Text as SvgText } from 'react-native-svg';
 import { theme } from '../config/theme';
 
 const { width } = Dimensions.get('window');
 
 // مسارات الحروف (أمثلة)
 const LETTER_PATHS = {
-    // --- ARABIC ALPHABET (الحروف العربية) ---
-    'أ': 'M150 50 L150 250 M170 20 C140 20 140 40 170 40 L190 50',
-    'ب': 'M250 150 Q150 250 50 150 M150 270 L150 280', // Dot below
-    'ت': 'M250 150 Q150 250 50 150 M120 100 L120 110 M180 100 L180 110', // 2 Dots above
-    'ث': 'M250 150 Q150 250 50 150 M150 80 L140 100 L160 100 Z', // Triangle dots
-    'ج': 'M100 100 L200 100 Q200 250 100 250 M150 180 L160 170', // Dot inside
-    'ح': 'M100 100 L200 100 Q200 250 100 250',
-    'خ': 'M100 100 L200 100 Q200 250 100 250 M150 50 L150 60', // Dot above
-    'د': 'M150 100 Q200 150 150 200',
-    'ذ': 'M150 100 Q200 150 150 200 M150 50 L150 60',
-    'ر': 'M150 100 Q150 200 50 250',
-    'ز': 'M150 100 Q150 200 50 250 M150 50 L150 60',
-    'س': 'M250 100 L250 150 M200 100 L200 150 M150 100 L150 200 Q100 250 50 200',
-    'ش': 'M250 100 L250 150 M200 100 L200 150 M150 100 L150 200 Q100 250 50 200 M200 50 L190 70 L210 70 Z',
-    'ص': 'M100 150 Q150 100 200 150 L100 150 Q50 250 150 250',
-    'ض': 'M100 150 Q150 100 200 150 L100 150 Q50 250 150 250 M150 80 L150 90',
-    'ط': 'M100 150 Q150 100 200 150 L100 150 M150 50 L150 150',
-    'ظ': 'M100 150 Q150 100 200 150 L100 150 M150 50 L150 150 M180 80 L180 90',
-    'ع': 'M200 100 Q150 100 150 150 Q100 150 100 250 Q200 250 250 200',
-    'غ': 'M200 100 Q150 100 150 150 Q100 150 100 250 Q200 250 250 200 M180 50 L180 60',
-    'ف': 'M200 100 Q220 80 200 80 Q180 80 180 100 L180 150 L50 150 M200 60 L200 70',
-    'ق': 'M200 100 Q220 80 200 80 Q180 80 180 100 L180 150 Q100 250 50 150 M190 60 L190 70 M210 60 L210 70',
-    'ك': 'M200 50 L200 150 L50 150 M150 100 L100 100', // Simplified Kaf
-    'ل': 'M200 50 L200 200 Q150 250 100 200',
-    'م': 'M200 150 A20 20 0 1 0 200 110 L200 150 L150 150 L150 250',
-    'ن': 'M200 150 Q150 250 100 150 M150 100 L150 110',
-    'هـ': 'M250 100 Q200 200 150 150 Q200 100 250 100 A 30 30 0 1 0 190 150', // Complex Haa simplified
-    'و': 'M200 150 A20 20 0 1 0 200 110 Q200 200 100 250',
-    'ي': 'M250 100 Q200 150 150 150 Q100 150 100 200 Q150 250 250 200 M150 270 L140 280 M160 270 L170 280',
+    // --- ARABIC ALPHABET (نستخدم النصوص لدقة العرض) ---
+    'أ': "أ", 'إ': "إ", 'آ': "آ", 'ب': "ب", 'ت': "ت", 'ث': "ث",
+    'ج': "ج", 'ح': "ح", 'خ': "خ", 'د': "د", 'ذ': "ذ", 'ر': "ر",
+    'ز': "ز", 'س': "س", 'ش': "ش", 'ص': "ص", 'ض': "ض", 'ط': "ط",
+    'ظ': "ظ", 'ع': "ع", 'غ': "غ", 'ف': "ف", 'ق': "ق", 'ك': "ك",
+    'ل': "ل", 'م': "م", 'ن': "ن", 'هـ': "هـ", 'و': "و", 'ي': "ي",
+    'ء': "ء",
 
     // --- NUMBERS (الأرقام) ---
-    '1': 'M150 50 L150 250',
-    '2': 'M100 100 Q200 100 200 150 Q200 250 100 250 L250 250',
-    '3': 'M100 50 Q200 50 200 100 Q150 100 200 100 Q200 150 100 150',
-    '4': 'M200 150 L50 150 L50 50 M50 150 L50 250', // Simplified 4
-    '5': 'M200 50 L100 50 L100 100 Q200 150 100 200',
-
-    // --- SHAPES (الأشكال) ---
-    'دائرة': 'M150 50 A100 100 0 1 1 149 50',
-    'مربع': 'M50 50 L250 50 L250 250 L50 250 Z',
-    'مثلث': 'M150 50 L250 250 L50 250 Z',
-    'نجمة': 'M150 20 L180 100 L270 100 L200 160 L230 250 L150 200 L70 250 L100 160 L30 100 L120 100 Z',
+    '1': "1", '2': "2", '3': "3", '4': "4", '5': "5",
 
     // --- ENGLISH ---
-    'A': 'M150 50 L50 250 M150 50 L250 250 M100 150 L200 150',
-    'B': 'M100 50 L100 250 M100 50 Q200 50 200 100 Q200 150 100 150 M100 150 Q200 150 200 200 Q200 250 100 250',
+    'A': "A", 'B': "B",
 
-    'default': 'M150 50 A100 100 0 1 1 149 50' // Circle fallback
+    'default': 'M150 50 A100 100 0 1 1 149 50'
 };
 
-const HandwritingModal = ({ visible, letter, onClose, onSuccess }) => {
+const HandwritingModal = ({ visible, letter, onClose, onSuccess, onFailure }) => {
     const [paths, setPaths] = useState([]);
     const [currentPath, setCurrentPath] = useState('');
-    const pathRef = useRef(''); // Ref to hold current path value to avoid stale closures
+    const pathRef = useRef('');
+
+    // Status: 'drawing' | 'checking' | 'success' | 'failure'
+    const [checkStatus, setCheckStatus] = useState('drawing');
 
     const panResponder = useRef(
         PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponder: () => true,
             onPanResponderGrant: (evt) => {
+                if (checkStatus !== 'drawing') return;
                 const { locationX, locationY } = evt.nativeEvent;
                 const newPath = `M${locationX} ${locationY}`;
-                pathRef.current = newPath; // Update ref
-                setCurrentPath(newPath); // Update state for render
+                pathRef.current = newPath;
+                setCurrentPath(newPath);
             },
             onPanResponderMove: (evt) => {
+                if (checkStatus !== 'drawing') return;
                 const { locationX, locationY } = evt.nativeEvent;
                 const newPath = `${pathRef.current} L${locationX} ${locationY}`;
                 pathRef.current = newPath;
                 setCurrentPath(newPath);
             },
             onPanResponderRelease: () => {
-                const finishedPath = pathRef.current; // Capture value BEFORE resetting ref
-                if (finishedPath) {
-                    setPaths((prev) => [...prev, finishedPath]);
-                }
-                pathRef.current = '';
-                setCurrentPath('');
-            },
-            onPanResponderTerminate: () => {
-                const finishedPath = pathRef.current; // Capture value BEFORE resetting ref
+                if (checkStatus !== 'drawing') return;
+                const finishedPath = pathRef.current;
                 if (finishedPath) {
                     setPaths((prev) => [...prev, finishedPath]);
                 }
@@ -105,79 +72,245 @@ const HandwritingModal = ({ visible, letter, onClose, onSuccess }) => {
         })
     ).current;
 
+    useEffect(() => {
+        if (visible) {
+            setPaths([]);
+            setCurrentPath('');
+            setCheckStatus('drawing');
+            overlayOpacity.setValue(0);
+            scaleAnim.setValue(0);
+        }
+    }, [visible]);
+
     const handleClear = () => {
+        if (checkStatus !== 'drawing') return;
         setPaths([]);
         setCurrentPath('');
     };
 
-    const handleSubmit = () => {
-        // هنا يمكن إضافة منطق للتحقق من دقة الرسم
-        // للتبسيط، سنعتبر المحاولة ناجحة إذا رسم الطفل شيئاً
-        if (paths.length > 0) {
-            onSuccess();
-        } else {
-            onClose();
-        }
-        setPaths([]);
+    const shakeAnim = useRef(new Animated.Value(0)).current;
+    const overlayOpacity = useRef(new Animated.Value(0)).current;
+    const scaleAnim = useRef(new Animated.Value(0)).current;
+
+    const triggerShake = () => {
+        Animated.sequence([
+            Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+            Animated.timing(shakeAnim, { toValue: -10, duration: 50, useNativeDriver: true }),
+            Animated.timing(shakeAnim, { toValue: 10, duration: 50, useNativeDriver: true }),
+            Animated.timing(shakeAnim, { toValue: 0, duration: 50, useNativeDriver: true })
+        ]).start();
     };
+
+    const animateOverlay = () => {
+        Animated.parallel([
+            Animated.timing(overlayOpacity, { toValue: 1, duration: 300, useNativeDriver: true }),
+            Animated.spring(scaleAnim, { toValue: 1, friction: 5, useNativeDriver: true })
+        ]).start();
+    };
+
+    // --- IMPROVED VALIDATION LOGIC ---
+    const validateDrawing = (drawnPaths) => {
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        let totalPoints = 0;
+        let pointsInside = 0;
+
+        // "Target Zone" (Where the letter actually sits)
+        // Based on fontSize=180 and y=220, the visual letter is roughly in:
+        // X: 70 - 230
+        // Y: 80 - 240
+        const TARGET_MIN_X = 50;
+        const TARGET_MAX_X = 250;
+        const TARGET_MIN_Y = 60;
+        const TARGET_MAX_Y = 260;
+
+        drawnPaths.forEach(p => {
+            const parts = p.replace(/[ML]/g, ' ').trim().split(/\s+/);
+            for (let i = 0; i < parts.length; i += 2) {
+                const x = parseFloat(parts[i]);
+                const y = parseFloat(parts[i + 1]);
+                if (!isNaN(x) && !isNaN(y)) {
+                    if (x < minX) minX = x;
+                    if (x > maxX) maxX = x;
+                    if (y < minY) minY = y;
+                    if (y > maxY) maxY = y;
+
+                    totalPoints++;
+                    // Check if point is inside the GENEROUS target box
+                    if (x >= TARGET_MIN_X && x <= TARGET_MAX_X && y >= TARGET_MIN_Y && y <= TARGET_MAX_Y) {
+                        pointsInside++;
+                    }
+                }
+            }
+        });
+
+        // 1. Ink Check
+        if (totalPoints < 10) return false;
+
+        const width = maxX - minX;
+        const height = maxY - minY;
+
+        // 2. Minimum Size Check
+        // Relaxed constraint: If it's a tall thin letter (Alif), width can be small.
+        // If it's a flat wide letter (Ba), height can be small.
+        // So we require Max dimension to be substantial.
+        const maxDim = Math.max(width, height);
+        if (maxDim < 50) return false; // Must be at least 50px long in some direction
+
+        // 3. Containment Check
+        // At least 60% of points must be inside the Target Zone.
+        // This catches drawing in the far top margins or corners.
+        if ((pointsInside / totalPoints) < 0.60) return false;
+
+        // 4. Position Check (Centroid & Bounds)
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+
+        // A. Centroid must be generally central
+        // 150 +/- 60 (Range: 90 - 210)
+        if (centerX < 90 || centerX > 210) return false;
+        if (centerY < 90 || centerY > 210) return false;
+
+        // B. Vertical Bounds Sanity
+        // A drawing cannot be ENTIRELY in the top 30% or bottom 30%
+        if (maxY < 100) return false; // Too High (Stops before pixel 100)
+        if (minY > 220) return false; // Too Low (Starts after pixel 220)
+
+        return true;
+    };
+
+    const handleSubmit = () => {
+        if (checkStatus !== 'drawing') return;
+
+        if (paths.length < 1) {
+            triggerShake();
+            return;
+        }
+
+        setCheckStatus('checking');
+
+        // Verify Logic
+        const isValid = validateDrawing(paths);
+
+        setTimeout(() => {
+            if (isValid) {
+                setCheckStatus('success');
+                animateOverlay();
+                setTimeout(() => {
+                    if (onSuccess) onSuccess();
+                }, 1500);
+            } else {
+                setCheckStatus('failure');
+                animateOverlay();
+                setTimeout(() => {
+                    if (onFailure) onFailure(); // Use dedicated failure callback
+                    else if (onClose) onClose();
+                }, 1500);
+            }
+        }, 1000);
+    };
+
+    // Rendering Helpers
+    const isText = (content) => {
+        return typeof content === 'string' && !content.trim().startsWith('M') && content.length < 10;
+    };
+    const drawingContent = LETTER_PATHS[letter] || letter;
+    const isLetterText = isText(drawingContent) || true;
 
     return (
         <Modal
             visible={visible}
             transparent={true}
             animationType="fade"
-            onRequestClose={onClose}
+            onRequestClose={checkStatus === 'drawing' ? onClose : () => { }}
         >
             <View style={styles.overlay}>
-                <View style={styles.container}>
-                    <Text style={styles.title}>اكتب الحرف: {letter}</Text>
+                <Animated.View style={[styles.container, { transform: [{ translateX: shakeAnim }] }]}>
+                    <Text style={styles.title}>
+                        {checkStatus === 'checking' ? 'جاري التصحيح...' :
+                            checkStatus === 'success' ? 'أحسنت! 🌟' :
+                                checkStatus === 'failure' ? 'حاول مرة أخرى 🔁' :
+                                    `اكتب الحرف: ${letter}`}
+                    </Text>
 
                     <View style={styles.canvasContainer} {...panResponder.panHandlers}>
-                        {/* الحرف المراد كتابته (منقط) */}
                         <Svg height="300" width="300" style={styles.svg} pointerEvents="none">
-                            <Path
-                                d={LETTER_PATHS[letter] || LETTER_PATHS['default']}
-                                stroke="#ddd"
-                                strokeWidth="20"
-                                strokeDasharray="10, 10"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
+                            {/* Template */}
+                            {isLetterText ? (
+                                <SvgText
+                                    x="150" y="220"
+                                    fontSize="180" fontWeight="bold"
+                                    fill="none" stroke="#E0E0E0" strokeWidth="3"
+                                    strokeDasharray="15, 10" textAnchor="middle"
+                                >
+                                    {drawingContent}
+                                </SvgText>
+                            ) : (
+                                <Path
+                                    d={drawingContent}
+                                    stroke="#E0E0E0" strokeWidth="15"
+                                    strokeDasharray="20, 15" fill="none"
+                                    strokeLinecap="round" strokeLinejoin="round"
+                                />
+                            )}
 
-                            {/* رسم الطفل */}
+                            {/* User Drawing */}
                             {paths.map((d, index) => (
                                 <Path
-                                    key={index}
-                                    d={d}
-                                    stroke={theme.colors.primary}
-                                    strokeWidth="10"
-                                    fill="none"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
+                                    key={index} d={d}
+                                    stroke={theme.colors.primary} strokeWidth="12"
+                                    fill="none" strokeLinecap="round" strokeLinejoin="round"
                                 />
                             ))}
                             <Path
                                 d={currentPath}
-                                stroke={theme.colors.primary}
-                                strokeWidth="10"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                                stroke={theme.colors.primary} strokeWidth="12"
+                                fill="none" strokeLinecap="round" strokeLinejoin="round"
                             />
                         </Svg>
+
+                        {/* Feedback Overlay */}
+                        {checkStatus !== 'drawing' && (
+                            <Animated.View style={[styles.feedbackOverlay, { opacity: overlayOpacity }]}>
+                                {checkStatus === 'checking' && (
+                                    <View style={styles.feedbackContent}>
+                                        <ActivityIndicator size="large" color="white" />
+                                        <Text style={styles.feedbackText}>أنا أشاهد...</Text>
+                                    </View>
+                                )}
+                                {checkStatus === 'success' && (
+                                    <Animated.View style={[styles.feedbackContent, { transform: [{ scale: scaleAnim }] }]}>
+                                        <Text style={styles.feedbackIcon}>✅</Text>
+                                        <Text style={styles.feedbackText}>مُمْتَاز!</Text>
+                                    </Animated.View>
+                                )}
+                                {checkStatus === 'failure' && (
+                                    <Animated.View style={[styles.feedbackContent, { transform: [{ scale: scaleAnim }] }]}>
+                                        <Text style={styles.feedbackIcon}>❌</Text>
+                                        <Text style={styles.feedbackText}>خاطئ</Text>
+                                    </Animated.View>
+                                )}
+                            </Animated.View>
+                        )}
                     </View>
 
                     <View style={styles.buttons}>
-                        <TouchableOpacity style={styles.buttonClear} onPress={handleClear}>
+                        <TouchableOpacity
+                            style={[styles.buttonClear, checkStatus !== 'drawing' && styles.disabledBtn]}
+                            onPress={handleClear}
+                            disabled={checkStatus !== 'drawing'}
+                        >
                             <Text style={styles.buttonText}>مسح 🔄</Text>
                         </TouchableOpacity>
 
-                        <TouchableOpacity style={styles.buttonSubmit} onPress={handleSubmit}>
+                        <TouchableOpacity
+                            style={[styles.buttonSubmit, checkStatus !== 'drawing' && styles.disabledBtn]}
+                            onPress={handleSubmit}
+                            disabled={checkStatus !== 'drawing'}
+                        >
                             <Text style={[styles.buttonText, { color: 'white' }]}>تم ✅</Text>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </Animated.View>
             </View>
         </Modal>
     );
@@ -185,60 +318,54 @@ const HandwritingModal = ({ visible, letter, onClose, onSuccess }) => {
 
 const styles = StyleSheet.create({
     overlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        justifyContent: 'center',
-        alignItems: 'center',
+        flex: 1, backgroundColor: 'rgba(0,0,0,0.85)',
+        justifyContent: 'center', alignItems: 'center',
     },
     container: {
-        width: width * 0.9,
-        backgroundColor: 'white',
-        borderRadius: 20,
-        padding: 20,
-        alignItems: 'center',
+        width: width * 0.9, backgroundColor: 'white',
+        borderRadius: 25, padding: 25, alignItems: 'center',
         ...theme.shadows.lg,
     },
     title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: theme.colors.text,
-        marginBottom: 20,
+        fontSize: 26, fontWeight: 'bold', color: theme.colors.text, marginBottom: 20,
     },
     canvasContainer: {
-        width: 300,
-        height: 300,
-        backgroundColor: '#f9f9f9',
-        borderRadius: 15,
-        borderWidth: 2,
-        borderColor: '#eee',
-        overflow: 'hidden',
+        width: 300, height: 300, backgroundColor: '#FAFAFA',
+        borderRadius: 20, borderWidth: 3, borderColor: '#F0F0F0',
+        overflow: 'hidden', position: 'relative'
     },
-    svg: {
-        position: 'absolute',
+    svg: { position: 'absolute' },
+    feedbackOverlay: {
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+        backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center',
+        zIndex: 10
+    },
+    feedbackContent: {
+        alignItems: 'center', justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.2)', padding: 20, borderRadius: 20,
+    },
+    feedbackIcon: {
+        fontSize: 80, marginBottom: 10,
+        textShadowColor: 'rgba(0,0,0,0.3)', textShadowOffset: { width: 0, height: 4 }, textShadowRadius: 6
+    },
+    feedbackText: {
+        fontSize: 24, fontWeight: 'bold', color: 'white',
+        textShadowColor: 'rgba(0,0,0,0.5)', textShadowOffset: { width: 0, height: 2 }, textShadowRadius: 4
     },
     buttons: {
-        flexDirection: 'row',
-        marginTop: 20,
-        gap: 15,
+        flexDirection: 'row', marginTop: 25, gap: 15, width: '100%'
     },
     buttonClear: {
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: '#f0f0f0',
-        flex: 1,
-        alignItems: 'center',
+        padding: 15, borderRadius: 15, backgroundColor: '#F5F5F5',
+        flex: 1, alignItems: 'center', borderWidth: 1, borderColor: '#E0E0E0'
     },
     buttonSubmit: {
-        padding: 15,
-        borderRadius: 10,
-        backgroundColor: theme.colors.primary,
-        flex: 1,
-        alignItems: 'center',
+        padding: 15, borderRadius: 15, backgroundColor: theme.colors.primary,
+        flex: 1, alignItems: 'center', ...theme.shadows.md
     },
+    disabledBtn: { opacity: 0.5 },
     buttonText: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: theme.colors.text,
+        fontSize: 20, fontWeight: 'bold', color: theme.colors.text,
     },
 });
 

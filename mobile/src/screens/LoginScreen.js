@@ -34,7 +34,7 @@ const LoginScreen = ({ navigation }) => {
         try {
             await AsyncStorage.setItem('user', JSON.stringify(user));
         } catch (e) {
-            console.log('AsyncStorage error', e); 
+            console.log('AsyncStorage error', e);
         }
         if (navigation && navigation.replace) {
             navigation.replace('Home');
