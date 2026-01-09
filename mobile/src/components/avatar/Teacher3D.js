@@ -74,7 +74,7 @@ const Teacher3D = forwardRef((props, ref) => {
                         const data = JSON.parse(event.data);
                         if (data.type === 'READY') setIsLoaded(true);
                     }
-                } catch (e) { }
+                } catch (e) { /* ignore parse error */ }
             };
             window.addEventListener('message', handleMessage);
             return () => window.removeEventListener('message', handleMessage);

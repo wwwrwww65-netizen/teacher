@@ -1,4 +1,4 @@
-export const GOOGLE_API_KEY = 'AIzaSyC_etWPTE9ZXHIa-a7TxeM2rCg69erBERU';
+export const GOOGLE_API_KEY = 'AIzaSyDg93OejWfAfCC-_JLQH9cqQtIlsGQhFDM';
 export const ANDROID_PACKAGE_NAME = 'com.tinyteacher';
 export const ANDROID_CERT_FINGERPRINT = '6A:A3:03:D2:43:58:19:DD:63:18:CD:F7:DB:CD:97:DF:F0:C2:60:23';
 

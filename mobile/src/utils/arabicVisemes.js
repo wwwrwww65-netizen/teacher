@@ -91,8 +91,6 @@ export const ARABIC_PHONEMES = {
     'ِ': 'HALF_OPEN', // كسرة
     'ُ': 'ROUNDED',   // ضمة
     'ا': 'WIDE',      // ألف
-    'و': 'ROUNDED',   // واو
-    'ي': 'HALF_OPEN', // ياء
 };
 
 // تحليل النص العربي وتحويله لمخارج

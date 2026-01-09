@@ -55,6 +55,7 @@ class AIService {
     cleanName(name) {
         if (!name) return null;
         // Keep only Arabic/English letters and spaces. Remove all punctuation.
+        // eslint-disable-next-line no-misleading-character-class
         return name.replace(/[^\u0621-\u064A\u064B-\u065F\u0671-\u06D3\u06F0-\u06F9a-zA-Z\s]/g, '').trim();
     }
 
@@ -175,7 +176,8 @@ class AIService {
         // We replace them with a simple space to avoid merging words.
         // We explicitly remove: ! ? . , : ; - _ ( ) [ ] { } * ~
         // CRITICAL: We PRESERVE < > / " = for SSML tags!
-        clean = clean.replace(/[!؟.,،:;'()\[\]\{\}\-_\*~]/g, ' ');
+        // eslint-disable-next-line no-useless-escape
+        clean = clean.replace(/[!؟.,،:;'()\[\]{}*~_-]/g, ' ');
 
         // 5. Collapse multiple spaces into one and trim
         clean = clean.replace(/\s+/g, ' ').trim();
@@ -194,21 +196,43 @@ class AIService {
             - إذا لم تكن تعرفين الاسم بعد، اسأليه "ما اسمك؟" في سياق اللعب.
             `;
             // --- SMART STT CORRECTION (Phonetic Fuzzy Matching) ---
-            // Fix common misheard vowel sounds
+            // Fix common misheard vowel sounds (especially for phonics drills)
             let msg = userMessage.toLowerCase();
             const vowelCorrections = {
-                'اي': 'أ', 'او': 'أ', 'آه': 'أ', 'ايه': 'أ',
-                'ay': 'أ', 'aw': 'أ', 'aa': 'أ',
+                // Fatha sounds (أَ) - Often missed or merged
+                'اا': 'أَ', 'آ': 'أَ', 'آه': 'أَ', 'ااه': 'أَ', 'اه': 'أَ',
+                'aa': 'أَ', 'ah': 'أَ', 'a': 'أَ',
+
+                // Kasra sounds (إِ) - Usually recognized
+                'اي': 'إِ', 'ايي': 'إِ', 'ايه': 'إِ', 'إي': 'إِ',
+                'ee': 'إِ', 'ii': 'إِ', 'i': 'إِ',
+
+                // Damma sounds (أُ) - Usually recognized  
+                'او': 'أُ', 'اوو': 'أُ', 'اوه': 'أُ', 'أو': 'أُ',
+                'oo': 'أُ', 'uu': 'أُ', 'u': 'أُ',
+
+                // Combined patterns (when child says all three)
+                'اي او': 'إِ أُ', 'ا اي او': 'أَ إِ أُ',
+
+                // Numbers
                 'واحد': '1', 'اثنين': '2', 'ثلاثة': '3'
             };
 
-            // Apply corrections if message is very short (likely a single answer)
-            if (msg.split(' ').length <= 2) {
+            // Apply corrections if message is very short (likely a single phonetic answer)
+            // Also apply if we detect isolated vowel patterns
+            const isPhoneticAnswer = msg.split(' ').length <= 3 || /^[اأإآ\s]+$/.test(msg.trim());
+            if (isPhoneticAnswer) {
                 for (const [wrong, right] of Object.entries(vowelCorrections)) {
                     if (msg.includes(wrong)) {
-                        msg = msg.replace(wrong, right);
+                        msg = msg.replace(new RegExp(wrong, 'g'), right);
                         console.log(`🔧 STT Auto-Correction: ${wrong} -> ${right}`);
                     }
+                }
+
+                // Special case: If ONLY "اي او" was captured (missing اا), prepend أَ
+                if (msg.trim() === 'إِ أُ' || msg.trim() === 'اي او') {
+                    msg = 'أَ ' + msg;
+                    console.log(`🔧 STT Auto-Correction: Prepended missing أَ`);
                 }
             }
 
@@ -460,7 +484,12 @@ class AIService {
             🧩 **المنهجية (Scaffolding Flow)**:
             1. **الخطوة 1 (الربط البصري)**: عند تقديم حرف جديد، **يجب** أن ترسميه على السبورة فوراً (استخدمي الحقل \`draw\` أو \`action: draw_letter_X\`).
             2. **الخطوة 2 (الصوت)**: علميه أصوات الحرف (أَ، إِ، أُ) مع أمثلة.
-            3. **الخطوة 3 (الكتابة)**: اطلبي منه أن يكتب الحرف في الهواء أو على جهازه اللوحي (استخدمي \`action: practice_writing\`).
+            3. **الخطوة 3 (الاختبار)**: اسألي الطفل سؤالاً اختيارياً للتأكد من فهمه.
+               - **تنسيق الاختبار (Quiz)**:
+                 * اجعلي "action": "quiz".
+                 * أضيفي مصفوفة "options": ["خيار 1", "خيار 2", "خيار 3"].
+                 * أضيفي حقل "answer": "الخيار الصحيح".
+            4. **الخطوة 4 (الكتابة)**: اطلبي منه أن يكتب الحرف (استخدمي \`action: practice_writing\`).
             
             ⚠️ **قواعد صارمة**:
             - لا تستخدمي الرموز (markdown) مثل النجوم ** أو الخطوط السفلية _ في النص المنطوق (voiceText).
@@ -495,17 +524,46 @@ class AIService {
             try {
                 aiResponse = JSON.parse(aiRawText);
 
-                // Normalization: Ensure 'text' property exists
-                // Check if wrapped in 'teacher_nora' or similar
+                // Normalization: Flatten nested structures
                 const coreData = aiResponse.teacher_nora || aiResponse.response || aiResponse;
-
                 if (coreData !== aiResponse) {
-                    // Merge core data up to root
                     aiResponse = { ...aiResponse, ...coreData };
                 }
 
+                // If AI put quiz/options inside a 'quiz' object, move them to root
+                if (aiResponse.quiz && typeof aiResponse.quiz === 'object') {
+                    aiResponse.options = aiResponse.options || aiResponse.quiz.options;
+                    aiResponse.answer = aiResponse.answer || aiResponse.quiz.answer;
+                    aiResponse.text = aiResponse.text || aiResponse.quiz.question;
+                }
+
+                // If AI put draw info inside a 'draw' object, resolve the key
+                if (aiResponse.draw && typeof aiResponse.draw === 'object') {
+                    aiResponse.draw = aiResponse.draw.letter || aiResponse.draw.shape || aiResponse.draw.text || aiResponse.draw.item || null;
+                }
+
+                if (aiResponse.prompt && typeof aiResponse.prompt === 'string') {
+                    if (aiResponse.text && !aiResponse.text.includes(aiResponse.prompt.substring(0, 5))) {
+                        aiResponse.text += " " + aiResponse.prompt;
+                    } else if (!aiResponse.text) {
+                        aiResponse.text = aiResponse.prompt;
+                    }
+                }
+
                 if (!aiResponse.text) {
-                    aiResponse.text = aiResponse.displayText || aiResponse.message || aiResponse.response_text || "";
+                    aiResponse.text = aiResponse.displayText ||
+                        aiResponse.message ||
+                        aiResponse.response_text ||
+                        aiResponse.arabicText ||
+                        aiResponse.subtitleText ||
+                        (Array.isArray(aiResponse.subtitles) ? aiResponse.subtitles.join(' ') : aiResponse.subtitles) ||
+                        aiResponse.subtitle ||
+                        "";
+                }
+
+                // If text is still empty but voiceText exists, strip SSML tags and use it
+                if (!aiResponse.text && aiResponse.voiceText) {
+                    aiResponse.text = aiResponse.voiceText.replace(/<[^>]+>/g, '').trim();
                 }
             } catch (e) {
                 const textMatch = aiRawText.match(/"text"\s*:\s*["']([\s\S]*?)["']/);
@@ -550,11 +608,22 @@ class AIService {
                 aiResponse.voiceText = this.cleanForTTS(aiResponse.text);
             }
 
+            // --- 4. ACTION & DRAW NORMALIZATION ---
+            // If action is an object (sometimes from Gemini), extract the type
+            if (aiResponse.action && typeof aiResponse.action === 'object') {
+                aiResponse.action = aiResponse.action.type || aiResponse.action.action || 'listening';
+            }
+
+            if (aiResponse.action && typeof aiResponse.action === 'string' && aiResponse.action.startsWith('draw_letter_')) {
+                const targetKey = aiResponse.action.replace('draw_letter_', '').trim();
+                if (!aiResponse.draw) aiResponse.draw = targetKey;
+                aiResponse.action = 'explain_board';
+            }
+
             const practiceKeywords = ['دورك', 'جرب', 'تكتب', 'اكتب', 'ارسمه أنت', 'بقلمك', 'اصبعك', 'إصبعك'];
             if (practiceKeywords.some(kw => aiResponse.text.includes(kw))) {
                 aiResponse.action = 'practice_writing';
             } else if (aiResponse.text.includes('سبورة') || aiResponse.text.includes('انظر') || aiResponse.draw) {
-                // FIXED: Do not overwrite QUIZ action
                 if (aiResponse.action !== 'practice_writing' && aiResponse.action !== 'quiz') {
                     aiResponse.action = 'explain_board';
                 }
@@ -567,25 +636,33 @@ class AIService {
                 const drawData = (intentResult.intent.type === 'letter') ? ARABIC_ALPHABET_PATHS[shape] : DRAWING_LIBRARY[shape];
                 if (drawData) {
                     aiResponse.draw = drawData;
-                    // FIXED: Only switch to explain_board if it's NOT a quiz
+                    if (!aiResponse.intent) aiResponse.intent = intentResult.intent;
+
                     if (aiResponse.action !== 'practice_writing' && aiResponse.action !== 'quiz') {
                         aiResponse.action = 'explain_board';
                     }
                 }
             } else if (aiResponse.draw) {
-                if (ARABIC_ALPHABET_PATHS[aiResponse.draw]) aiResponse.draw = ARABIC_ALPHABET_PATHS[aiResponse.draw];
-                else if (DRAWING_LIBRARY[aiResponse.draw]) aiResponse.draw = DRAWING_LIBRARY[aiResponse.draw];
+                const drawKey = aiResponse.draw;
+                if (ARABIC_ALPHABET_PATHS[drawKey]) {
+                    aiResponse.draw = ARABIC_ALPHABET_PATHS[drawKey];
+                    if (!aiResponse.intent) aiResponse.intent = { shape: typeof drawKey === 'string' ? drawKey : 'أ', type: 'letter', count: 1 };
+                } else if (DRAWING_LIBRARY[drawKey]) {
+                    aiResponse.draw = DRAWING_LIBRARY[drawKey];
+                    if (!aiResponse.intent) aiResponse.intent = { shape: typeof drawKey === 'string' ? drawKey : 'object', type: 'object', count: 1 };
+                }
 
-                // FIXED: Do not overwrite quiz action if drawing is present
-                // (Sometimes we want to draw items for the quiz)
                 if (aiResponse.action !== 'practice_writing' && aiResponse.action !== 'quiz') {
-                    // aiResponse.action = 'explain_board'; 
+                    aiResponse.action = 'explain_board';
                 }
             }
 
             this.context.push({ role: 'user', content: userMessage });
             this.context.push({ role: 'assistant', content: aiResponse.text });
             this.saveMemory();
+
+            // Include corrected input so UI can display it
+            aiResponse.correctedInput = msg !== userMessage.toLowerCase() ? msg : null;
 
             return aiResponse;
 

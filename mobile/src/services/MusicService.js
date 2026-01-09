@@ -9,46 +9,24 @@ class MusicService {
     playBackgroundMusic() {
         console.log('🎵 MusicService.playBackgroundMusic() called - Redirected to BackgroundMusic component');
         return;
-        /* Legacy logic disabled to prevent SoundPlayer singleton conflicts
-        try {
-            // Play looped
-            SoundPlayer.playSoundFile('classroom_music', 'mp3');
-            // SoundPlayer doesn't support loop natively easily without listener, 
-            // but let's try volume first.
-            // DELAY IS CRITICAL: Some devices won't set volume until playback starts
-            setTimeout(() => {
-                SoundPlayer.setVolume(this.volume);
-                console.log(`🎵 Music Volume set to ${this.volume}`);
-            }, 500);
-            this.isPlaying = true;
-
-            // Replay when finished loop
-            SoundPlayer.addEventListener('FinishedPlaying', ({ success }) => {
-                if (success && this.isPlaying) {
-                    SoundPlayer.playSoundFile('classroom_music', 'mp3');
-                    // Ensure volume persists
-                    setTimeout(() => SoundPlayer.setVolume(this.volume), 100);
-                }
-            });
-
-        } catch (e) {
-            console.log('Cannot play background music', e);
-        }
-        */
     }
 
     stopBackgroundMusic() {
         try {
             this.isPlaying = false;
             SoundPlayer.stop();
-        } catch (e) { }
+        } catch (err) {
+            console.log('Error stopping background music:', err);
+        }
     }
 
     setVolume(vol) {
         this.volume = vol;
         try {
             SoundPlayer.setVolume(vol);
-        } catch (e) { }
+        } catch (err) {
+            console.log('Error setting music volume:', err);
+        }
     }
 }
 

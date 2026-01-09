@@ -24,6 +24,7 @@ import Teacher3D from '../components/avatar/Teacher3D';
 import ChalkboardWhiteboard from '../components/ChalkboardWhiteboard';
 import HandwritingModal from '../components/HandwritingModal';
 import Tts from 'react-native-tts'; // Import TTS for event listeners
+import Voice from '@react-native-voice/voice';
 import { aiService } from '../services/AIService';
 import arabicVoiceService from '../services/ArabicVoiceService';
 import { musicService } from '../services/MusicService';
@@ -31,6 +32,9 @@ import { soundService } from '../services/SoundService';
 import { theme } from '../config/theme';
 import BouncyButton from '../components/BouncyButton';
 import BackgroundMusic from '../components/BackgroundMusic';
+import { WebView } from 'react-native-webview';
+import geminiLiveService from '../services/GeminiLiveService';
+import { LIVE_AUDIO_HTML } from '../services/LiveAudioBridge';
 
 const { width, height } = Dimensions.get('window');
 
@@ -55,6 +59,12 @@ const ClassroomScreen = ({ navigation, route }) => {
     const [transcript, setTranscript] = useState('');
     const [isMicActive, setIsMicActive] = useState(false);
     const [userName, setUserName] = useState('يا بطل');
+    const transcriptScrollRef = useRef(null);
+    const [isLiveMode, setIsLiveMode] = useState(false);
+    const isLiveModeRef = useRef(false);
+    const liveAudioBridgeRef = useRef(null);
+
+    useEffect(() => { isLiveModeRef.current = isLiveMode; }, [isLiveMode]);
 
     const updateStatus = (newStatus) => {
         console.log(`📡 Status Transition: ${statusRef.current} -> ${newStatus}`);
@@ -85,49 +95,161 @@ const ClassroomScreen = ({ navigation, route }) => {
     const pendingQuizRef = useRef(false);
     const pendingWritingRef = useRef(false);
 
-    // --- TTS Synchronization Listener ---
+    // --- Unified Speech Events ---
     useEffect(() => {
-        const onFinish = () => {
-            console.log('✅ TTS Finished speaking.');
-            // Only update status if consistent
-            if (statusRef.current === 'speaking') {
-                updateStatus('listening');
+        const handleFinish = () => {
+            console.log('✅ Speech/TTS Finished speaking.');
+            avatarRef.current?.stopTalking();
 
-                // Writing Modal Check
+            if (statusRef.current === 'speaking' || isLiveModeRef.current) {
+                if (!isLiveModeRef.current) updateStatus('listening');
+
                 if (pendingWritingRef.current) {
-                    console.log('✨ TTS done -> Revealing Writing Modal now.');
                     setIsWritingModalVisible(true);
                     pendingWritingRef.current = false;
-                    return;
-                }
-
-                // If we were waiting to show a quiz, show it now
-                if (pendingQuizRef.current) {
-                    console.log('✨ TTS done -> Revealing Quiz Modal now.');
+                } else if (pendingQuizRef.current) {
                     setIsSelectionModalVisible(true);
                     pendingQuizRef.current = false;
                 }
             }
         };
 
-        // Add listeners
-        const finishListener = Tts.addEventListener('tts-finish', onFinish);
-        const cancelListener = Tts.addEventListener('tts-cancel', onFinish); // Handle cancel as finish too
+        const voiceListener = { onFinish: handleFinish };
+        arabicVoiceService.addListener(voiceListener);
+        const ttsSub = Tts.addEventListener('tts-finish', handleFinish);
+        const ttsCancel = Tts.addEventListener('tts-cancel', handleFinish);
 
         return () => {
-            finishListener.remove();
-            cancelListener.remove();
+            arabicVoiceService.removeListener(voiceListener);
+            ttsSub.remove();
+            ttsCancel.remove();
         };
     }, []);
 
     // --- Interactive Selection Choice Logic ---
     const [isSelectionModalVisible, setIsSelectionModalVisible] = useState(false);
+    const isSelectionModalVisibleRef = useRef(false);
     const [selectionOptions, setSelectionOptions] = useState([]);
     const [correctAnswer, setCorrectAnswer] = useState(null);
+
+    // Sync Ref with State
+    useEffect(() => { isSelectionModalVisibleRef.current = isSelectionModalVisible; }, [isSelectionModalVisible]);
 
     // NEW: Track status of EACH option individually { "OptionA": "wrong", "OptionB": "idle" }
     const [optionStates, setOptionStates] = useState({});
     const quizErrorCounter = useRef(0);
+
+    useEffect(() => {
+        if (isLiveMode) {
+            setupLiveMode();
+        } else {
+            geminiLiveService.disconnect();
+        }
+        return () => geminiLiveService.disconnect();
+    }, [isLiveMode]);
+
+    const setupLiveMode = async () => {
+        updateStatus('thinking');
+        isLiveModeRef.current = true; // LOCK IMMEDIATELY
+
+        try {
+            // KILL OLD VOICE COMPLETELY
+            await arabicVoiceService.cancel();
+            try {
+                await Voice.stop();
+                Voice.removeAllListeners(); // IMPORTANT: Wipe old system listeners
+                await Voice.destroy();
+            } catch (e) { }
+
+            await geminiLiveService.connect(userName, aiService.userProfile.grade);
+
+            // Force Audio Unlock
+            setTimeout(() => {
+                if (liveAudioBridgeRef.current) {
+                    liveAudioBridgeRef.current.injectJavaScript(`
+                        if (document.getElementById('authBtn')) document.getElementById('authBtn').click();
+                    `);
+                }
+            }, 1000);
+
+            geminiLiveService.onAudioData = (base64) => {
+                console.log('🔊 [BRIDGE] Sending audio to WebView, length:', base64?.length || 0);
+                if (liveAudioBridgeRef.current) {
+                    liveAudioBridgeRef.current.postMessage(JSON.stringify({ type: 'audio', data: base64 }));
+                } else {
+                    console.log('❌ [BRIDGE] WebView ref is null!');
+                }
+                avatarRef.current?.startTalking();
+            };
+
+            geminiLiveService.onIncrementalText = (partialText) => {
+                // نكتفي بتسجيله في السجل ولا نعرضه على الشاشة فوراً
+                console.log('🛰️ [LIVE-STREAM] Buffering...');
+                // setTranscript(partialText);
+            };
+
+            geminiLiveService.onContentReceived = async (text) => {
+                console.log('🚀 [LIVE-HYBRID] Full Text Ready. Starting Sync-Speech.');
+                setTranscript("");
+
+                try {
+                    geminiLiveService.pauseMic();
+                    await new Promise(r => setTimeout(r, 200));
+
+                    const cleanText = text.trim();
+
+                    // نطق النص مع تفعيل التزامن "كلمة بكلمة"
+                    await speakResponse({
+                        text: cleanText,
+                        voiceText: cleanText,
+                        action: 'speaking',
+                        emotion: 'happy'
+                    });
+                } catch (e) {
+                    console.error('❌ [LIVE-HYBRID] Error:', e);
+                } finally {
+                    setTimeout(() => geminiLiveService.resumeMic(), 400);
+                }
+            };
+
+            geminiLiveService.onToolCall = (name, args) => {
+                console.log('🛠️ Gemini Live Action:', name, args);
+
+                if (name === 'showQuiz') {
+                    setSelectionOptions(args.options);
+                    setCorrectAnswer(args.answer);
+                    setIsSelectionModalVisible(true);
+                }
+
+                if (name === 'drawOnBoard') {
+                    const item = args.item;
+                    const drawData = aiService.getDrawData(item);
+                    avatarRef.current?.walkToBoard();
+                    setTimeout(() => {
+                        whiteboardRef.current?.write(drawData || item, { count: 1, duration: 3000 });
+                    }, 1200);
+                }
+            };
+
+            // HANDLE DISCONNECTS (e.g. Network drop, Timeouts)
+            geminiLiveService.onDisconnect = () => {
+                console.log('🔌 Gemini Live Disconnected unexpectedly.');
+                if (isLiveModeRef.current) {
+                    setIsLiveMode(false);
+                    updateStatus('idle');
+                    setIsMicActive(false);
+                    // Optional: Try to reconnect automatically after 2s?
+                    // setTimeout(() => setIsLiveMode(true), 2000); 
+                }
+            };
+
+            updateStatus('listening');
+            setIsMicActive(true);
+        } catch (e) {
+            console.error('Failed to connect to Live API:', e);
+            setIsLiveMode(false);
+        }
+    };
 
     // --- Analytics Logging (Placeholder) ---
     const logAnalyticsEvent = (eventName, payload) => {
@@ -139,7 +261,6 @@ const ClassroomScreen = ({ navigation, route }) => {
             ...payload
         };
         console.log('📊 ANALYTICS EVENT:', JSON.stringify(event, null, 2));
-        // TODO: Send to backend (e.g., Api.post('/events', event))
     };
 
     const handleOptionSelect = (option) => {
@@ -296,6 +417,7 @@ const ClassroomScreen = ({ navigation, route }) => {
     };
 
     const initializeClassroom = async () => {
+        global.gemini = geminiLiveService;
         await requestPermissions();
         let name = 'بَطَل'; // Default
 
@@ -307,6 +429,7 @@ const ClassroomScreen = ({ navigation, route }) => {
 
                 // 1. Sanitize Name immediately
                 if (userData.name) {
+                    // eslint-disable-next-line no-misleading-character-class
                     name = userData.name.replace(/[^\u0621-\u064A\u064B-\u065F\u0671-\u06D3\u06F0-\u06F9a-zA-Z\s]/g, '').trim();
                 }
 
@@ -336,6 +459,10 @@ const ClassroomScreen = ({ navigation, route }) => {
 
         // Greeting with delay to ensure ready
         setTimeout(async () => {
+            if (isLiveModeRef.current) {
+                console.log('🤖 Live Mode detected on startup: Skipping old greeting.');
+                return;
+            }
             console.log('👋 Starting Greeting for:', name);
             await startGreeting(name);
             // After greeting, start the continuous live loop
@@ -345,6 +472,10 @@ const ClassroomScreen = ({ navigation, route }) => {
     };
 
     const startGreeting = async (name) => {
+        if (isLiveModeRef.current) {
+            console.log('🤖 startGreeting blocked: Live Mode is already Active.');
+            return;
+        }
         updateStatus('speaking');
 
         // Handle Lesson Mode - INSTANT START (No AI Delay)
@@ -423,6 +554,16 @@ const ClassroomScreen = ({ navigation, route }) => {
     };
 
     const startListening = async () => {
+        if (isLiveModeRef.current) {
+            console.log('🎤 Live Mode is active: Legacy STT Loop BLOCKED to prevent interference.');
+            return;
+        }
+
+        if (statusRef.current === 'speaking' || isWritingModalRef.current || isSelectionModalVisibleRef.current) {
+            console.log('🛑 startListening blocked: System busy.');
+            return;
+        }
+
         // PREVENT OVERLAP
         if (statusRef.current === 'listening' ||
             statusRef.current === 'thinking' ||
@@ -444,6 +585,7 @@ const ClassroomScreen = ({ navigation, route }) => {
             if (userText && userText.trim().length > 0) {
                 // Speech detected
                 console.log('🎤 User Text Detected:', userText);
+                // Note: Corrected text will be shown after processUserMessage receives AI response
                 setTranscript(`أنت: ${userText}`);
                 setIsMicActive(false);
                 silenceCounterRef.current = 0; // Reset counter on success
@@ -484,7 +626,11 @@ const ClassroomScreen = ({ navigation, route }) => {
         }
     };
 
-    const processUserMessage = async (text, base64Image = null) => {
+    const processUserMessage = async (text, base64Image = null, forceLegacy = false) => {
+        if (isLiveModeRef.current && !forceLegacy) {
+            console.log('🛑 processUserMessage BLOCKED: Gemini Live is dominating the interaction.');
+            return;
+        }
         try {
             updateStatus('thinking');
             avatarRef.current?.setEmotion('thinking');
@@ -542,8 +688,15 @@ const ClassroomScreen = ({ navigation, route }) => {
                 Action: response.action || 'speaking',
                 Emotion: response.emotion || 'neutral',
                 Intent: response.intent?.type || 'none',
+                Draw: response.draw ? `Yes (${typeof response.draw === 'string' ? response.draw.length : 'obj'})` : 'No',
                 ResponseText: response.text?.substring(0, 50) + '...'
             });
+
+            // 🔧 DISPLAY CORRECTED INPUT (if STT was auto-corrected)
+            if (response.correctedInput) {
+                console.log('📝 Displaying Corrected Input:', response.correctedInput);
+                setTranscript(`أنت: ${response.correctedInput}`);
+            }
 
             if (response.action === 'ignore') {
                 console.log('🔇 AI DECISION: Ignoring as Echo/Noise');
@@ -693,15 +846,18 @@ const ClassroomScreen = ({ navigation, route }) => {
 
         // Prepare Subtitles
         const cleanFullText = ttsText.replace(/<[^>]+>/g, '');
-        // Split by punctuation for readable chunks
-        const rawSubs = cleanFullText.split(/([.؟!،,]+\s+)/).filter(s => s.trim().length > 0);
+
+        // Granular splitting for Live Mode (word-by-word feel)
+        const splitRegex = isLiveModeRef.current ? /(\s+)/ : /([.؟!،,]+\s+)/;
+        const rawSubs = cleanFullText.split(splitRegex).filter(s => s.trim().length > 0);
         const subtitles = [];
         let temp = "";
 
-        // Group short segments
+        // Group short segments (Smaller limit for Live Mode)
+        const charLimit = isLiveModeRef.current ? 15 : 40;
         rawSubs.forEach(seg => {
-            temp += seg;
-            if (temp.length > 40 || /[.؟!]/.test(seg)) {
+            temp += (temp && isLiveModeRef.current ? " " : "") + seg;
+            if (temp.length > charLimit || /[.؟!،]/.test(seg)) {
                 subtitles.push(temp.trim());
                 temp = "";
             }
@@ -713,26 +869,40 @@ const ClassroomScreen = ({ navigation, route }) => {
 
             // Start Cinema Subtitles (Parallel Task)
             const runCinemaSubtitles = async () => {
-                // If it's a short one-liner, just show it
+                // If it's a very short one-liner, just show it
                 if (subtitles.length <= 1) {
                     setTranscript(cleanFullText);
                     return;
                 }
 
+                let cumulativeText = "";
                 for (let i = 0; i < subtitles.length; i++) {
-                    if (statusRef.current !== 'speaking') break;
+                    // Check status - if we stopped speaking, show ALL and quit
+                    if (statusRef.current !== 'speaking') {
+                        setTranscript(cleanFullText);
+                        break;
+                    }
 
                     const sub = subtitles[i];
-                    setTranscript(sub);
 
-                    // Smart Duration Calculation:
-                    // Base time (500ms) + 105ms per character (calibrated for natural Arabic)
-                    const duration = 500 + (sub.length * 105);
+                    if (isLiveModeRef.current) {
+                        cumulativeText += (cumulativeText ? " " : "") + sub;
+                        setTranscript(cumulativeText);
+                    } else {
+                        setTranscript(sub);
+                    }
+
+                    // Optimized for Arabic Chirp3 speed
+                    const charSpeed = isLiveModeRef.current ? 60 : 105;
+                    const baseDelay = isLiveModeRef.current ? 200 : 500;
+                    const duration = baseDelay + (sub.length * charSpeed);
 
                     if (i < subtitles.length - 1) {
                         await new Promise(r => setTimeout(r, duration));
                     }
                 }
+                // Final safety: show full text
+                setTranscript(cleanFullText);
             };
             runCinemaSubtitles();
 
@@ -774,10 +944,8 @@ const ClassroomScreen = ({ navigation, route }) => {
         }
 
         // 4. POST-SPEECH ACTIONS
-        if (response.action === 'quiz' && response.options && response.options.length > 0) {
-            setIsSelectionModalVisible(true);
-            return;
-        }
+        // Selection modal is now handled by the TTS finish event (pendingQuizRef)
+        // for better synchronization. No redundant trigger needed here.
 
         if (shouldTriggerWriting && !isWritingModalVisible) {
             setIsWritingModalVisible(true);
@@ -933,6 +1101,16 @@ const ClassroomScreen = ({ navigation, route }) => {
                     <BouncyButton onPress={() => navigation.goBack()} style={styles.backButton}>
                         <Text style={styles.backButtonText}>←</Text>
                     </BouncyButton>
+
+                    <BouncyButton
+                        onPress={() => setIsLiveMode(!isLiveMode)}
+                        style={[styles.statusBadge, { backgroundColor: isLiveMode ? '#4CAF50' : 'rgba(0,0,0,0.5)', minWidth: 100 }]}
+                    >
+                        <Text style={styles.statusText}>
+                            LIVE {isLiveMode ? 'ON 🟢' : 'OFF ⚪'}
+                        </Text>
+                    </BouncyButton>
+
                     <View style={styles.statusBadge}>
                         <Text style={styles.statusText}>
                             {status === 'listening' ? '🎤 أستمع' :
@@ -952,7 +1130,11 @@ const ClassroomScreen = ({ navigation, route }) => {
                 </View>
 
                 <View style={styles.transcriptContainer}>
-                    <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}>
+                    <ScrollView
+                        ref={transcriptScrollRef}
+                        onContentSizeChange={() => transcriptScrollRef.current?.scrollToEnd({ animated: true })}
+                        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+                    >
                         <Text style={styles.transcriptText}>{transcript}</Text>
                     </ScrollView>
                 </View>
@@ -1074,8 +1256,24 @@ const ClassroomScreen = ({ navigation, route }) => {
 
                 <BackgroundMusic volume={0.002} playing={true} />
                 {renderConfetti()}
-            </SafeAreaView >
-        </View >
+
+                {/* Hidden Audio Bridge for Live Mode */}
+                {/* Hidden Audio Bridge for Live Mode */}
+                {/* Audio Bridge - Hidden */}
+                <WebView
+                    ref={liveAudioBridgeRef}
+                    originWhitelist={['*']}
+                    source={{ html: LIVE_AUDIO_HTML }}
+                    javaScriptEnabled={true}
+                    domStorageEnabled={true}
+                    allowsInlineMediaPlayback={true}
+                    mediaPlaybackRequiresUserAction={false}
+                    onMessage={(event) => console.log('🔊 [WEBVIEW]:', event.nativeEvent.data)}
+                    style={{ position: 'absolute', width: 1, height: 1, opacity: 0 }}
+                />
+
+            </SafeAreaView>
+        </View>
     );
 };
 
@@ -1147,8 +1345,8 @@ const styles = StyleSheet.create({
         zIndex: 40,
         elevation: 5,
         borderWidth: 2, borderColor: '#F0F0F0',
-        minHeight: 60,
-        maxHeight: 120
+        minHeight: 50,
+        maxHeight: 85 // سطرين كحد أقصى (Padding + LineHeight)
     },
     transcriptText: {
         fontSize: 16, color: '#2D3436', textAlign: 'center',

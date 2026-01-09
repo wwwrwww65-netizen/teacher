@@ -213,8 +213,8 @@ const HandwritingModal = ({ visible, letter, onClose, onSuccess, onFailure }) =>
     const isText = (content) => {
         return typeof content === 'string' && !content.trim().startsWith('M') && content.length < 10;
     };
-    const drawingContent = LETTER_PATHS[letter] || letter;
-    const isLetterText = isText(drawingContent) || true;
+    const drawingContent = LETTER_PATHS[letter] || (typeof letter === 'string' ? letter : 'أ');
+    const isLetterText = isText(drawingContent);
 
     return (
         <Modal
