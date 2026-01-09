@@ -1,685 +1,241 @@
-import axios from 'axios';
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GOOGLE_API_KEY, ANDROID_PACKAGE_NAME, ANDROID_CERT_FINGERPRINT } from '../config/constants';
+import axios from 'axios';
 
-// --- VISUAL LIBRARIES ---
+const GOOGLE_API_KEY = 'AIzaSyDHjklmJ4NjIP0qFspkVxzmNRhS1qkAYOE';
+
+// مكتبة رسومات الحروف العربية
 const ARABIC_ALPHABET_PATHS = {
-    'أ': "أ", 'إ': "إ", 'آ': "آ", 'ب': "ب", 'ت': "ت", 'ث': "ث",
-    'ج': "ج", 'ح': "ح", 'خ': "خ", 'د': "د", 'ذ': "ذ", 'ر': "ر",
-    'ز': "ز", 'س': "س", 'ش': "ش", 'ص': "ص", 'ض': "ض", 'ط': "ط",
-    'ظ': "ظ", 'ع': "ع", 'غ': "غ", 'ف': "ف", 'ق': "ق", 'ك': "ك",
-    'ل': "ل", 'م': "م", 'ن': "ن", 'هـ': "هـ", 'و': "و", 'ي': "ي",
-    'ء': "ء",
-    '1': "1", '2': "2", '3': "3", '4': "4", '5': "5",
-    'دائرة': "M 150 50 a 100 100 0 1 1 -0.1 0",
-    'مربع': "M 50 50 h 200 v 200 h -200 Z",
-    'مثلث': "M 150 50 L 250 250 L 50 250 Z",
-    'نجمة': "M 150 20 L 180 100 L 270 100 L 200 160 L 230 250 L 150 200 L 70 250 L 100 160 L 30 100 L 120 100 Z",
-    '+': '+', '-': '-', '=': '=', '?': '?', '×': '×', '÷': '÷'
+    'أ': 'M 60 80 L 60 30 M 60 15 A 3 3 0 1 1 60 14.9',
+    'ا': 'M 60 80 L 60 20',
+    'ب': 'M 20 50 Q 60 70 100 50 M 60 80 A 3 3 0 1 1 60 79.9',
+    'ت': 'M 20 60 Q 60 80 100 60 M 45 45 A 2 2 0 1 1 45 44.9 M 75 45 A 2 2 0 1 1 75 44.9',
+    'ث': 'M 20 65 Q 60 85 100 65 M 40 50 A 2 2 0 1 1 40 49.9 M 60 35 A 2 2 0 1 1 60 34.9 M 80 50 A 2 2 0 1 1 80 49.9',
+    'ج': 'M 80 30 Q 30 40 30 70 Q 30 90 60 90 Q 90 90 90 70 M 55 60 A 3 3 0 1 1 55 59.9',
+    'ح': 'M 80 30 Q 30 40 30 70 Q 30 90 60 90 Q 90 90 90 70',
+    'خ': 'M 80 30 Q 30 40 30 70 Q 30 90 60 90 Q 90 90 90 70 M 60 20 A 3 3 0 1 1 60 19.9',
+    'د': 'M 30 60 L 80 60 Q 100 60 100 80',
+    'ذ': 'M 30 60 L 80 60 Q 100 60 100 80 M 70 45 A 3 3 0 1 1 70 44.9',
+    'ر': 'M 60 40 Q 80 60 60 80',
+    'ز': 'M 60 40 Q 80 60 60 80 M 60 25 A 3 3 0 1 1 60 24.9',
+    'س': 'M 10 70 Q 25 50 40 70 Q 55 50 70 70 Q 85 50 100 70',
+    'ش': 'M 10 75 Q 25 55 40 75 Q 55 55 70 75 Q 85 55 100 75 M 40 40 A 2 2 0 1 1 40 39.9 M 55 30 A 2 2 0 1 1 55 29.9 M 70 40 A 2 2 0 1 1 70 39.9',
+    'ص': 'M 20 60 Q 40 40 60 60 Q 80 40 100 60 L 100 80',
+    'ض': 'M 20 60 Q 40 40 60 60 Q 80 40 100 60 L 100 80 M 60 35 A 3 3 0 1 1 60 34.9',
+    'ط': 'M 30 80 L 30 50 Q 30 30 60 30 Q 90 30 90 50 L 90 80 M 60 20 L 60 10',
+    'ظ': 'M 30 80 L 30 50 Q 30 30 60 30 Q 90 30 90 50 L 90 80 M 60 20 L 60 10 M 60 5 A 3 3 0 1 1 60 4.9',
+    'ع': 'M 80 30 L 50 50 Q 30 70 50 85 Q 70 95 90 80',
+    'غ': 'M 80 30 L 50 50 Q 30 70 50 85 Q 70 95 90 80 M 65 20 A 3 3 0 1 1 65 19.9',
+    'ف': 'M 20 70 Q 60 90 100 70 L 100 50 Q 100 30 80 30 M 60 20 A 3 3 0 1 1 60 19.9',
+    'ق': 'M 20 70 Q 60 90 100 70 L 100 50 Q 100 30 80 30 M 45 50 A 2 2 0 1 1 45 49.9 M 75 50 A 2 2 0 1 1 75 49.9',
+    'ك': 'M 90 80 L 90 40 Q 90 20 60 20 L 30 20 M 60 35 L 45 50',
+    'ل': 'M 60 80 L 60 20 Q 60 10 50 10 L 30 10',
+    'م': 'M 20 70 Q 60 90 100 70 Q 110 50 90 40 Q 70 30 60 50',
+    'ن': 'M 20 60 Q 60 80 100 60 M 60 40 A 3 3 0 1 1 60 39.9',
+    'ه': 'M 40 60 Q 60 40 80 60 Q 60 80 40 60',
+    'و': 'M 60 40 A 20 20 0 1 1 60 80 L 60 95',
+    'ي': 'M 20 50 Q 60 70 100 50 M 45 85 A 2 2 0 1 1 45 84.9 M 75 85 A 2 2 0 1 1 75 84.9',
+    'ى': 'M 20 50 Q 60 70 100 50 Q 110 60 100 70',
+    'ة': 'M 40 60 Q 60 40 80 60 Q 60 80 40 60 M 50 35 A 2 2 0 1 1 50 34.9 M 70 35 A 2 2 0 1 1 70 34.9',
+    'ء': 'M 50 50 Q 60 40 70 50 Q 60 60 50 50',
+    'ئ': 'M 20 50 Q 60 70 100 50 M 45 85 A 2 2 0 1 1 45 84.9 M 75 85 A 2 2 0 1 1 75 84.9 M 60 30 Q 70 20 60 10',
+    'ؤ': 'M 60 50 A 15 15 0 1 1 60 80 L 60 95 M 60 30 Q 70 20 60 10',
+    'إ': 'M 60 80 L 60 20 M 60 95 A 3 3 0 1 1 60 94.9',
+    'آ': 'M 60 80 L 60 20 M 50 10 Q 60 5 70 10',
 };
 
 const DRAWING_LIBRARY = {
-    'أسد': "أَسَدٌ", 'بطة': "بَطَّةٌ", 'تفاحة': "تُفَّاحَةٌ", 'ثعلب': "ثَعْلَبٌ",
-    'جمل': "جَمَلٌ", 'حوت': "حُوتٌ", 'خروف': "خَرُوفٌ", 'ديك': "دِيكٌ",
-    'ذرة': "ذُرَةٌ", 'ريشة': "رِيشَةٌ", 'رمان': "رُمَّانٌ", 'زرافة': "زَرَافَةٌ",
-    'سمكة': "سَمَكَةٌ", 'شمس': "شَمْسٌ", 'صقر': "صَقْرٌ", 'ضفدع': "ضِفْدَعٌ",
-    'طائرة': "طَائِرَةٌ", 'ظرف': "ظَرْفٌ", 'عنب': "عِنَبٌ", 'غزال': "غَزَالٌ",
-    'فيل': "فِيلٌ", 'قمر': "قَمَرٌ", 'قطار': "قِطَارٌ", 'كتاب': "كِتَابٌ",
-    'ليمون': "لَيْمُونٌ", 'موز': "مَوْزٌ", 'نحلة': "نَحْلَةٌ", 'هلال': "هِلالٌ",
-    'وردة': "وَرْدَةٌ", 'يد': "يَدٌ", 'بيت': "بَيْتٌ", 'شجرة': "شَجَرَةٌ", 'سيارة': "سَيَّارَةٌ"
+    '1': 'M 60 20 L 60 80 M 50 80 L 70 80',
+    '2': 'M 30 30 Q 60 10 80 30 Q 90 50 60 60 L 30 80 L 90 80',
+    '3': 'M 30 25 Q 60 15 80 30 Q 90 45 60 55 Q 90 65 80 80 Q 60 95 30 85',
+    '4': 'M 70 80 L 70 20 L 30 60 L 90 60',
+    '5': 'M 80 20 L 40 20 L 35 45 Q 60 40 80 55 Q 90 75 60 85 Q 35 90 25 75',
+    '6': 'M 70 25 Q 40 20 30 50 Q 25 80 55 85 Q 85 85 85 60 Q 85 40 55 40 Q 30 45 30 60',
+    '7': 'M 30 20 L 80 20 L 50 80',
+    '8': 'M 60 50 Q 30 35 40 20 Q 60 5 80 20 Q 95 40 60 50 Q 25 60 35 80 Q 55 95 80 80 Q 95 65 60 50',
+    '9': 'M 40 75 Q 70 80 80 50 Q 85 20 55 15 Q 25 15 25 40 Q 25 60 55 60 Q 80 55 80 40',
+    '0': 'M 60 20 Q 30 20 30 50 Q 30 80 60 80 Q 90 80 90 50 Q 90 20 60 20',
+    '١': 'M 60 20 L 60 80',
+    '٢': 'M 40 30 Q 60 20 80 40 Q 70 60 50 80',
+    '٣': 'M 35 25 Q 55 20 70 35 Q 75 50 55 55 Q 75 60 70 75 Q 55 85 35 80',
+    '٤': 'M 70 20 L 30 60 L 90 60 M 70 40 L 70 80',
+    '٥': 'M 30 20 A 30 30 0 1 1 30 80',
+    '٦': 'M 60 20 A 25 25 0 1 1 35 70 L 35 85',
+    '٧': 'M 30 20 L 70 20 L 70 80',
+    '٨': 'M 30 40 L 70 40 L 70 80 L 30 80 L 30 40',
+    '٩': 'M 70 80 A 25 25 0 1 1 70 30',
+    '٠': 'M 60 80 A 3 3 0 1 1 60 79.9',
+
+    // --- SHAPES & FUN OBJECTS ---
+    'apple': 'M 50 40 Q 30 20 20 50 Q 20 80 50 90 Q 80 80 80 50 Q 70 20 50 40 M 50 40 Q 50 20 60 10', // apple / تفاحة
+    'tree': 'M 50 70 L 50 95 M 50 70 Q 20 70 20 40 Q 20 10 50 10 Q 80 10 80 40 Q 80 70 50 70', // tree / شجرة
+    'house': 'M 20 50 L 50 20 L 80 50 L 80 90 L 20 90 L 20 50 M 40 90 L 40 70 L 60 70 L 60 90', // house / بيت
+    'car': 'M 20 60 L 30 40 L 70 40 L 80 60 L 90 60 L 90 80 L 10 80 L 10 60 L 20 60 M 30 80 A 5 5 0 1 0 30 80 M 70 80 A 5 5 0 1 0 70 80', // car / سيارة
+    'ball': 'M 50 50 A 30 30 0 1 1 50 49.9 M 20 50 L 80 50 M 50 20 L 50 80', // ball / كرة
+    'flower': 'M 50 50 A 10 10 0 1 0 50 50 M 50 40 Q 50 10 70 20 Q 50 40 50 50 M 50 60 Q 50 90 30 80 Q 50 60 50 50 M 60 50 Q 90 50 80 30 Q 60 50 50 50 M 40 50 Q 10 50 20 70 Q 40 50 50 50 M 50 90 L 50 100', // flower / زهرة
+    'sun': 'M 50 50 A 15 15 0 1 1 50 49.9 M 50 30 L 50 10 M 50 70 L 50 90 M 70 50 L 90 50 M 30 50 L 10 50 M 65 35 L 80 20 M 35 65 L 20 80 M 65 65 L 80 80 M 35 35 L 20 20', // sun / شمس
+    'star': 'M 50 20 L 60 40 L 85 40 L 65 55 L 75 80 L 50 65 L 25 80 L 35 55 L 15 40 L 40 40 L 50 20', // star / نجمة
+    'smile': 'M 50 50 A 30 30 0 1 1 50 49.9 M 35 40 A 3 3 0 1 1 35 39.9 M 65 40 A 3 3 0 1 1 65 39.9 M 35 65 Q 50 80 65 65', // smile / وجه سعيد
 };
 
 class AIService {
     constructor() {
         this.context = [];
-        this.userProfile = { name: 'صديقي', grade: 'الروضة', interests: [] };
-        this.loadMemory();
+        this.userProfile = { name: '', grade: '', gradeId: 'Grade1', interests: [], gradeVerified: false };
     }
 
     async loadMemory() {
         try {
-            const savedContext = await AsyncStorage.getItem('ai_memory');
-            if (savedContext) {
-                this.context = JSON.parse(savedContext);
-                if (this.context.length > 20) this.context = this.context.slice(-20);
+            const data = await AsyncStorage.getItem('nora_memory');
+            if (data) {
+                const parsed = JSON.parse(data);
+                this.context = parsed.context || [];
+                if (parsed.userProfile) {
+                    this.userProfile = { ...this.userProfile, ...parsed.userProfile };
+                }
             }
-        } catch (e) { console.log('Failed to load memory'); }
+        } catch (e) { }
     }
 
     async saveMemory() {
-        try { await AsyncStorage.setItem('ai_memory', JSON.stringify(this.context)); }
-        catch (e) { console.log('Failed to save memory'); }
+        try {
+            await AsyncStorage.setItem('nora_memory', JSON.stringify({
+                context: this.context.slice(-20),
+                userProfile: this.userProfile
+            }));
+        } catch (e) { }
     }
 
-    cleanName(name) {
-        if (!name) return null;
-        // Keep only Arabic/English letters and spaces. Remove all punctuation.
-        // eslint-disable-next-line no-misleading-character-class
-        return name.replace(/[^\u0621-\u064A\u064B-\u065F\u0671-\u06D3\u06F0-\u06F9a-zA-Z\s]/g, '').trim();
-    }
-
-    setUserProfile(name, grade, interests = []) {
-        const cleanedName = this.cleanName(name);
-        this.userProfile = { name: cleanedName, grade, interests };
-        this.saveMemory(); // Persist changes immediately
-    }
-
-    normalizeArabic(text) {
-        if (!text) return "";
-        return text.normalize('NFC').replace(/[\u064B-\u0652]/g, "").replace(/(^|\s)ال([\u0621-\u064A])/g, "$1$2").replace(/[أإآ]/g, "ا").replace(/ة/g, "ه").replace(/ى/g, "ي").replace(/[!؟?.،,]/g, "").trim();
-    }
-
-    parseIntent(aiText) {
-        const normalized = this.normalizeArabic(aiText);
-        let result = { rawASR: aiText, normalizedText: normalized, intent: null, confidence: 0, selectedAssetKey: null, log: "" };
-
-        // 1. Full Names
-        const fullLetterNames = {
-            'أ': ['ألف', 'اليف', 'الف'], 'ب': ['باء'], 'ت': ['تاء'], 'ث': ['ثاء'], 'ج': ['جيم'], 'ح': ['حاء'], 'خ': ['خاء'],
-            'د': ['دال'], 'ذ': ['ذال'], 'ر': ['راء'], 'ز': ['زاي', 'زين'], 'س': ['سين'], 'ش': ['شين'], 'ص': ['صاد'], 'ض': ['ضاد'],
-            'ط': ['طاء'], 'ظ': ['ظاء'], 'ع': ['عين'], 'غ': ['غين'], 'ف': ['فاء'], 'ق': ['قاف'], 'ك': ['كاف'], 'ل': ['لام'],
-            'م': ['ميم'], 'ن': ['نون'], 'هـ': ['هاء'], 'و': ['واو'], 'ي': ['ياء'], 'ء': ['همزة'],
-            '1': ['واحد', 'رقم واحد'], '2': ['اثنين', 'إثنان', 'رقم اثنين'], '3': ['ثلاثة', 'رقم ثلاثة'], '4': ['أربعة', 'رقم أربعة'], '5': ['خمسة', 'رقم خمسة']
-        };
-
-        let bestMatch = null;
-        let lowestIndex = Infinity;
-        for (const [letter, synonyms] of Object.entries(fullLetterNames)) {
-            for (const synonym of synonyms) {
-                const ns = this.normalizeArabic(synonym);
-                const regex = new RegExp(`(?:^|\\s)${ns}(?:$|\\s)`, 'u');
-                const match = normalized.match(regex);
-                if (match && match.index < lowestIndex) {
-                    lowestIndex = match.index;
-                    bestMatch = { shape: letter, type: 'letter', count: 1, confidence: 1.0, selectedAssetKey: letter, log: `✅ Full Name: '${letter}'` };
-                }
-            }
-        }
-        if (bestMatch) { result.intent = bestMatch; result.selectedAssetKey = bestMatch.selectedAssetKey; return result; }
-
-        // 2. Explicit Context
-        const explicitMatch = normalized.match(/(?:حرف)\s+(?:ال)?([أ-ي]|[\u0621-\u064A]+)/u);
-        if (explicitMatch) {
-            const capturedWord = explicitMatch[1];
-            for (const [letter, synonyms] of Object.entries(fullLetterNames)) {
-                if (synonyms.some(s => this.normalizeArabic(s) === this.normalizeArabic(capturedWord))) {
-                    result.intent = { shape: letter, type: 'letter', count: 1 }; result.selectedAssetKey = letter; return result;
-                }
-            }
-        }
-
-        // 3. Objects
-        const objectSynonyms = {
-            'تفاحة': ['تفاح', 'تفاحة'], 'بطة': ['بطة', 'بطه'], 'أسد': ['أسد', 'اسد', 'الأسد'],
-            'نجمة': ['نجمة', 'نجوم'], 'دائرة': ['دائرة', 'كرة', 'كور'], 'مربع': ['مربع'], 'مثلث': ['مثلث'],
-            '1': ['واحد'], '2': ['اثنين'], '3': ['ثلاثة'], '4': ['أربعة'], '5': ['خمسة']
-        };
-        const allObjectKeys = Object.keys(DRAWING_LIBRARY).concat(Object.keys(ARABIC_ALPHABET_PATHS).filter(k => k.length > 1));
-
-        for (const key of allObjectKeys) {
-            const synonyms = objectSynonyms[key] || [key];
-            if (synonyms.some(s => new RegExp(`(?:^|\\s)${this.normalizeArabic(s)}(?:$|\\s)`, 'u').test(normalized))) {
-                result.intent = { shape: key, type: 'object', count: 1 };
-                result.selectedAssetKey = key;
-                return result;
-            }
-        }
-        return result;
+    setUserProfile(profile) {
+        this.userProfile = { ...this.userProfile, ...profile };
+        this.saveMemory();
     }
 
     cleanForTTS(text) {
-        if (!text) return "";
-        let clean = text;
-
-        // 1. Remove Emojis & Symbols (Keep Arabic, English, Numbers, Punctuation)
-        clean = clean.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2700}-\u{27BF}\u{2B50}\u{2600}-\u{26FF}]/gu, '');
-
-        // 2. Pause delimiters (Replace ... with Arabic semicolon for safer pause)
-        clean = clean.replace(/\.{2,}/g, '؛');
-
-        // 3. Process words at the end of sentences/phrases (before punctuation OR end of string)
-        clean = clean.replace(/([^\s]+?)([\u0621-\u064A])([\u064B-\u065F]*)(?=\s*[.!؟،؛:]|$)/g, (match, wordPrefix, lastChar, diacritics) => {
-
-            // EXCEPTION: Single Letters (Educational Context e.g. "بَ، بِ، بُ")
-            // If the "word" (prefix + lastChar) is just 1 letter long, we MUST preserve its diacritic.
-            // Note: wordPrefix contains everything BEFORE the last char. 
-            // If wordPrefix is empty, it means the word is just lastChar (1 letter).
-            if (wordPrefix.length === 0) {
-                return match; // Return exactly as is (Base char + Diacritic)
-            }
-
-            // Case A: Ta-Marbuta (ة) -> Ha (ه) + Sukun (always)
-            if (lastChar === 'ة') {
-                return wordPrefix + 'ه' + '\u0652';
-            }
-
-            // Case B: Tanween Fath (اً OR ًا) -> Alif (Remove Tanween)
-            if (diacritics.includes('\u064B')) {
-                return wordPrefix + lastChar;
-            }
-
-            // Case C: Long Vowels (Alif, Waw, Ya) -> Keep as is (Natural Sukun)
-            if (/[اويى]/.test(lastChar)) {
-                return wordPrefix + lastChar;
-            }
-
-            // Case D: Standard consonant ending with Short Vowel -> Force Sukun
-            // only add sukun if there isn't already a sukun or shaddah.
-            if (!diacritics.includes('\u0652') && !diacritics.includes('\u0651')) {
-                return wordPrefix + lastChar + '\u0652';
-            }
-            return wordPrefix + lastChar + diacritics;
-        });
-
-        // 4. AGGRESSIVE CLEANUP: Remove ALL punctuation and non-word characters
-        // We replace them with a simple space to avoid merging words.
-        // We explicitly remove: ! ? . , : ; - _ ( ) [ ] { } * ~
-        // CRITICAL: We PRESERVE < > / " = for SSML tags!
-        // eslint-disable-next-line no-useless-escape
-        clean = clean.replace(/[!؟.,،:;'()\[\]{}*~_-]/g, ' ');
-
-        // 5. Collapse multiple spaces into one and trim
-        clean = clean.replace(/\s+/g, ' ').trim();
-
-        return clean;
-    }
-
-    async chat(userMessage, base64Image = null) {
-        try {
-            const userName = this.cleanName(this.userProfile.name) || 'بَطَل';
-
-            // Explicit Instruction for Name Extraction
-            const nameExtractionRule = `
-            🔍 **مهمة خاصة (User Profile)**:
-            - إذا ذكر الطفل اسمه أو صفه في رسالته (مثلاً: "أنا أحمد"، "اسمي سارة")، **يجب** أن تعيدي كائن "user_info" بالمعلومات الجديدة.
-            - إذا لم تكن تعرفين الاسم بعد، اسأليه "ما اسمك؟" في سياق اللعب.
-            `;
-            // --- SMART STT CORRECTION (Phonetic Fuzzy Matching) ---
-            // Fix common misheard vowel sounds (especially for phonics drills)
-            let msg = userMessage.toLowerCase();
-            const vowelCorrections = {
-                // Fatha sounds (أَ) - Often missed or merged
-                'اا': 'أَ', 'آ': 'أَ', 'آه': 'أَ', 'ااه': 'أَ', 'اه': 'أَ',
-                'aa': 'أَ', 'ah': 'أَ', 'a': 'أَ',
-
-                // Kasra sounds (إِ) - Usually recognized
-                'اي': 'إِ', 'ايي': 'إِ', 'ايه': 'إِ', 'إي': 'إِ',
-                'ee': 'إِ', 'ii': 'إِ', 'i': 'إِ',
-
-                // Damma sounds (أُ) - Usually recognized  
-                'او': 'أُ', 'اوو': 'أُ', 'اوه': 'أُ', 'أو': 'أُ',
-                'oo': 'أُ', 'uu': 'أُ', 'u': 'أُ',
-
-                // Combined patterns (when child says all three)
-                'اي او': 'إِ أُ', 'ا اي او': 'أَ إِ أُ',
-
-                // Numbers
-                'واحد': '1', 'اثنين': '2', 'ثلاثة': '3'
-            };
-
-            // Apply corrections if message is very short (likely a single phonetic answer)
-            // Also apply if we detect isolated vowel patterns
-            const isPhoneticAnswer = msg.split(' ').length <= 3 || /^[اأإآ\s]+$/.test(msg.trim());
-            if (isPhoneticAnswer) {
-                for (const [wrong, right] of Object.entries(vowelCorrections)) {
-                    if (msg.includes(wrong)) {
-                        msg = msg.replace(new RegExp(wrong, 'g'), right);
-                        console.log(`🔧 STT Auto-Correction: ${wrong} -> ${right}`);
-                    }
-                }
-
-                // Special case: If ONLY "اي او" was captured (missing اا), prepend أَ
-                if (msg.trim() === 'إِ أُ' || msg.trim() === 'اي او') {
-                    msg = 'أَ ' + msg;
-                    console.log(`🔧 STT Auto-Correction: Prepended missing أَ`);
-                }
-            }
-
-            // Check for Name Identification
-            const normalize = (s) => s.replace(/[^\u0621-\u064A\s]/g, '').trim();
-
-            // 0. Credits / Creator Query
-            if (/(?:من|مين).*?(?:صنعك|صممك|سواك|برمجك|عملك|طورك|اخترعك|أنشأك|انشأك|مديرك|رئيسك)/.test(msg)) {
-                return {
-                    text: "المدير هاشم محمد الجائفي",
-                    voiceText: "الْمُدِير هَاشِم مُحَمَّد الْجَائِفِي",
-                    action: "listening",
-                    emotion: "happy"
-                };
-            }
-
-            // 1. Completion (Gentle Praise)
-            if ((msg.includes('كتبت') || msg.includes('انتهيت')) && (msg.includes('كتابة') || msg.includes('حرف') || msg.includes('خطي'))) {
-                return {
-                    text: "أَحْسَنْتَ يَا بَطَل! لَقَدْ رَأَيْتُ مُحَاوَلَتَكَ الرَّائِعَةَ! خَطُّكَ يَتَحَسَّنُ كَثِيرًا. هَلْ نَنْتَقِلُ لِلْحَرْفِ التَّالِي؟",
-                    voiceText: this.cleanForTTS("أَحْسَنْتَ يَا بَطَل! لَقَدْ رَأَيْتُ مُحَاوَلَتَكَ الرَّائِعَةَ! خَطُّكَ يَتَحَسَّنُ كَثِيرًا. هَلْ نَنْتَقِلُ لِلْحَرْفِ التَّالِي؟"),
-                    action: "listening",
-                    emotion: "happy"
-                };
-            }
-
-            // Helper: Extract Grade (Now returns Voweled text)
-            const detectGrade = (text) => {
-                const t = text.replace(/[^\u0621-\u064A\s]/g, ''); // Clean chars
-                if (t.includes('روضة') || t.includes('تمهيدي') || t.includes('كي جي')) return 'الرَّوْضَة';
-                if (t.includes('اول') || t.includes('أول') || t.includes('واحد')) return 'الصَّفِّ الْأَوَّل';
-                if (t.includes('ثاني') || t.includes('اثنان')) return 'الصَّفِّ الثَّانِي';
-                if (t.includes('ثالث') || t.includes('ثلاثة')) return 'الصَّفِّ الثَّالِث';
-                return null;
-            };
-
-            // A. Check Name (or Combined Name + Grade)
-            if (!this.userProfile.name || this.userProfile.name === 'صديقي') {
-                let potentialName = null;
-                let potentialGrade = detectGrade(msg);
-
-                // Smart Name Extraction Strategy
-                // Remove common prefixes/stopwords to find the real name
-                let cleanMsg = msg
-                    .replace(/(?:^|\s)(أنا|انا|اسمي|إسمي|هو)(?=\s|$)/g, ' ') // Remove identifiers
-                    .replace(/(?:^|\s)(الصف|صف|في)(?=\s|$)/g, ' ') // Remove location preps
-                    .replace(/[0-9]/g, '') // Remove numbers
-                    .trim();
-
-                // Also remove the grade keywords themselves if found, to isolate name
-                if (potentialGrade) {
-                    const gradeKeywords = ['اول', 'أول', 'ثاني', 'ثالث', 'روضة', 'تمهيدي'];
-                    gradeKeywords.forEach(kw => {
-                        cleanMsg = cleanMsg.replace(new RegExp(kw, 'g'), '');
-                    });
-                }
-
-                const parts = cleanMsg.split(/\s+/).filter(p => p.length > 2);
-                if (parts.length > 0) {
-                    potentialName = parts[0];
-                }
-
-                const invalidNames = ['حرف', 'صورة', 'كتابة', 'رسم', 'درس', 'تعلم', 'احب', 'اريد', 'بطل', 'معلمتي'];
-                if (potentialName && invalidNames.includes(this.normalizeArabic(potentialName))) {
-                    potentialName = null;
-                }
-
-                if (potentialName) {
-                    potentialName = this.cleanName(potentialName);
-                    this.setUserProfile(potentialName, this.userProfile.grade);
-
-                    if (potentialGrade) {
-                        this.setUserProfile(potentialName, potentialGrade);
-                        this.userProfile.gradeVerified = true;
-                        this.saveMemory();
-                        return {
-                            text: `أَهْلاً يَا ${potentialName}! يَا بَطَلَ ${potentialGrade}! أَنَا سَعِيدَةٌ جِدًّا بِكَ. مَاذَا تُحِبُّ أَنْ نَتَعَلَّمَ الْيَوْمَ؟`,
-                            voiceText: this.cleanForTTS(`أَهْلاً يَا ${potentialName}! يَا بَطَلَ ${potentialGrade}! أَنَا سَعِيدَةٌ جِدًّا بِكَ. مَاذَا تُحِبُّ أَنْ نَتَعَلَّمَ الْيَوْمَ؟`),
-                            action: "listening",
-                            emotion: "excited"
-                        };
-                    }
-
-                    this.saveMemory();
-                    return {
-                        text: `أَهْلاً بِكَ يَا ${potentialName}! فِي أَيِّ صَفٍّ أَنْتَ؟ (الرَّوْضَة، أَمِ الْأَوَّل؟)`,
-                        voiceText: this.cleanForTTS(`أَهْلاً بِكَ يَا ${potentialName}! فِي أَيِّ صَفٍّ أَنْتَ؟ (الرَّوْضَة، أَمِ الْأَوَّل؟)`),
-                        action: "listening",
-                        emotion: "happy"
-                    };
-                }
-
-                return {
-                    text: "أَهْلاً! أَنَا الْمُعَلِّمَة نُورَا. مَا اسْمُكَ يَا بَطَل؟",
-                    voiceText: this.cleanForTTS("أَهْلاً! أَنَا الْمُعَلِّمَة نُورَا. مَا اسْمُكَ يَا بَطَل؟"),
-                    action: "listening",
-                    emotion: "happy"
-                };
-            }
-
-            // B. Check Grade
-            if (!this.userProfile.gradeVerified) {
-                let detectedGrade = null;
-                if (msg.includes('روضة') || msg.includes('تمهيدي') || msg.includes('كي جي')) detectedGrade = 'KG1';
-                else if (msg.includes('اول') || msg.includes('أول') || msg.includes('1')) detectedGrade = 'الصف الأول';
-                else if (msg.includes('ثاني') || msg.includes('2')) detectedGrade = 'الصف الثاني';
-                else if (msg.includes('ثالث') || msg.includes('3')) detectedGrade = 'الصف الثالث';
-
-                if (detectedGrade) {
-                    this.userProfile.grade = detectedGrade;
-                    this.userProfile.gradeVerified = true;
-                    this.saveMemory();
-                    return {
-                        text: `تَشَرَّفْنَا يَا ${this.userProfile.name}. أَنْتَ فِي ${detectedGrade}! مَاذَا تُحِبُّ أَنْ تَتَعَلَّمَ الْيَوْمَ؟`,
-                        voiceText: this.cleanForTTS(`تَشَرَّفْنَا يَا ${this.userProfile.name}. أَنْتَ فِي ${detectedGrade}! مَاذَا تُحِبُّ أَنْ تَتَعَلَّمَ الْيَوْمَ؟`),
-                        action: "listening",
-                        emotion: "excited"
-                    };
-                }
-
-                if (!msg.includes('صف')) {
-                    return {
-                        text: `فِي أَيِّ صَفٍّ أَنْتَ يَا ${this.userProfile.name}؟ (هَلْ أَنْتَ فِي الرَّوْضَةِ أَمِ الْمَدْرَسَةِ؟)`,
-                        voiceText: this.cleanForTTS(`فِي أَيِّ صَفٍّ أَنْتَ يَا ${this.userProfile.name}؟ (هَلْ أَنْتَ فِي الرَّوْضَةِ أَمِ الْمَدْرَسَةِ؟)`),
-                        action: "listening",
-                        emotion: "curious"
-                    };
-                }
-            }
-
-            // 3. Readiness (Gentle Menu) - ONLY if Onboarding Complete
-            if (msg.includes('مستعد') || msg.includes('جاهز') || msg.includes('يلا') || msg.includes('قائمة')) {
-                return {
-                    text: "رَائِع! هَيَّا نَبْدَأُ. مَاذَا تُحِبُّ أَنْ تَتَعَلَّمَ؟ الْقُرْآنَ، أَمِ اللُّغَةَ الْعَرَبِيَّةَ؟",
-                    voiceText: this.cleanForTTS("رَائِع! هَيَّا نَبْدَأُ. مَاذَا تُحِبُّ أَنْ تَتَعَلَّمَ؟ الْقُرْآنَ، أَمِ اللُّغَةَ الْعَرَبِيَّةَ؟"),
-                    action: "listening",
-                    emotion: "happy"
-                };
-            }
-
-            // --- 1. SYSTEM PROMPT (Dynamic Grade Adaptation & Grammar) ---
-            const grade = String(this.userProfile.grade || 'KG1');
-            let difficultyRules = "";
-
-            if (grade.includes('KG') || grade.includes('الروضة') || grade.includes('تمهيدي')) {
-                difficultyRules = `
-                - **مستوى KG (طفل صغير)**:
-                1. جمل قصيرة جداً ومفعمة بالحماس (Dora Style).
-                2. اطلبي منه الحركة والتقليد (اقفز، صفق، قلد الصوت).
-                3. بسّطي المعلومات لأقصى حد.`;
-            } else {
-                difficultyRules = `
-                - **مستوى المدرسة (صف 1-3)**:
-                1. تحديات ومهمات سرية (Titans Style).
-                2. شجعي على الدقة والملاحظة.`;
-            }
-
-            const promptUserName = this.cleanName(this.userProfile.name) && this.userProfile.name !== 'بَطَل' && this.userProfile.name !== 'صديقي'
-                ? this.cleanName(this.userProfile.name)
-                : "غير معروف (اسأليه عن اسمه)";
-
-            const systemPrompt = `أنتِ "المعلمة نورا" (Teacher Nora) 👩‍🏫، معلمة اللغة العربية اللطيفة والمحبوبة للأطفال!
-            
-            🎉 **أهلاً بك في فصلي الدراسي!**
-            👤 **اسم الطالب:** ${promptUserName}
-            🎓 **الصف:** ${grade}
-            
-            📜 **مهمتك الأساسية:**
-            - **التحقق من التاريخ**: قبل الترحيب، انظري إلى سجل المحادثة. إذا كنتِ قد رحبتِ بالطفل سابقاً أو بدأتِ الدرس بالفعل، **لا تكرري الترحيب** (مثل "أهلاً بك أنا نورا") وادخلي في صلب الموضوع فوراً.
-            - في **أول رد مطلقاً فقط** (إذا كان السجل فارغاً)، رحبي بالطفل ترحيباً حاراً باسمه وصفه.
-            - تكيّفي مع مستوى الصف:
-              * إذا كان روضة (KG): استخدمي لغة بسيطة جداً، مرحة، وكثيرة التشجيع.
-              * إذا كان مدرسة (1-3): كوني مشجعة لكن بمعلومات أكثر دقة وتحديات بسيطة.
-
-            style: دورا المستكشفة (تفاعلي) + أبلة فضيلة (حنونة وقصصية).
-
-            ${nameExtractionRule}
-            ${difficultyRules}
-
-            🔊 **Strict Pronunciation & SSML Rules (قواعد النطق والوقف الصارمة)**:
-
-            1. **The Golden Rule of Waqf (قاعدة الوقف - أهم قاعدة)**:
-               - "Arabs do not start with a silence, nor stop on a move." (لا يُبدأ بساكن ولا يُوقف على متحرك).
-               - **CRITICAL**: The LAST letter of EVERY sentence or phrase (before a comma '،' or period '.') MUST have a **SUKUN (ْ)**.
-               - Bad: "أَهْلاً بِكَ يَا هَاشِمُ." (Damman at end is Robot-like).
-               - Good: "أَهْلاً بِكَ يَا هَاشِمْ." (Sukun is Natural).
-
-            2. **Partial vs Full Tashkeel (التشكيل)**:
-               - Vowelize EVERY letter inside the word (Internal Vowels).
-               - BUT enforce SUKUN on the last letter if it's a stop.
-               - Example: "مُعَلِّمَة" -> "مُعَلِّمَهْ" (if stopping).
-
-            3. **The Ta-Marbuta Rule (التاء المربوطة - ة)**:
-               - If stopping on a word ending in 'ة', pronounce it as 'h' (Ha Sakina).
-               - Rule: Write it as 'ة' but ensure the vowel is SUKUN 'ْ'.
-               - Example: "مَدْرَسَةْ" (Madrasah), NOT "مَدْرَسَةُ".
-
-            4. **Pacing & Intonation (السرعة والنغم)**:
-               - **Normal Speech**: Rate 1.0 (Implicit).
-               - **Teaching/Spelling**: Use \`<prosody rate="slow">word</prosody>\`.
-               - **Excitement**: Use \`<prosody rate="1.1">Great job!</prosody>\`.
-               - **Pauses**:
-                 * Comma '،': Insert \`<break time="200ms"/>\` (Short pause).
-                 * Period '.': Insert \`<break time="500ms"/>\` (Full stop).
-                 * Between letters (Spelling): \`<break time="300ms"/>\`.
-
-            5. **Explicit Phonics for Teaching**:
-               - When teaching a letter sound, use Short Vowels with pauses.
-               - Example: "بَ <break time='200ms'/> بـِ <break time='200ms'/> بُ".
-            
-            6. **🎯 DRILL MODE: Isolated Letter Pronunciation (نطق الحروف المنفردة)**:
-               **CRITICAL RULE**: When teaching individual letter sounds (أَ، إِ، أُ), you MUST use this exact structure:
-               
-               ✅ **The Perfect Formula**:
-               - Start with: <break time="300ms"/>
-               - Then: <prosody rate="slow">أَ.</prosody>
-               - Then: <break time="400ms"/>
-               - Repeat for each vowel
-               
-               **Why this works**:
-               - Break BEFORE the letter = **Isolation** (prevents co-articulation)
-               - Prosody rate slow = **Clarity** (slow enough to hear the vowel)
-               - Dot AFTER the letter = **Finality** (forces stop intonation)
-               - Break AFTER = **Separation** (clear boundary)
-               
-               **❌ WRONG Examples** (DO NOT USE):
-               - "أَ، إِ، أُ" (Too fast, letters merge)
-               - "<prosody rate='1.1'>أَ</prosody>" (Too fast, unclear)
-               - "أَ <break time='100ms'/>" (Break too short)
-               
-               **✅ CORRECT Full Example**:
-               voiceText: "رَدِّدْ مَعِي: <break time='300ms'/> <prosody rate='slow'>أَ.</prosody> <break time='400ms'/> <prosody rate='slow'>إِ.</prosody> <break time='400ms'/> <prosody rate='slow'>أُ.</prosody> <break time='500ms'/> مُمْتَازْ!"
-               
-               **When to use Drill Mode**:
-               - Teaching letter sounds (أصوات الحروف)
-               - Phonics practice (التدريب الصوتي)
-               - Vowel demonstration (الحركات)
-               - Any time you say "قل" or "ردد" followed by a single letter
-            
-            7. **Subtitle Chunks**:
-               - Insert \`<break>\` tags logically to split subtitles.
-               - Max 5-7 words per chunk.
-
-            🛑 **Final Output Check**:
-            - Did you put Sukun on the last letter?
-            - Did you use \`<break>\` tags?
-            - Did you write perfect Arabic with full Diacritics?
-            
-            🧩 **المنهجية (Scaffolding Flow)**:
-            1. **الخطوة 1 (الربط البصري)**: عند تقديم حرف جديد، **يجب** أن ترسميه على السبورة فوراً (استخدمي الحقل \`draw\` أو \`action: draw_letter_X\`).
-            2. **الخطوة 2 (الصوت)**: علميه أصوات الحرف (أَ، إِ، أُ) مع أمثلة.
-            3. **الخطوة 3 (الاختبار)**: اسألي الطفل سؤالاً اختيارياً للتأكد من فهمه.
-               - **تنسيق الاختبار (Quiz)**:
-                 * اجعلي "action": "quiz".
-                 * أضيفي مصفوفة "options": ["خيار 1", "خيار 2", "خيار 3"].
-                 * أضيفي حقل "answer": "الخيار الصحيح".
-            4. **الخطوة 4 (الكتابة)**: اطلبي منه أن يكتب الحرف (استخدمي \`action: practice_writing\`).
-            
-            ⚠️ **قواعد صارمة**:
-            - لا تستخدمي الرموز (markdown) مثل النجوم ** أو الخطوط السفلية _ في النص المنطوق (voiceText).
-            - ابدأي الدرس دائماً بمثال مرئي ومحسوس.
-            - اذا كان الدرس عن "حرف الألف"، ابدأي برسمه فوراً.
-            `;
-
-            const currentParts = [{ text: `[Strict JSON Only]\nالطفل يقول: ${userMessage}` }];
-            if (base64Image) currentParts.push({ inlineData: { mimeType: "image/jpeg", data: base64Image } });
-
-            const recentHistory = this.context.slice(-10);
-
-            let contents = [
-                { role: 'model', parts: [{ text: systemPrompt }] },
-                ...recentHistory.map(m => ({ role: m.role === 'user' ? 'user' : 'model', parts: [{ text: m.content }] })),
-                { role: 'user', parts: currentParts }
-            ];
-
-            // --- 2. API CALL ---
-            console.log('🤖 Sending to Gemini...');
-            const response = await axios.post(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${GOOGLE_API_KEY}`,
-                { contents, generationConfig: { temperature: 0.7, responseMimeType: "application/json" } },
-                { headers: { 'Content-Type': 'application/json', ...(Platform.OS !== 'web' ? { 'X-Android-Package': ANDROID_PACKAGE_NAME, 'X-Android-Cert': ANDROID_CERT_FINGERPRINT } : {}) } }
-            );
-
-            let aiRawText = response.data.candidates[0].content.parts[0].text;
-            aiRawText = aiRawText.replace(/```json/g, "").replace(/```/g, "").trim();
-            console.log('🤖 Gemini Text:', aiRawText);
-
-            let aiResponse;
-            try {
-                aiResponse = JSON.parse(aiRawText);
-
-                // Normalization: Flatten nested structures
-                const coreData = aiResponse.teacher_nora || aiResponse.response || aiResponse;
-                if (coreData !== aiResponse) {
-                    aiResponse = { ...aiResponse, ...coreData };
-                }
-
-                // If AI put quiz/options inside a 'quiz' object, move them to root
-                if (aiResponse.quiz && typeof aiResponse.quiz === 'object') {
-                    aiResponse.options = aiResponse.options || aiResponse.quiz.options;
-                    aiResponse.answer = aiResponse.answer || aiResponse.quiz.answer;
-                    aiResponse.text = aiResponse.text || aiResponse.quiz.question;
-                }
-
-                // If AI put draw info inside a 'draw' object, resolve the key
-                if (aiResponse.draw && typeof aiResponse.draw === 'object') {
-                    aiResponse.draw = aiResponse.draw.letter || aiResponse.draw.shape || aiResponse.draw.text || aiResponse.draw.item || null;
-                }
-
-                if (aiResponse.prompt && typeof aiResponse.prompt === 'string') {
-                    if (aiResponse.text && !aiResponse.text.includes(aiResponse.prompt.substring(0, 5))) {
-                        aiResponse.text += " " + aiResponse.prompt;
-                    } else if (!aiResponse.text) {
-                        aiResponse.text = aiResponse.prompt;
-                    }
-                }
-
-                if (!aiResponse.text) {
-                    aiResponse.text = aiResponse.displayText ||
-                        aiResponse.message ||
-                        aiResponse.response_text ||
-                        aiResponse.arabicText ||
-                        aiResponse.subtitleText ||
-                        (Array.isArray(aiResponse.subtitles) ? aiResponse.subtitles.join(' ') : aiResponse.subtitles) ||
-                        aiResponse.subtitle ||
-                        "";
-                }
-
-                // If text is still empty but voiceText exists, strip SSML tags and use it
-                if (!aiResponse.text && aiResponse.voiceText) {
-                    aiResponse.text = aiResponse.voiceText.replace(/<[^>]+>/g, '').trim();
-                }
-            } catch (e) {
-                const textMatch = aiRawText.match(/"text"\s*:\s*["']([\s\S]*?)["']/);
-                aiResponse = { text: textMatch ? textMatch[1] : aiRawText, action: "listening", emotion: "neutral" };
-            }
-
-            // --- 3. LOGIC ENFORCEMENT & HIDDEN CONTENT EXTRACTION ---
-            if (!aiResponse.text) {
-                // Fallback if still empty
-                aiResponse.text = "";
-            }
-
-            // MERGE HIDDEN CONTENT: If AI put the actual lesson in 'lesson_content' or 'next_step_prompt'
-            // we MUST append it to 'text' so it gets spoken (IF voiceText is missing).
-            const hiddenParts = [];
-            if (aiResponse.lesson_content && aiResponse.lesson_content.details) {
-                hiddenParts.push(aiResponse.lesson_content.details);
-            }
-            if (aiResponse.next_step_prompt) {
-                hiddenParts.push(aiResponse.next_step_prompt);
-            }
-
-            if (hiddenParts.length > 0) {
-                console.log('📦 Merging hidden content into speech:', hiddenParts);
-                const combinedHidden = hiddenParts.join(' ');
-                if (!aiResponse.text.includes(combinedHidden.substring(0, 10))) {
-                    // Check if we should append to text 
-                    // (Don't append if we have a specific voiceText already)
-                    if (!aiResponse.voiceText) {
-                        aiResponse.text += " " + combinedHidden;
-                    }
-                }
-            }
-
-            // CRITICAL: Preserve SSML in voiceText if provided
-            if (aiResponse.voiceText) {
-                // Ensure no conflicting markdown chars that might ruin SSML attributes, but keep tags.
-                // Generally, trust the AI's SSML.
-                console.log('🛡️ Preserving AI-generated SSML voiceText');
-            } else if (aiResponse.text) {
-                // Only generate from text if voiceText is missing
-                aiResponse.voiceText = this.cleanForTTS(aiResponse.text);
-            }
-
-            // --- 4. ACTION & DRAW NORMALIZATION ---
-            // If action is an object (sometimes from Gemini), extract the type
-            if (aiResponse.action && typeof aiResponse.action === 'object') {
-                aiResponse.action = aiResponse.action.type || aiResponse.action.action || 'listening';
-            }
-
-            if (aiResponse.action && typeof aiResponse.action === 'string' && aiResponse.action.startsWith('draw_letter_')) {
-                const targetKey = aiResponse.action.replace('draw_letter_', '').trim();
-                if (!aiResponse.draw) aiResponse.draw = targetKey;
-                aiResponse.action = 'explain_board';
-            }
-
-            const practiceKeywords = ['دورك', 'جرب', 'تكتب', 'اكتب', 'ارسمه أنت', 'بقلمك', 'اصبعك', 'إصبعك'];
-            if (practiceKeywords.some(kw => aiResponse.text.includes(kw))) {
-                aiResponse.action = 'practice_writing';
-            } else if (aiResponse.text.includes('سبورة') || aiResponse.text.includes('انظر') || aiResponse.draw) {
-                if (aiResponse.action !== 'practice_writing' && aiResponse.action !== 'quiz') {
-                    aiResponse.action = 'explain_board';
-                }
-            }
-
-            // Intent Injection
-            const intentResult = this.parseIntent(aiResponse.text);
-            if (!aiResponse.draw && intentResult.intent) {
-                const { shape } = intentResult.intent;
-                const drawData = (intentResult.intent.type === 'letter') ? ARABIC_ALPHABET_PATHS[shape] : DRAWING_LIBRARY[shape];
-                if (drawData) {
-                    aiResponse.draw = drawData;
-                    if (!aiResponse.intent) aiResponse.intent = intentResult.intent;
-
-                    if (aiResponse.action !== 'practice_writing' && aiResponse.action !== 'quiz') {
-                        aiResponse.action = 'explain_board';
-                    }
-                }
-            } else if (aiResponse.draw) {
-                const drawKey = aiResponse.draw;
-                if (ARABIC_ALPHABET_PATHS[drawKey]) {
-                    aiResponse.draw = ARABIC_ALPHABET_PATHS[drawKey];
-                    if (!aiResponse.intent) aiResponse.intent = { shape: typeof drawKey === 'string' ? drawKey : 'أ', type: 'letter', count: 1 };
-                } else if (DRAWING_LIBRARY[drawKey]) {
-                    aiResponse.draw = DRAWING_LIBRARY[drawKey];
-                    if (!aiResponse.intent) aiResponse.intent = { shape: typeof drawKey === 'string' ? drawKey : 'object', type: 'object', count: 1 };
-                }
-
-                if (aiResponse.action !== 'practice_writing' && aiResponse.action !== 'quiz') {
-                    aiResponse.action = 'explain_board';
-                }
-            }
-
-            this.context.push({ role: 'user', content: userMessage });
-            this.context.push({ role: 'assistant', content: aiResponse.text });
-            this.saveMemory();
-
-            // Include corrected input so UI can display it
-            aiResponse.correctedInput = msg !== userMessage.toLowerCase() ? msg : null;
-
-            return aiResponse;
-
-        } catch (error) {
-            console.error('Gemini Error:', error);
-            return {
-                text: "لَمْ أَسْمَعْكَ جَيِّدًا. هَلْ يُمْكِنُكَ الْإِعَادَةُ؟",
-                voiceText: this.cleanForTTS("لَمْ أَسْمَعْكَ جَيِّدًا. هَلْ يُمْكِنُكَ الْإِعَادَةُ؟"),
-                action: "listening",
-                emotion: "calm"
-            };
-        }
+        if (!text) return '';
+        return text
+            .replace(/\*\*/g, '')
+            .replace(/[#_`~]/g, '')
+            .replace(/\[.*?\]/g, '')
+            .replace(/\(.*?\)/g, '')
+            .replace(/\{.*?\}/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
     }
 
     getDrawData(key) {
         if (!key) return null;
-        return ARABIC_ALPHABET_PATHS[key] || DRAWING_LIBRARY[key] || null;
+        let normalizedKey = key.trim().replace(/[ًٌٍَُِّْ]/g, '').toLowerCase();
+
+        // Arabic-to-English Mapping & English Code Handling
+        const dictionary = {
+            'تفاحة': 'apple', 'تفاحه': 'apple',
+            'شجرة': 'tree', 'شجره': 'tree',
+            'بيت': 'house', 'منزل': 'house',
+            'سيارة': 'car', 'سياره': 'car',
+            'كرة': 'ball', 'كره': 'ball',
+            'زهرة': 'flower', 'وردة': 'flower',
+            'شمس': 'sun',
+            'نجمة': 'star', 'نجمه': 'star',
+            'وجه': 'smile', 'مبتسم': 'smile'
+        };
+
+        // Handle "letter_x" format from Gemini
+        if (normalizedKey.startsWith('letter_')) {
+            const char = normalizedKey.split('_')[1];
+            const englishToArabic = {
+                // Single letters
+                'a': 'أ', 'b': 'ب', 't': 'ت', 'th': 'ث', 'j': 'ج', 'h': 'ح', 'kh': 'خ',
+                'd': 'د', 'dh': 'ذ', 'r': 'ر', 'z': 'ز', 's': 'س', 'sh': 'ش', 's2': 'ص',
+                'd2': 'ض', 't2': 'ط', 'z2': 'ظ', 'aa': 'ع', 'gh': 'غ', 'f': 'ف', 'q': 'ق',
+                'k': 'ك', 'l': 'ل', 'm': 'م', 'n': 'ن', 'h2': 'ه', 'w': 'و', 'y': 'ي',
+                // Full names (what Gemini often uses)
+                'alif': 'أ', 'alef': 'أ', 'baa': 'ب', 'ba': 'ب', 'taa': 'ت', 'ta': 'ت',
+                'thaa': 'ث', 'tha': 'ث', 'jeem': 'ج', 'jim': 'ج', 'haa': 'ح', 'ha': 'ح',
+                'khaa': 'خ', 'kha': 'خ', 'daal': 'د', 'dal': 'د', 'dhaal': 'ذ', 'dhal': 'ذ',
+                'raa': 'ر', 'ra': 'ر', 'zay': 'ز', 'zayn': 'ز', 'seen': 'س', 'sin': 'س',
+                'sheen': 'ش', 'shin': 'ش', 'saad': 'ص', 'sad': 'ص', 'daad': 'ض', 'dad': 'ض',
+                'tah': 'ط', 'dhah': 'ظ', 'ayn': 'ع', 'ain': 'ع', 'ghayn': 'غ', 'ghain': 'غ',
+                'faa': 'ف', 'fa': 'ف', 'qaaf': 'ق', 'qaf': 'ق', 'kaaf': 'ك', 'kaf': 'ك',
+                'laam': 'ل', 'lam': 'ل', 'meem': 'م', 'mim': 'م', 'noon': 'ن', 'nun': 'ن',
+                'hah': 'ه', 'waw': 'و', 'yaa': 'ي', 'ya': 'ي'
+            };
+            if (englishToArabic[char]) return englishToArabic[char];
+        }
+
+        // Also check for standalone letter names (without letter_ prefix)
+        const letterNames = {
+            'alif': 'أ', 'alef': 'أ', 'baa': 'ب', 'ba': 'ب', 'taa': 'ت', 'ta': 'ت',
+            'thaa': 'ث', 'tha': 'ث', 'jeem': 'ج', 'jim': 'ج', 'haa': 'ح', 'ha': 'ح',
+            'khaa': 'خ', 'kha': 'خ', 'daal': 'د', 'dal': 'د', 'dhaal': 'ذ', 'dhal': 'ذ',
+            'raa': 'ر', 'ra': 'ر', 'zay': 'ز', 'zayn': 'ز', 'seen': 'س', 'sin': 'س',
+            'sheen': 'ش', 'shin': 'ش', 'saad': 'ص', 'sad': 'ص', 'daad': 'ض', 'dad': 'ض',
+            'tah': 'ط', 'dhah': 'ظ', 'ayn': 'ع', 'ain': 'ع', 'ghayn': 'غ', 'ghain': 'غ',
+            'faa': 'ف', 'fa': 'ف', 'qaaf': 'ق', 'qaf': 'ق', 'kaaf': 'ك', 'kaf': 'ك',
+            'laam': 'ل', 'lam': 'ل', 'meem': 'م', 'mim': 'م', 'noon': 'ن', 'nun': 'ن',
+            'hah': 'ه', 'waw': 'و', 'yaa': 'ي', 'ya': 'ي'
+        };
+        if (letterNames[normalizedKey]) return letterNames[normalizedKey];
+
+        if (dictionary[normalizedKey]) {
+            normalizedKey = dictionary[normalizedKey];
+        }
+
+        // FORCE PLAIN TEXT FOR LETTERS
+        if (/^[\u0600-\u06FF]$/.test(normalizedKey)) return normalizedKey;
+
+        // Try exact match first
+        // if (ARABIC_ALPHABET_PATHS[normalizedKey]) return ARABIC_ALPHABET_PATHS[normalizedKey]; // DEPRECATED for letters
+        if (DRAWING_LIBRARY[normalizedKey]) return DRAWING_LIBRARY[normalizedKey];
+
+        // Try first character (only if it's a single Arabic letter)
+        if (normalizedKey.length === 1) {
+            const firstChar = normalizedKey.charAt(0);
+            if (ARABIC_ALPHABET_PATHS[firstChar]) return ARABIC_ALPHABET_PATHS[firstChar];
+            if (DRAWING_LIBRARY[firstChar]) return DRAWING_LIBRARY[firstChar];
+        }
+
+        return null; // Return null so the UI can decide (e.g. render as text)
+    }
+
+    async chat(userMessage) {
+        try {
+            const systemPrompt = `أنتِ المعلمة نورا. معلمة عربية محبوبة للأطفال.
+            
+قواعد:
+1. تحدثي بالفصحى البسيطة فقط
+2. كوني لطيفة وحنونة
+3. استخدمي جمل قصيرة وواضحة
+4. لا تستخدمي رموز markdown
+
+الطفل اسمه: ${this.userProfile.name || 'بطل'}
+الصف: ${this.userProfile.grade || 'الأول'}`;
+
+            const contents = [
+                { role: 'user', parts: [{ text: systemPrompt }] },
+                { role: 'model', parts: [{ text: 'حسناً، سأكون المعلمة نورا الحنونة.' }] },
+                { role: 'user', parts: [{ text: userMessage }] }
+            ];
+
+            const response = await axios.post(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${GOOGLE_API_KEY}`,
+                { contents, generationConfig: { temperature: 0.9 } },
+                { headers: { 'Content-Type': 'application/json' } }
+            );
+
+            const aiRawText = response.data.candidates[0].content.parts[0].text;
+
+            this.context.push({ role: 'user', content: userMessage });
+            this.context.push({ role: 'assistant', content: aiRawText });
+            this.saveMemory();
+
+            return {
+                text: aiRawText,
+                voiceText: this.cleanForTTS(aiRawText)
+            };
+        } catch (error) {
+            console.error('❌ [AIService] Chat Error:', error.message || error);
+            return { text: "لَمْ أَسْمَعْكَ جَيِّدًا.", action: "listening" };
+        }
     }
 }
 

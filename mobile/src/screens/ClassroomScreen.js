@@ -46,6 +46,7 @@ const normalize = (text) => {
         .replace(/[أإآ]/g, 'ا') // Normalize alif
         .replace(/ة/g, 'ه') // Normalize taa marbuta
         .replace(/ى/g, 'ي') // Normalize alif maqsura
+        .replace(/[*_#~]/g, '') // Strip markdown formatting symbols
         .toLowerCase()
         .trim();
 };
@@ -60,9 +61,10 @@ const ClassroomScreen = ({ navigation, route }) => {
     const [isMicActive, setIsMicActive] = useState(false);
     const [userName, setUserName] = useState('يا بطل');
     const transcriptScrollRef = useRef(null);
-    const [isLiveMode, setIsLiveMode] = useState(false);
-    const isLiveModeRef = useRef(false);
+    const [isLiveMode, setIsLiveMode] = useState(true);
+    const isLiveModeRef = useRef(true);
     const liveAudioBridgeRef = useRef(null);
+    const justFinishedTaskRef = useRef(false); // New: preventing praise re-triggers
 
     useEffect(() => { isLiveModeRef.current = isLiveMode; }, [isLiveMode]);
 
@@ -101,12 +103,23 @@ const ClassroomScreen = ({ navigation, route }) => {
             console.log('✅ Speech/TTS Finished speaking.');
             avatarRef.current?.stopTalking();
 
+            // IMPORTANT: Tell Live Service we are done speaking so it un-mutes the mic upstream
+            if (geminiLiveService) {
+                geminiLiveService.isSpeaking = false;
+                console.log('🔊 [LIVE-MIC] isSpeaking reset to FALSE. Mic should accept input now.');
+            }
+
             if (statusRef.current === 'speaking' || isLiveModeRef.current) {
                 if (!isLiveModeRef.current) updateStatus('listening');
 
                 if (pendingWritingRef.current) {
                     setIsWritingModalVisible(true);
                     pendingWritingRef.current = false;
+                    // IMPORTANT: Pause mic immediately in Live mode (don't wait for useEffect)
+                    if (isLiveModeRef.current && geminiLiveService) {
+                        geminiLiveService.pauseMic();
+                        console.log('✍️ [LIVE-MIC] Paused immediately for writing modal');
+                    }
                 } else if (pendingQuizRef.current) {
                     setIsSelectionModalVisible(true);
                     pendingQuizRef.current = false;
@@ -139,14 +152,7 @@ const ClassroomScreen = ({ navigation, route }) => {
     const [optionStates, setOptionStates] = useState({});
     const quizErrorCounter = useRef(0);
 
-    useEffect(() => {
-        if (isLiveMode) {
-            setupLiveMode();
-        } else {
-            geminiLiveService.disconnect();
-        }
-        return () => geminiLiveService.disconnect();
-    }, [isLiveMode]);
+
 
     const setupLiveMode = async () => {
         updateStatus('thinking');
@@ -196,7 +202,42 @@ const ClassroomScreen = ({ navigation, route }) => {
                     geminiLiveService.pauseMic();
                     await new Promise(r => setTimeout(r, 200));
 
-                    const cleanText = text.trim();
+                    let cleanText = text.trim();
+
+                    // 🔧 FALLBACK: Detect tool calls written as text and execute them
+                    // drawOnBoard detection
+                    const drawMatch = cleanText.match(/`?drawOnBoard\s*\(\s*item\s*=\s*['"]?([^'")\s]+)['"]?\s*\)`?/i);
+                    if (drawMatch && drawMatch[1]) {
+                        console.log('🎨 [FALLBACK] Detected drawOnBoard as text, executing:', drawMatch[1]);
+                        const item = drawMatch[1];
+                        const drawData = aiService.getDrawData(item);
+                        avatarRef.current?.walkToBoard();
+                        setTimeout(() => {
+                            whiteboardRef.current?.write(drawData || item, { count: 1, duration: 3000 });
+                        }, 1200);
+                    }
+
+                    // showQuiz detection
+                    const quizMatch = cleanText.match(/`?showQuiz\s*\(\s*question\s*=\s*['"]([^'"]+)['"]\s*,\s*options\s*=\s*\[([^\]]+)\]\s*,\s*answer\s*=\s*['"]([^'"]+)['"]\s*\)`?/i);
+                    if (quizMatch) {
+                        console.log('🎯 [FALLBACK] Detected showQuiz as text, executing...');
+                        const question = quizMatch[1];
+                        const optionsStr = quizMatch[2];
+                        const answer = quizMatch[3];
+                        const options = optionsStr.split(',').map(o => o.replace(/['"]/g, '').trim());
+
+                        setSelectionOptions(options);
+                        setCorrectAnswer(answer);
+                        pendingQuizRef.current = true;
+                    }
+
+                    // askToWrite detection
+                    const writeMatch = cleanText.match(/`?askToWrite\s*\(\s*letter\s*=\s*['"]?([^'")\s]+)['"]?\s*\)`?/i);
+                    if (writeMatch && writeMatch[1]) {
+                        console.log('✍️ [FALLBACK] Detected askToWrite as text, executing:', writeMatch[1]);
+                        setWritingLetter(writeMatch[1]);
+                        pendingWritingRef.current = true;
+                    }
 
                     // نطق النص مع تفعيل التزامن "كلمة بكلمة"
                     await speakResponse({
@@ -208,7 +249,14 @@ const ClassroomScreen = ({ navigation, route }) => {
                 } catch (e) {
                     console.error('❌ [LIVE-HYBRID] Error:', e);
                 } finally {
-                    setTimeout(() => geminiLiveService.resumeMic(), 400);
+                    // Only resume if we aren't about to open a modal (Writing/Quiz)
+                    setTimeout(() => {
+                        if (!isWritingModalRef.current && !pendingWritingRef.current && !pendingQuizRef.current) {
+                            geminiLiveService.resumeMic();
+                        } else {
+                            console.log('🔇 [LIVE-HYBRID] Keeping mic paused for pending modal');
+                        }
+                    }, 400);
                 }
             };
 
@@ -216,9 +264,10 @@ const ClassroomScreen = ({ navigation, route }) => {
                 console.log('🛠️ Gemini Live Action:', name, args);
 
                 if (name === 'showQuiz') {
+                    console.log('🎯 [LIVE] Quiz pending - will show after speech finishes.');
                     setSelectionOptions(args.options);
                     setCorrectAnswer(args.answer);
-                    setIsSelectionModalVisible(true);
+                    pendingQuizRef.current = true; // Use pending ref to sync with end of speech
                 }
 
                 if (name === 'drawOnBoard') {
@@ -228,6 +277,13 @@ const ClassroomScreen = ({ navigation, route }) => {
                     setTimeout(() => {
                         whiteboardRef.current?.write(drawData || item, { count: 1, duration: 3000 });
                     }, 1200);
+                }
+
+                if (name === 'askToWrite') {
+                    console.log('✍️ [LIVE] Asking to write:', args.letter);
+                    setWritingLetter(args.letter);
+                    setIsWritingModalVisible(true);
+                    pendingWritingRef.current = true; // Use pending ref if audio is playing, though modal opens immediately here
                 }
             };
 
@@ -284,7 +340,12 @@ const ClassroomScreen = ({ navigation, route }) => {
                     setIsSelectionModalVisible(false);
                     setCorrectAnswer(null);
                     setOptionStates({}); // Clear states
-                    processUserMessage(`لقد اخترت "${option}" وهي إجابة صحيحة! احتفلي بي!`);
+                    pendingQuizRef.current = false; // Reset pending flag
+
+                    // Enable protection for the praise turn
+                    justFinishedTaskRef.current = true;
+
+                    geminiLiveService.sendText(`✅ لقد اختار الطفل الإجابة الصحيحة وهي "${option}". احتفلي به!`);
                 }, 1000);
             } else {
                 // ❌ WRONG (Persistent Red)
@@ -313,7 +374,9 @@ const ClassroomScreen = ({ navigation, route }) => {
                         setCorrectAnswer(null);
                         setOptionStates({});
                         quizErrorCounter.current = 0;
-                        processUserMessage("لقد أخطأ الطفل مرتين متتاليتين في الاختبار. من فضلك اشرحي له الدرس مجدداً وارسمي له على السبورة ليفهم (action: explain_board).");
+                        pendingQuizRef.current = false; // Reset pending flag
+
+                        geminiLiveService.sendText(`❌ لقد أخطأ الطفل مرتين متتاليتين في الاختبار بالإجابة "${option}". من فضلك اشرحي له الدرس مجدداً وارسمي له على السبورة ليفهم.`);
                     }, 500);
                 }
             }
@@ -326,7 +389,8 @@ const ClassroomScreen = ({ navigation, route }) => {
         setTimeout(() => {
             setIsSelectionModalVisible(false);
             setOptionStates({});
-            processUserMessage(`لقد اخترت: ${option}`);
+            pendingQuizRef.current = false; // Reset pending flag
+            geminiLiveService.sendText(`لقد اختار الطفل: ${option}`);
         }, 500);
     };
 
@@ -383,23 +447,42 @@ const ClassroomScreen = ({ navigation, route }) => {
         isWritingModalRef.current = isWritingModalVisible;
         if (isWritingModalVisible) {
             console.log('✍️ Writing Modal Open: Pausing Voice Listening...');
+            if (isLiveModeRef.current && geminiLiveService) {
+                geminiLiveService.pauseMic();
+            }
             arabicVoiceService.cancel(); // Stop any active listening
-            updateStatus('idle'); // Ensure status is idle so we can resume later
+            updateStatus('idle');
             setIsMicActive(false);
         } else {
             console.log('✍️ Writing Modal Closed: Resuming check...');
-            if (!isMutedRef.current && statusRef.current === 'idle') {
-                setTimeout(startListening, 500);
+            if (isLiveModeRef.current && geminiLiveService && !isMutedRef.current && statusRef.current === 'idle') {
+                geminiLiveService.resumeMic();
             }
         }
-    }, [isWritingModalVisible]);
+    }, [isWritingModalVisible, isLiveMode]);
 
     useEffect(() => {
         initializeClassroom();
         return () => {
             arabicVoiceService.stop();
+            geminiLiveService.disconnect();
         };
     }, []);
+
+    const toggleMute = () => {
+        const newMuteState = !isMuted;
+        setIsMuted(newMuteState);
+
+        if (newMuteState) {
+            console.log('🔇 Muting Gemini Live Mic...');
+            geminiLiveService.pauseMic();
+            setIsMicActive(false);
+        } else {
+            console.log('🎤 Unmuting Gemini Live Mic...');
+            geminiLiveService.resumeMic();
+            setIsMicActive(true);
+        }
+    };
 
     const requestPermissions = async () => {
         if (Platform.OS === 'android') {
@@ -454,354 +537,17 @@ const ClassroomScreen = ({ navigation, route }) => {
             }
         } catch (e) { console.log('No user profile found', e); }
 
-        setUserName(name); // Update State
+        setUserName(name);
         await arabicVoiceService.initialize();
 
-        // Greeting with delay to ensure ready
-        setTimeout(async () => {
-            if (isLiveModeRef.current) {
-                console.log('🤖 Live Mode detected on startup: Skipping old greeting.');
-                return;
-            }
-            console.log('👋 Starting Greeting for:', name);
-            await startGreeting(name);
-            // After greeting, start the continuous live loop
-            console.log('🚀 Entering Live Mode...');
-            startListening();
-        }, 1500);
+        // Launch Gemini Live immediately
+        console.log('🚀 Launching Gemini Live...');
+        setupLiveMode();
     };
 
-    const startGreeting = async (name) => {
-        if (isLiveModeRef.current) {
-            console.log('🤖 startGreeting blocked: Live Mode is already Active.');
-            return;
-        }
-        updateStatus('speaking');
 
-        // Handle Lesson Mode - INSTANT START (No AI Delay)
-        if (route?.params?.mode === 'lesson' && route?.params?.initialMessage) {
-            console.log('🎓 Starting Lesson Mode (Instant)...');
 
-            let msg = route.params.initialMessage;
-            const target = route.params.targetItem;
 
-            // Personalize the greeting if we have a name
-            if (name && name !== 'بَطَل' && name !== 'صديقي') {
-                msg = msg.replace('يا بطل', `يا ${name}`);
-            }
-
-            // Construct simulated AI response
-            const instantResponse = {
-                text: msg,
-                voiceText: msg,
-                action: target ? 'explain_board' : 'speaking',
-                draw: target ? aiService.getDrawData(target) : null,
-                emotion: 'happy'
-            };
-
-            // Manually update Memory so context is preserved
-            aiService.context.push({ role: 'assistant', content: msg });
-            aiService.saveMemory();
-
-            // Execute immediately
-            await speakResponse(instantResponse);
-            return;
-        }
-
-        // Standard Greeting
-        // Dynamic Greeting Logic (Updated for Teacher Nora)
-        let welcomeText;
-        if (name && name !== 'بَطَل' && name !== 'يا بطل') {
-            const grade = aiService.userProfile.grade || 'الصف';
-            // Returning User
-            welcomeText = `أَهْلاً بِكَ مُجَدَّدًا يَا ${name}! أَنَا الْمُعَلِّمَة نُورَا. هَلْ أَنْتَ مُسْتَعِدٌّ لِلدِّرَاسَةِ فِي ${grade} الْيَوْم؟`;
-        } else {
-            // New User / First Time
-            welcomeText = `أَهْلًا بِكَ يَا بَطَلْ! أَنَا الْمُعَلِّمَة نُورَا. مَا اسْمُكَ وَفِي أَيِّ صَفٍّ أَنْتْ؟`;
-        }
-
-        console.log('🗣️ Speaking Greeting:', welcomeText);
-        setTranscript(welcomeText);
-
-        await arabicVoiceService.speak(welcomeText, {
-            onPlayStart: () => avatarRef.current?.startTalking()
-        });
-        avatarRef.current?.stopTalking();
-
-        updateStatus('idle');
-    };
-
-    const silenceCounterRef = useRef(0);
-
-    const toggleMute = () => {
-        const newMuteState = !isMuted;
-        setIsMuted(newMuteState);
-
-        if (newMuteState) {
-            // MUTE ENABLED: Stop listening immediately
-            console.log('🔇 Muting...');
-            arabicVoiceService.cancel();
-            updateStatus('idle');
-            setIsMicActive(false);
-        } else {
-            // MUTE DISABLED: Start listening
-            console.log('🎤 Unmuting...');
-            if (statusRef.current !== 'thinking' && statusRef.current !== 'speaking') {
-                updateStatus('idle');
-            }
-            setTimeout(startListening, 300);
-        }
-    };
-
-    const startListening = async () => {
-        if (isLiveModeRef.current) {
-            console.log('🎤 Live Mode is active: Legacy STT Loop BLOCKED to prevent interference.');
-            return;
-        }
-
-        if (statusRef.current === 'speaking' || isWritingModalRef.current || isSelectionModalVisibleRef.current) {
-            console.log('🛑 startListening blocked: System busy.');
-            return;
-        }
-
-        // PREVENT OVERLAP
-        if (statusRef.current === 'listening' ||
-            statusRef.current === 'thinking' ||
-            statusRef.current === 'speaking' ||
-            isMutedRef.current ||
-            isWritingModalRef.current ||
-            arabicVoiceService.isPlaying) {
-            console.log('🚫 startListening blocked (already active/modal open/audio playing):', statusRef.current);
-            return;
-        }
-
-        updateStatus('listening');
-        setIsMicActive(true);
-        avatarRef.current?.setEmotion('neutral');
-
-        try {
-            const userText = await arabicVoiceService.listen();
-
-            if (userText && userText.trim().length > 0) {
-                // Speech detected
-                console.log('🎤 User Text Detected:', userText);
-                // Note: Corrected text will be shown after processUserMessage receives AI response
-                setTranscript(`أنت: ${userText}`);
-                setIsMicActive(false);
-                silenceCounterRef.current = 0; // Reset counter on success
-                processUserMessage(userText);
-            } else {
-                // Silence or Session closed
-                console.log('🔄 Silence detected/Session Ended.');
-
-                if (statusRef.current !== 'listening') {
-                    console.log('🛑 Listen Loop Aborted: Status changed externally to:', statusRef.current);
-                    return;
-                }
-
-                console.log('🔄 Resetting for next window...');
-                updateStatus('idle');
-                setIsMicActive(false);
-
-                if (!isMutedRef.current) {
-                    setTimeout(startListening, 400);
-                }
-            }
-        } catch (e) {
-            console.log('❌ Voice Critical Error (Looping):', e);
-
-            if (statusRef.current !== 'listening') {
-                console.log('🛑 Listen Loop Aborted (Error path): Status changed externally to:', statusRef.current);
-                return;
-            }
-
-            if (!isMutedRef.current) {
-                updateStatus('idle');
-                setIsMicActive(false);
-                setTimeout(startListening, 1000);
-            } else {
-                updateStatus('idle');
-                setIsMicActive(false);
-            }
-        }
-    };
-
-    const processUserMessage = async (text, base64Image = null, forceLegacy = false) => {
-        if (isLiveModeRef.current && !forceLegacy) {
-            console.log('🛑 processUserMessage BLOCKED: Gemini Live is dominating the interaction.');
-            return;
-        }
-        try {
-            updateStatus('thinking');
-            avatarRef.current?.setEmotion('thinking');
-
-            const response = await aiService.chat(text, base64Image);
-
-            // 🔍 DEEP DEBUG: Raw Response Inspection
-            console.log('═══════════════════════════════════════════════════════');
-            console.log('🔍 DEEP DEBUG: RAW AI RESPONSE');
-            console.log('═══════════════════════════════════════════════════════');
-
-            if (response.voiceText) {
-                const rawVoice = response.voiceText;
-                const visibleVoice = rawVoice
-                    .replace(/\n/g, '\\n')
-                    .replace(/\r/g, '\\r')
-                    .replace(/\t/g, '\\t')
-                    .replace(/\s/g, '·'); // Show spaces as dots
-
-                console.log(`📝 RAW voiceText: "${rawVoice}"`);
-                console.log(`👁️ VISIBLE voiceText: "${visibleVoice}"`);
-                console.log(`📏 Length: ${rawVoice.length} characters`);
-                console.log(`🔢 Char codes (first 50): ${rawVoice.substring(0, 50).split('').map(c => c.charCodeAt(0)).join(',')}`);
-
-                // Check for hidden problems
-                const hasNewlines = /\n/.test(rawVoice);
-                const hasCarriageReturn = /\r/.test(rawVoice);
-                const hasMultipleSpaces = /\s{2,}/.test(rawVoice);
-                const startsWithSpace = /^\s/.test(rawVoice);
-                const endsWithDot = /\.$/.test(rawVoice.trim());
-
-                console.log(`⚠️ Issues Found:`);
-                console.log(`   - Has newlines (\\n): ${hasNewlines ? '❌ YES' : '✅ NO'}`);
-                console.log(`   - Has carriage return (\\r): ${hasCarriageReturn ? '❌ YES' : '✅ NO'}`);
-                console.log(`   - Has multiple spaces: ${hasMultipleSpaces ? '⚠️ YES' : '✅ NO'}`);
-                console.log(`   - Starts with space: ${startsWithSpace ? '❌ YES' : '✅ NO'}`);
-                console.log(`   - Ends with dot: ${endsWithDot ? '⚠️ YES' : '✅ NO'}`);
-            }
-
-            if (response.text) {
-                const rawText = response.text;
-                const visibleText = rawText
-                    .replace(/\n/g, '\\n')
-                    .replace(/\r/g, '\\r')
-                    .replace(/\t/g, '\\t');
-
-                console.log(`📝 RAW text: "${rawText}"`);
-                console.log(`👁️ VISIBLE text: "${visibleText}"`);
-                console.log(`📏 Length: ${rawText.length} characters`);
-            }
-
-            console.log('═══════════════════════════════════════════════════════\n');
-
-            console.log('🧠 AI BRAIN DECISION:', {
-                Action: response.action || 'speaking',
-                Emotion: response.emotion || 'neutral',
-                Intent: response.intent?.type || 'none',
-                Draw: response.draw ? `Yes (${typeof response.draw === 'string' ? response.draw.length : 'obj'})` : 'No',
-                ResponseText: response.text?.substring(0, 50) + '...'
-            });
-
-            // 🔧 DISPLAY CORRECTED INPUT (if STT was auto-corrected)
-            if (response.correctedInput) {
-                console.log('📝 Displaying Corrected Input:', response.correctedInput);
-                setTranscript(`أنت: ${response.correctedInput}`);
-            }
-
-            if (response.action === 'ignore') {
-                console.log('🔇 AI DECISION: Ignoring as Echo/Noise');
-                updateStatus('idle');
-                setTimeout(startListening, 1000);
-                return;
-            }
-
-            // EXTRACT & SAVE USER INFO (from JSON)
-            if (response.user_info && response.user_info.name) {
-                console.log('📝 Saving User Profile (JSON):', response.user_info);
-                setUserName(response.user_info.name);
-
-                // Preserve existing grade if AI sends null/undefined, otherwise use new grade, otherwise default to KG1
-                const existingGrade = aiService.userProfile.grade;
-                const newGrade = response.user_info.grade || existingGrade || 'KG1';
-
-                // Mark as verified if we have a real name and valid grade
-                const isVerified = true;
-
-                const finalProfile = { ...response.user_info, name: response.user_info.name, grade: newGrade, gradeVerified: isVerified };
-
-                AsyncStorage.setItem('userProfile', JSON.stringify(finalProfile));
-
-                aiService.setUserProfile(response.user_info.name, newGrade, null);
-                aiService.userProfile.gradeVerified = true;
-            }
-            // FALLBACK: Extract Name from Text if JSON failed
-            else if (!userName || userName === 'بَطَل') {
-                // 1. Strip Diacritics/Tashkeel for easier regex matching
-                const cleanText = response.text.replace(/[\u064B-\u065F]/g, '');
-
-                // 2. Define Patterns: "Ya [Name]", "Ana [Name]", "Ismi [Name]"
-                const namePatterns = [
-                    /يا\s+([^\s!?.،:"]+)/,
-                    /أنا\s+([^\s!?.،:"]+)/,
-                    /اسمي\s+([^\s!?.،:"]+)/
-                ];
-
-                let extractedName = null;
-                for (let pattern of namePatterns) {
-                    const match = cleanText.match(pattern);
-                    if (match && match[1]) {
-                        extractedName = match[1].replace(/[!?.،:"]/g, '').trim(); // Double clean
-                        break;
-                    }
-                }
-
-                const ignoredNames = ['بطل', 'صغيري', 'تيني', 'معلمتي', 'حبيبي', 'صديقي', 'سعيد', 'تلميذ'];
-
-                if (extractedName && !ignoredNames.includes(extractedName) && extractedName.length > 2) {
-                    console.log('📝 Saving User Profile (Robust Regex Fallback):', extractedName);
-                    const newProfile = { name: extractedName, grade: 'KG1' };
-                    setUserName(extractedName);
-                    AsyncStorage.setItem('userProfile', JSON.stringify(newProfile));
-                    aiService.setUserProfile(extractedName, 'KG1', null);
-                }
-            }
-
-            // Capture Quiz/Choice Options
-            if ((response.action === 'quiz' || response.action === 'ask_choice') && response.options && response.options.length > 0) {
-                console.log('🤔 AI Quiz/Choice detected:', response.options);
-                setSelectionOptions(response.options);
-                setCorrectAnswer(response.answer || null);
-            }
-
-            await speakResponse(response);
-
-            if (response.intent && response.intent.type === 'letter') {
-                const drawPath = aiService.getDrawData(response.intent.shape);
-                if (drawPath) {
-                    setWritingLetter(response.intent.shape);
-                    // Also trigger the board write!
-                    whiteboardRef.current?.write(drawPath, { count: 1, duration: 3000 });
-                }
-            } else if (response.draw) {
-                // Check if it's a key or a raw path (raw paths are long strings)
-                let drawContent = response.draw;
-                let key = typeof response.draw === 'string' && response.draw.length < 10 ? response.draw : null;
-
-                // Try to resolve key if it's short
-                if (key) {
-                    const resolved = aiService.getDrawData(key);
-                    if (resolved) drawContent = resolved;
-                }
-
-                // If we found valid content, set it
-                if (drawContent) {
-                    setWritingLetter(key || 'أ'); // For modal default
-                    // Ensure whiteboard gets the full path!
-                    whiteboardRef.current?.write(drawContent, { count: 1, duration: 3000 });
-                }
-            }
-
-            if (response.action === 'practice_writing') {
-                const targetLetter = response.data || (response.intent?.shape) || (response.draw && typeof response.draw === 'string' && response.draw.length < 5 ? response.draw : 'أ');
-                setWritingLetter(targetLetter);
-                setTimeout(() => setIsWritingModalVisible(true), 500);
-            }
-        } catch (error) {
-            console.error('❌ Critical error in processUserMessage:', error);
-            updateStatus('idle');
-            setTimeout(startListening, 1000);
-        }
-    };
 
     const speakResponse = async (response) => {
         await arabicVoiceService.cancel();
@@ -841,11 +587,21 @@ const ClassroomScreen = ({ navigation, route }) => {
 
         // 2. UNIFIED GAPLESS SPEECH 🎤 (Single-Shot Mode)
         // Using "Smart Timer" for Cinema-Style Subtitles (Robust & Fast)
-        let ttsText = (response.voiceText || response.text || "").trim();
-        ttsText = ttsText.replace(/^\s*<speak>/i, '').replace(/<\/speak>\s*$/i, '').trim();
+        // 2. UNIFIED GAPLESS SPEECH 🎤 (Single-Shot Mode)
+        // Using "Smart Timer" for Cinema-Style Subtitles (Robust & Fast)
+        const rawTtsText = (response.voiceText || response.text || "").trim(); // Keep raw for logic
+        let ttsText = rawTtsText
+            .replace(/^\s*<speak>/i, '').replace(/<\/speak>\s*$/i, '')
+            .replace(/[*#_~]/g, '') // Strip all markdown formatting symbols
+            .replace(/[\[\`]?\w+\(.*?\)[\]\`\.]?/g, '') // Remove function calls from speech
+            .replace(/askToWrite|drawOnBoard|showQuiz/g, '')
+            .trim();
 
         // Prepare Subtitles
-        const cleanFullText = ttsText.replace(/<[^>]+>/g, '');
+        const cleanFullText = ttsText
+            .replace(/<[^>]+>/g, '')  // Remove SSML tags
+            .replace(/[\[\`]?\w+\(.*?\)[\]\`\.]?/g, '') // Remove function calls like [askToWrite(...)]
+            .replace(/askToWrite|drawOnBoard|showQuiz/g, ''); // Remove stray function names
 
         // Granular splitting for Live Mode (word-by-word feel)
         const splitRegex = isLiveModeRef.current ? /(\s+)/ : /([.؟!،,]+\s+)/;
@@ -930,34 +686,109 @@ const ClassroomScreen = ({ navigation, route }) => {
         }
 
         // 3. MAGIC PEN DETECTION (Trigger writing modal if keywords detected)
-        const magicPenKeywords = ['دورك', 'بقلمك', 'اصبعك', 'إصبعك', 'جرب أن ترسم', 'جرب رسم', 'بيدك', 'شكل الحرف بيدك'];
-        // For detection, use the full clean text
+        const magicPenKeywords = ['دورك', 'بقلمك', 'اصبعك', 'إصبعك', 'جرب أن ترسم', 'جرب رسم', 'بيدك', 'شكل الحرف بيدك', 'اكتب', 'ارسم', 'هيا نكتب', 'استخدم أداة الكتابة', 'نافذة الكتابة'];
+
+        // 4. DRAWING DETECTION (Fallback text-to-action)
+        // If AI says "I will draw" but forgets the tool, we catch it here.
+        const drawingKeywords = ['سأرسم', 'ارسم لك', 'انظر إلى اللوح', 'على السبورة', 'شكل حرف'];
         const fullCleanText = ttsText.replace(/<[^>]+>/g, '');
         const normText = normalize(fullCleanText);
         let shouldTriggerWriting = false;
 
-        if (magicPenKeywords.some(kw => normText.includes(normalize(kw)))) {
-            if (response.action !== 'practice_writing' && response.action !== 'quiz' && !response.draw) {
-                shouldTriggerWriting = true;
-                pendingWritingRef.current = true;
+        // SKIP TRIGGERS if we just finished a task (praise turn)
+        if (justFinishedTaskRef.current) {
+            console.log('🌈 [DEBOUNCE] Skipping triggers during praise turn for turn protection.');
+            justFinishedTaskRef.current = false; // CONSUME THE SHIELD - it's a one-turn protection
+        } else {
+            // 1. MULTI-DRAWING DETECTION (Teacher Drawing)
+            // Extract all matches of drawOnBoard(item='...')
+            const drawMatches = [...rawTtsText.matchAll(/drawOnBoard\(item=['"]?([a-zA-Z0-9_\u0600-\u06FF]+)['"]?\)/g)];
+            const textDrawMatches = [];
+
+            // Also check for natural language drawing intents if no code matches or in addition
+            const extendedKeywords = [...drawingKeywords, 'سأقوم برسم', 'انظر للسبورة', 'لنبدا برسم', 'لنرسم', 'برسم', 'سأكتب', 'لنكتب'];
+            if (extendedKeywords.some(kw => normText.includes(normalize(kw))) && drawMatches.length === 0) {
+                const letterMatch = normText.match(/حرف\s+[\("']?([\u0600-\u06FF]+)[\)"']?/);
+                if (letterMatch && letterMatch[1]) {
+                    textDrawMatches.push(letterMatch[1]);
+                }
             }
+
+            // Execute all drawings found
+            const allItemsToDraw = [...drawMatches.map(m => m[1]), ...textDrawMatches];
+            let teacherDidDraw = allItemsToDraw.length > 0;
+
+            allItemsToDraw.forEach((item, index) => {
+                let finalItem = item;
+                // Mapping if it's a letter name
+                // Mapping from English/Phonetic names to Arabic characters
+                const nameMap = {
+                    'الف': 'أ', 'باء': 'ب', 'تاء': 'ت', 'ثاء': 'ث', 'جيم': 'ج', 'حاء': 'ح', 'خاء': 'خ', 'دال': 'د', 'ذال': 'ذ', 'راء': 'ر', 'زاي': 'ز', 'سين': 'س', 'شين': 'ش', 'صاد': 'ص', 'ضاد': 'ض', 'طاء': 'ط', 'ظاء': 'ظ', 'عين': 'ع', 'غين': 'غ', 'فاء': 'ف', 'قاف': 'ق', 'كاف': 'ك', 'لام': 'ل', 'ميم': 'م', 'نون': 'ن', 'هاء': 'ه', 'واو': 'و', 'ياء': 'ي',
+                    // English placeholders
+                    'a': 'أ', 'b': 'ب', 't': 'ت', 'th': 'ث', 'j': 'ج', 'h': 'ح', 'kh': 'خ', 'd': 'د', 'z': 'ز', 'r': 'ر', 's': 'س', 'sh': 'ش', 'S': 'ص', 'D': 'ض', 'T': 'ط', 'Z': 'ظ', 'E': 'ع', 'G': 'غ', 'f': 'ف', 'q': 'ق', 'k': 'ك', 'l': 'ل', 'm': 'م', 'n': 'ن', 'w': 'و', 'y': 'ي'
+                };
+                if (finalItem.startsWith('letter_')) finalItem = finalItem.replace('letter_', '');
+                finalItem = nameMap[finalItem] || finalItem;
+
+                console.log(`🎨 [QUEUE-DRAW] Drawing item ${index + 1}:`, finalItem);
+
+                setTimeout(() => {
+                    if (index === 0) avatarRef.current?.walkToBoard();
+                    const drawData = aiService.getDrawData(finalItem);
+                    whiteboardRef.current?.write(drawData || finalItem, { count: 1, duration: 2500 });
+                }, 1200 + (index * 3000));
+            });
+
+            // 2. Student Writing Intent
+            const strongTurnKeywords = ['دورك', 'بقلمك', 'اصبعك', 'إصبعك', 'بيدك', 'جرب', 'حاول', 'استخدم أداة الكتابة', 'نافذة الكتابة'];
+            const isStrongTrigger = strongTurnKeywords.some(kw => normText.includes(normalize(kw))) || /askToWrite/i.test(rawTtsText);
+
+            const genericKeywordsLine = ["اكتب", "ارسم", "خطط", "شكل"];
+            const isGenericTrigger = genericKeywordsLine.some(kw => {
+                const normalizedKw = normalize(kw);
+                const regex = new RegExp(`(^|\\s)${normalizedKw}(\\s|\\.|!|\\?|$)`);
+                return regex.test(normText);
+            });
+
+            const shouldActivateWriting = teacherDidDraw ? isStrongTrigger : (isStrongTrigger || isGenericTrigger);
+
+            if (shouldActivateWriting) {
+                if (response.action !== 'practice_writing' && response.action !== 'quiz' && !response.draw) {
+                    shouldTriggerWriting = true;
+                    pendingWritingRef.current = true;
+
+                    const codeMatch = rawTtsText.match(/letter=['"]?([a-zA-Z0-9_\u0600-\u06FF]+)['"]?/);
+                    if (codeMatch && codeMatch[1]) {
+                        setWritingLetter(codeMatch[1]);
+                    } else {
+                        const letterMatch = fullCleanText.match(/حرف\s+([\u0600-\u06FF]+)/);
+                        if (letterMatch && letterMatch[1]) {
+                            let extracted = letterMatch[1];
+                            if (extracted === 'ألف') extracted = 'أ';
+                            if (extracted === 'باء') extracted = 'ب';
+                            setWritingLetter(extracted.charAt(0));
+                        }
+                    }
+                }
+            }
+
+            if (shouldTriggerWriting && !isWritingModalVisible) {
+                setIsWritingModalVisible(true);
+                return;
+            }
+
+            // 5. MAGIC QUIZ DETECTION (Fallback if tool fails but keywords exist)
+            const quizKeywords = ['سأختبرك', 'أين الإجابة', 'اختر الإجابة', 'لعبة الخيارات', 'أي واحد منهم', 'سؤال لك'];
+            const shouldTriggerQuiz = quizKeywords.some(kw => normText.includes(normalize(kw))) && !isSelectionModalVisible;
+
+            if (shouldTriggerQuiz && !pendingQuizRef.current && selectionOptions.length > 0) {
+                console.log('🎯 [TEXT-TRIGGER] Detected quiz intent by keywords.');
+                setIsSelectionModalVisible(true);
+                return;
+            }
+
+            console.log('🔄 Turn complete.');
         }
-
-        // 4. POST-SPEECH ACTIONS
-        // Selection modal is now handled by the TTS finish event (pendingQuizRef)
-        // for better synchronization. No redundant trigger needed here.
-
-        if (shouldTriggerWriting && !isWritingModalVisible) {
-            setIsWritingModalVisible(true);
-            return;
-        }
-
-        console.log('🔄 Auto-listening check...');
-        setTimeout(() => {
-            const isIdle = statusRef.current === 'idle';
-            const isRefHidden = !isWritingModalRef.current;
-            if (isIdle && isRefHidden) startListening();
-        }, 2500);
     };
 
     const pickImage = async () => {
@@ -992,6 +823,11 @@ const ClassroomScreen = ({ navigation, route }) => {
         updateStatus('thinking');
 
         setIsWritingModalVisible(false);
+        pendingWritingRef.current = false; // CRITICAL: Reset the pending flag immediately!
+
+        // Shield the NEXT turn (the praise turn) from re-triggering the writing modal.
+        // This is consumed and reset in speakResponse.
+        justFinishedTaskRef.current = true;
 
         // KILL VOICE to prevent self-echo of the congratulations message
         await arabicVoiceService.cancel();
@@ -1008,23 +844,24 @@ const ClassroomScreen = ({ navigation, route }) => {
             Animated.timing(confettiAnim, { toValue: 0, duration: 1000, useNativeDriver: true })
         ]).start(() => setShowConfetti(false));
 
-        // Let AI know about success
+        // Let Gemini Live know about success
         setTimeout(() => {
-            processUserMessage("✅ لقد نجح الطفل في كتابة الحرف بشكل صحيح! احتفلي به!", null, true);
-        }, 1000);
+            geminiLiveService.sendText("✅ لقد نجح الطفل في كتابة الحرف بشكل صحيح! احتفلي به!");
+        }, 800);
     };
 
     const handleWritingFailure = async () => {
         updateStatus('thinking');
         setIsWritingModalVisible(false);
+        pendingWritingRef.current = false; // Reset flag on failure too
 
-        // Notify AI of failure
+        // Notify Gemini Live of failure
         await arabicVoiceService.cancel();
         avatarRef.current?.setEmotion('sad');
 
         setTimeout(() => {
-            processUserMessage("❌ لقد حاول الطفل الكتابة ولكن لم ينجح (الرسم غير واضح أو خاطئ). شجعيه وحاولي معه مرة أخرى.", null, true);
-        }, 1000);
+            geminiLiveService.sendText("❌ لقد حاول الطفل الكتابة ولكن لم ينجح (الرسم غير واضح أو خاطئ). شجعيه وحاولي معه مرة أخرى.");
+        }, 800);
     };
 
     const renderConfetti = () => {
@@ -1089,7 +926,7 @@ const ClassroomScreen = ({ navigation, route }) => {
         setIsKeyboardOpen(false);
 
         setTranscript(`أنت: ${textToSend}`);
-        await processUserMessage(textToSend);
+        geminiLiveService.sendText(textToSend);
     };
 
     return (
@@ -1102,14 +939,7 @@ const ClassroomScreen = ({ navigation, route }) => {
                         <Text style={styles.backButtonText}>←</Text>
                     </BouncyButton>
 
-                    <BouncyButton
-                        onPress={() => setIsLiveMode(!isLiveMode)}
-                        style={[styles.statusBadge, { backgroundColor: isLiveMode ? '#4CAF50' : 'rgba(0,0,0,0.5)', minWidth: 100 }]}
-                    >
-                        <Text style={styles.statusText}>
-                            LIVE {isLiveMode ? 'ON 🟢' : 'OFF ⚪'}
-                        </Text>
-                    </BouncyButton>
+
 
                     <View style={styles.statusBadge}>
                         <Text style={styles.statusText}>
@@ -1272,8 +1102,8 @@ const ClassroomScreen = ({ navigation, route }) => {
                     style={{ position: 'absolute', width: 1, height: 1, opacity: 0 }}
                 />
 
-            </SafeAreaView>
-        </View>
+            </SafeAreaView >
+        </View >
     );
 };
 

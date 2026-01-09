@@ -18,11 +18,14 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
             setImageUri(null);
 
             // Detection Logic: Is it a word/number or an SVG path?
-            const isSvgPath = typeof content === 'string' &&
-                content.trim().startsWith('M') &&
-                content.includes(' ');
+            // STRICT SVG CHECK: Must start with a path command AND contain multiple coordinates.
+            // If it's a single letter or short text, treat as TEXT even if it matches path chars indirectly.
+            const isComplexSvg = typeof content === 'string' &&
+                /^[MmLlCcAaQqZz][\d\s\.\,\-]+$/.test(content.trim()) && // Must look line 'M 10 10 L 20 20'
+                content.trim().length > 20; // Assume genuine paths are longer
 
-            const determinedIsText = type === 'text' || !isSvgPath;
+            // Force text for simple inputs
+            const determinedIsText = type === 'text' || !isComplexSvg;
             const finalContentType = determinedIsText ? 'text' : 'path';
 
             setDrawings([{
