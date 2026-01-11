@@ -408,47 +408,304 @@ eas build --platform android --profile production
 
 ---
 
-## 📄 الترخيص
+## 🧠 كيف يعمل نظام "المعلّمة نورا" مع السبورة والنوافذ التفاعلية (Mobile Live)
 
-هذا المشروع مرخص تحت **MIT License** - انظر ملف [LICENSE](LICENSE) للتفاصيل.
+> هذا القسم يشرح منطق **ClassroomScreen** في تطبيق الموبايل:
+> كيف يرسم على السبورة، وكيف تُفتح نافذة الكتابة ونافذة الخيارات، وكيف يتعامل الذكاء الاصطناعي (Gemini Live) مع هذه الأدوات.
 
----
+### 1️⃣ المكوّنات الأساسية
 
-## 👥 الفريق
+- **السبورة (ChalkboardWhiteboard)**  
+  ملف: `mobile/src/components/ChalkboardWhiteboard.js`  
+  - تعرض:
+    - رسومات الحروف/الكلمات (مسارات SVG).
+    - خط اليد القادم من الطفل.
+  - واجهتها من منظور الشاشة:
+    - `whiteboardRef.current?.write(content, { count, duration })`
+      - `content`: إمّا حرف واحد (مثلاً: `ع`) أو بيانات رسم من `AIService.getDrawData(letterOrWord)`.
+      - `count`: عدد مرات التكرار (للحروف أو العناصر).
+      - `duration`: مدة حركة الرسم (ms).
 
-- **المطور الرئيسي**: [اسمك](https://github.com/yourusername)
-- **التصميم**: AI-Generated Assets
-- **المحتوى التعليمي**: فريق Tiny Teacher
+- **نافذة الكتابة (HandwritingModal)**  
+  ملف: `mobile/src/components/HandwritingModal.js`  
+  - تفتح عندما يُطلَب من الطفل أن يكتب حرفًا معيّنًا.
+  - الخصائص:
+    - `visible`: هل النافذة ظاهرة الآن؟
+    - `letter`: الحرف المطلوب كتابته (مثلاً: "م").
+    - `onSuccess`: يُستدعى عند نجاح الكتابة.
+    - `onFailure`: يُستدعى عند الفشل.
+  - تتحكم فيها شاشة الصف:
+    - حالة React: `isWritingModalVisible`, `writingLetter`.
+    - مراجع: `pendingWritingRef`, `isWritingModalRef`.
 
----
+- **نافذة الخيارات (Quiz Modal)**  
+  جزء من `ClassroomScreen`  
+  - تعرض سؤالًا مع **2–4 خيارات**.
+  - حالة React:
+    - `isSelectionModalVisible`
+    - `selectionOptions`
+    - `correctAnswer`
+    - `optionStates` (ألوان الخيارات: صحيح/خطأ).
+  - مراجع:
+    - `pendingQuizRef`
+    - `isSelectionModalVisibleRef`
 
-## 🙏 شكر خاص
+- **خدمة الذكاء الاصطناعي المباشر (GeminiLiveService)**  
+  ملف: `mobile/src/services/GeminiLiveService.js`  
+  - اتصال WebSocket مع Gemini Live:
+    - يستقبل نصوص المعلمة تدريجيًا (partial text).
+    - يستقبل استدعاءات الأدوات:
+      - `drawOnBoard`
+      - `showQuiz`
+      - `askToWrite`
+  - يمرّر:
+    - النص الكامل إلى `onContentReceived`.
+    - أدوات الذكاء إلى `onToolCall`.
 
-- [Expo](https://expo.dev/) - منصة التطوير
-- [OpenAI](https://openai.com/) - الذكاء الاصطناعي
-- [React Native](https://reactnative.dev/) - إطار العمل
-- [PostgreSQL](https://www.postgresql.org/) - قاعدة البيانات
+### 2️⃣ مسار الرسم على السبورة (drawOnBoard)
 
----
+#### أ) عندما يستدعي جيميني الأداة مباشرة
 
-## 📞 التواصل
+- من Gemini Live تأتي رسالة تحتوي `tool_call` باسم:
+  - `drawOnBoard` وبداخلها:
+    - `args.item`: مثل `"ع"`, `"apple"`, `"5"`, `"كلمة"`.
 
-<div align="center">
+- في `ClassroomScreen`:
 
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yourusername/tiny-teacher)
-[![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:support@tinyteacher.com)
-[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/tinyteacher)
+  - في `geminiLiveService.onToolCall`:
+    - إذا كان `name === 'drawOnBoard'`:
+      - يحوّل `item` إلى بيانات رسم (إن أمكن) عبر:
+        - `aiService.getDrawData(item)`
+      - يبدأ المعلم في المشي نحو السبورة:
+        - `avatarRef.current?.walkToBoard()`
+      - بعد تأخير بسيط (1200ms):
+        - `whiteboardRef.current?.write(drawData || item, { count: 1, duration: 3000 })`
+      - إذا كان `item` حرفًا واحدًا:
+        - يتم تحديث `currentTargetLetterRef.current = item`
+          - ليعرف النظام أن "حرف الدرس الحالي" هو هذا الحرف.
 
-</div>
+#### ب) عندما يكتب جيميني طلب الرسم كنص (SMART-FALLBACK)
 
----
+- أحيانًا لا يستدعي الأداة، بل يكتب في النص:
+  - `drawOnBoard({ item: "ع" })`
+  - أو يذكر حرفًا بين أقواس، مثل `(ع)`.
 
-<div align="center">
+- في `onContentReceived` (داخل `ClassroomScreen`):
+  - يتم تحليل النص (normalized) بحثًا عن:
+    - تعابير تشبه `drawOnBoard(...)`
+    - أو حروف بين أقواس `(ع)`، `(م)` بعد عبارات مثل:
+      - "انظر إلى السبورة"
+      - "هذا هو حرف (ع)"
+  - عند العثور:
+    - يستخرج الحرف/النص المناسب (`foundLetter`).
+    - يحدِّث `currentTargetLetterRef.current` إذا كان حرفًا.
+    - يستدعي `whiteboardRef.current?.write(...)` بنفس منطق الأداة.
+    - يسجّل في اللوق:
+      - `🎨 [SMART-FALLBACK] Drawing detected letter: ع`
 
-**صنع بـ ❤️ للأطفال في كل مكان**
+### 3️⃣ مسار نافذة الكتابة (askToWrite)
 
-⭐ إذا أعجبك المشروع، لا تنسَ إعطاءه نجمة!
+#### أ) من الأداة المباشرة (Tool Call)
 
-[⬆ العودة للأعلى](#-tiny-teacher---المشروع-الكامل-والمتكامل)
+- عندما يرسل جيميني:
+  - `askToWrite({ letter: "م" })`
 
-</div>
+- في `onToolCall` داخل `ClassroomScreen`:
+  - إذا كان `name === 'askToWrite'`:
+    - **حماية ضد الكويز النشط**:
+      - إذا كان `pendingQuizRef.current === true`
+      - أو `isSelectionModalVisibleRef.current === true`  
+      → يتم تجاهل الطلب وتسجيل:
+        - `✍️ [LIVE] askToWrite ignored because quiz is active.`
+    - إذا لم يكن هناك كويز:
+      - يستخرج الحرف:
+        - `requestedLetter = safeArgs.letter`
+        - `requestedChar = resolveArabicLetter(requestedLetter)`
+      - يحدد الحرف الفعّال:
+        - `effectiveLetter = currentTargetLetterRef.current || requestedChar || 'أ'`
+      - يسجّل:
+        - `✍️ [LIVE] Asking to write: { requestedLetter, effectiveLetter }`
+      - يضبط:
+        - `setWritingLetter(effectiveLetter)`
+        - `pendingWritingRef.current = true`
+      - **فتح النافذة فعليًا** يحدث بعد انتهاء الصوت (انظر فقرة "تزامن الفتح").
+
+#### ب) من النص (SMART-FALLBACK)
+
+- عندما لا يستخدم جيميني الأداة ويكتفي بالنص، مثل:
+  - "اكتب الحرف (ت) بيدك"
+  - "نتدرّب على كتابة (م)"
+
+- في `onContentReceived`:
+
+  1. **في دور المدح (بعد نجاح كويز أو كتابة)**  
+     - إذا كان `justFinishedTaskRef.current === true`:
+       - نحمي الطفل من سيل المهام، لكن مع استثناء مهم:
+       - إذا وُجدت صيغة قوية مثل:
+         - `"اكتب الحرف (ت)"` أو `"اكتبي الحرف (ت)"`  
+         → حتى في دور المدح، نسمح بفتح نافذة الكتابة:
+         - بشرط عدم وجود كويز نشط/معلّق:
+           - `!pendingQuizRef.current && !isSelectionModalVisibleRef.current`
+         - عندها:
+           - يتم استخراج الحرف بين الأقواس.
+           - تحويله عبر `resolveArabicLetter`.
+           - تفعيل:
+             - `setWritingLetter(effectiveLetter)`
+             - `pendingWritingRef.current = true`
+
+  2. **في الدور العادي (ليس مدحًا)**
+     - نبحث عن نيّة الكتابة:
+       - وجود كلمات مثل:
+         - `"اكتب"`, `"اكتبي"`, `"حاول أن تكتب"`, `"جرب أن تكتب"`, `"نتدرب على كتابة"`
+       - ووجود ذكر لحرف:
+         - `"حرف (ع)"` أو أي شيء بين الأقواس.
+     - إذا توافرت النية وذكر الحرف:
+       - نستخرج الحرف من الأقواس.
+       - نستخدم `resolveArabicLetter` + `currentTargetLetterRef`.
+       - نفعّل `writingLetter` + `pendingWritingRef`.
+       - **مرة أخرى:** بشرط:
+         - `!pendingQuizRef.current && !isSelectionModalVisibleRef.current`
+
+#### ج) متى تظهر نافذة الكتابة على الشاشة؟
+
+- `pendingWritingRef.current` هو فقط "وعد" بفتح النافذة بعد انتهاء الكلام.
+- دالة `speakResponse` مسؤولة عن:
+  - نطق كلام المعلّمة (TTS).
+  - تشغيل "الترجمة السينمائية" (subtitles).
+  - بعد انتهاء الصوت:
+    - `arabicVoiceService` يستدعي مستمع `onFinish`:
+      - في `useEffect` في أعلى `ClassroomScreen`:
+        - `handleFinish()`:
+          - إذا كان:
+            - `pendingWritingRef.current === true`:
+              - يضبط:
+                - `setIsWritingModalVisible(true)`
+                - `pendingWritingRef.current = false`
+              - يوقف الميكروفون فورًا في وضع Live:
+                - `geminiLiveService.pauseMic()`
+              - يتم تسجيل:
+                - `✍️ Writing Modal Open: Pausing Voice Listening...`
+
+### 4️⃣ مسار نافذة الخيارات (showQuiz)
+
+#### أ) من الأداة المباشرة
+
+- عندما يرسل جيميني:
+  - `showQuiz({ question: "...", options: ["...", "..."], answer: "..." })`
+
+- في `onToolCall`:
+  - إذا كان `name === 'showQuiz'`:
+    - يضبط:
+      - `setSelectionOptions(safeArgs.options || [])`
+      - `setCorrectAnswer(safeArgs.answer)`
+      - `pendingQuizRef.current = true`
+    - لا يفتح النافذة فورًا، بل ينتظر انتهاء الكلام.
+
+#### ب) من النص (SMART-FALLBACK)
+
+- أحيانًا يكتب جيميني النص فقط:
+  - "أي كلمة تبدأ بحرف (ع)؟ هل هي (عنب) أم (موز)؟"
+
+- في `onContentReceived`:
+  - يتم البحث عن:
+    - نمط سؤال يحتوي خيارات بين أقواس.
+  - من ثم:
+    - استخراج الخيارات.
+    - تصفيتها بحيث:
+      - تتجنّب الأسماء التي تساوي حرف الدرس نفسه إن لزم.
+  - مثال:
+    - `"عِنَبْ"`, `"مَوْزْ"`
+    - يختار أول خيار كـ `fallbackAnswer` إذا لم يُحدّد صراحة.
+  - تفعيل:
+    - `setSelectionOptions(filteredOptions)`
+    - `setCorrectAnswer(fallbackAnswer)`
+    - `pendingQuizRef.current = true`
+
+#### ج) متى تظهر نافذة الكويز؟
+
+- مثل نافذة الكتابة تمامًا، الفتح مؤجّل لنهاية الكلام:
+  - بعد انتهاء TTS في `handleFinish()`:
+    - إذا:
+      - `pendingQuizRef.current === true`
+      - و **لم تكن نافذة كتابة قيد الفتح**:
+        - `setIsSelectionModalVisible(true)`
+        - `pendingQuizRef.current = false`
+        - إيقاف الميكروفون:
+          - `geminiLiveService.pauseMic()`
+        - تسجيل:
+          - `🎯 Quiz Modal Open: Pausing Voice Listening...`
+
+### 5️⃣ قواعد منع التعارض بين الأنشطة
+
+لضبط سلوك الذكاء الاصطناعي ومنع الخلط بين الأنشطة:
+
+- **عدم جمع كويز + كتابة في نفس اللحظة:**
+  - إذا كان:
+    - `pendingQuizRef.current === true`
+    - أو `isSelectionModalVisibleRef.current === true`
+  - يتم تجاهل أي:
+    - `askToWrite` (أداة مباشرة).
+    - Fallback كتابة من النص.
+
+- **حماية "دور المدح":**
+  - بعد نجاح الكويز أو الكتابة:
+    - `justFinishedTaskRef.current = true`
+  - في الدور التالي:
+    - نتجنّب تشغيل نشاط جديد آليًا إلا إذا:
+      - كان هناك أمر صريح قوي:
+        - مثل `"اكتب الحرف (ت)"`.
+
+- **تنظيف النص قبل النطق (منع نطق الأكواد):**
+  - دالة `looksLikeCodeForChild(text)` تتحقق من:
+    - وجود أحرف إنجليزية.
+    - أقواس برمجية `{ } [ ] < >`.
+    - كلمات مثل:
+      - `showQuiz`, `drawOnBoard`, `askToWrite`, `function`, `return`, `optionsCount`, `fallbackAnswer`, `question:`, `options:`, `answer:`.
+  - إذا بدا النص كأنه كود:
+    - يتم استبدال النص بالكامل بجملة عربية آمنة:
+      - مثل:  
+        `"لَدَيَّ سُؤَالٌ أَوْ نَشَاطٌ لَكَ..."`
+  - ثم يُرسَل الناتج إلى `arabicVoiceService.speak(...)`.
+
+### 6️⃣ الكلمات/الأنماط التي تستدعي كل نافذة (ملخّص)
+
+- **رسم على السبورة (المعلّمة ترسم):**
+  - Tool Call:
+    - `drawOnBoard({ item: "ع" })`
+  - أو نص يحتوي:
+    - "انظر إلى السبورة"
+    - "هذا هو حرف (ع)"
+    - حرف بين أقواس بعد سياق السبورة.
+
+- **نافذة الكتابة (الطفل يكتب):**
+  - Tool Call:
+    - `askToWrite({ letter: "م" })`
+  - أو نص يحتوي:
+    - "اكتب الحرف (ت)" / "اكتبي الحرف (ت)" (حتى في دور المدح، مع حماية الكويز).
+    - "نتدرّب على كتابة (م)"
+    - "حاول أن تكتب (س)"
+
+- **نافذة الخيارات (الكويز):**
+  - Tool Call:
+    - `showQuiz({ question, options, answer })`
+  - أو نص يحتوي:
+    - "أي كلمة تبدأ بـ حرف (ع)؟ هل هي (عنب) أم (موز)؟"
+    - أسئلة مع خيارات بين أقواس، يتم جمعها كـ options.
+
+### 7️⃣ المصدر الرئيسي للمنطق
+
+- كل هذا المنطق متمركز في:
+  - شاشة الصف:
+    - `mobile/src/screens/ClassroomScreen.js`
+  - الخدمات:
+    - `mobile/src/services/GeminiLiveService.js`
+    - `mobile/src/services/AIService.js`
+    - `mobile/src/services/ArabicVoiceService.js`
+  - المكوّنات:
+    - `mobile/src/components/ChalkboardWhiteboard.js`
+    - `mobile/src/components/HandwritingModal.js`
+
+بهذا التوثيق يمكنك فهم الصورة الكاملة:
+- كيف يتعامل الذكاء الاصطناعي مع السبورة والنوافذ.
+- ما هي الكلمات التي تشغّل كل أداة.
+- وكيف تضبط التعارضات والـ debounce لضمان تجربة تعليمية هادئة ومنطقية للطفل.

@@ -15,16 +15,13 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         write: (content, options = {}) => {
             const { count = 1, duration = 1500, type = 'any' } = options;
+            console.log('📝 [BOARD] write called', { content, options });
             setImageUri(null);
 
-            // Detection Logic: Is it a word/number or an SVG path?
-            // STRICT SVG CHECK: Must start with a path command AND contain multiple coordinates.
-            // If it's a single letter or short text, treat as TEXT even if it matches path chars indirectly.
             const isComplexSvg = typeof content === 'string' &&
-                /^[MmLlCcAaQqZz][\d\s\.\,\-]+$/.test(content.trim()) && // Must look line 'M 10 10 L 20 20'
-                content.trim().length > 20; // Assume genuine paths are longer
+                /^[MmLlCcAaQqZz][\d\s\.\,\-]+$/.test(content.trim()) &&
+                content.trim().length > 20;
 
-            // Force text for simple inputs
             const determinedIsText = type === 'text' || !isComplexSvg;
             const finalContentType = determinedIsText ? 'text' : 'path';
 
@@ -44,10 +41,12 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
             }).start();
         },
         showImage: (uri) => {
+            console.log('📝 [BOARD] showImage called', { uri });
             setDrawings([]);
             setImageUri(uri);
         },
         clear: () => {
+            console.log('📝 [BOARD] clear called');
             setDrawings([]);
             setImageUri(null);
             progress.setValue(0);

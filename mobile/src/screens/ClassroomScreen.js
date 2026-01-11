@@ -23,7 +23,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Teacher3D from '../components/avatar/Teacher3D';
 import ChalkboardWhiteboard from '../components/ChalkboardWhiteboard';
 import HandwritingModal from '../components/HandwritingModal';
-import Tts from 'react-native-tts'; // Import TTS for event listeners
 import Voice from '@react-native-voice/voice';
 import { aiService } from '../services/AIService';
 import arabicVoiceService from '../services/ArabicVoiceService';
@@ -51,9 +50,51 @@ const normalize = (text) => {
         .trim();
 };
 
+const resolveArabicLetter = (input) => {
+    if (!input) return null;
+    const raw = String(input).trim();
+    if (raw.length === 1) return raw;
+
+    const cleaned = normalize(raw).replace(/[^ء-ي0-9]/g, '');
+
+    const map = {
+        'الالف': 'أ', 'الف': 'أ',
+        'الباء': 'ب', 'باء': 'ب',
+        'التاء': 'ت', 'تاء': 'ت',
+        'الثاء': 'ث', 'ثاء': 'ث',
+        'الجيم': 'ج', 'جيم': 'ج',
+        'الحاء': 'ح', 'حاء': 'ح',
+        'الخاء': 'خ', 'خاء': 'خ',
+        'الدال': 'د', 'دال': 'د',
+        'الذال': 'ذ', 'ذال': 'ذ',
+        'الراء': 'ر', 'راء': 'ر',
+        'الزاي': 'ز', 'زاي': 'ز',
+        'السين': 'س', 'سين': 'س',
+        'الشين': 'ش', 'شين': 'ش',
+        'الصاد': 'ص', 'صاد': 'ص',
+        'الضاد': 'ض', 'ضاد': 'ض',
+        'الطاء': 'ط', 'طاء': 'ط',
+        'الظاء': 'ظ', 'ظاء': 'ظ',
+        'العين': 'ع', 'عين': 'ع',
+        'الغين': 'غ', 'غين': 'غ',
+        'الفاء': 'ف', 'فاء': 'ف',
+        'القاف': 'ق', 'قاف': 'ق',
+        'الكاف': 'ك', 'كاف': 'ك',
+        'اللام': 'ل', 'لام': 'ل',
+        'الميم': 'م', 'ميم': 'م',
+        'النون': 'ن', 'نون': 'ن',
+        'الهاء': 'ه', 'هاء': 'ه',
+        'الواو': 'و', 'واو': 'و',
+        'الياء': 'ي', 'ياء': 'ي'
+    };
+
+    return map[cleaned] || (cleaned.startsWith('ال') ? (map[cleaned.slice(2)] || null) : null);
+};
+
 const ClassroomScreen = ({ navigation, route }) => {
     const avatarRef = useRef(null);
     const whiteboardRef = useRef(null);
+    const currentTargetLetterRef = useRef(null);
 
     const [status, setStatus] = useState('initializing');
     const statusRef = useRef('initializing');
@@ -84,13 +125,19 @@ const ClassroomScreen = ({ navigation, route }) => {
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
     const [inputText, setInputText] = useState('');
 
-    // Handwriting Modal State
     const [isWritingModalVisible, setIsWritingModalVisible] = useState(false);
     const isWritingModalRef = useRef(false);
     const [writingLetter, setWritingLetter] = useState('أ');
+    const lastSmartQuizContextRef = useRef(null);
 
-    // Sync Ref with State
-    useEffect(() => { isWritingModalRef.current = isWritingModalVisible; }, [isWritingModalVisible]);
+    useEffect(() => {
+        isWritingModalRef.current = isWritingModalVisible;
+        if (isWritingModalVisible) {
+            console.log('✍️ [WRITE-MODAL] visible in classroom', { writingLetter });
+        } else {
+            console.log('✍️ [WRITE-MODAL] hidden in classroom');
+        }
+    }, [isWritingModalVisible, writingLetter]);
 
     const [drawingIntent, setDrawingIntent] = useState(null);
     const lastQuizOptionsRef = useRef(null);
@@ -123,19 +170,20 @@ const ClassroomScreen = ({ navigation, route }) => {
                 } else if (pendingQuizRef.current) {
                     setIsSelectionModalVisible(true);
                     pendingQuizRef.current = false;
+                    // IMPORTANT: Pause mic immediately for Quiz too
+                    if (isLiveModeRef.current && geminiLiveService) {
+                        geminiLiveService.pauseMic();
+                        console.log('🎯 [LIVE-MIC] Paused immediately for quiz modal');
+                    }
                 }
             }
         };
 
         const voiceListener = { onFinish: handleFinish };
         arabicVoiceService.addListener(voiceListener);
-        const ttsSub = Tts.addEventListener('tts-finish', handleFinish);
-        const ttsCancel = Tts.addEventListener('tts-cancel', handleFinish);
 
         return () => {
             arabicVoiceService.removeListener(voiceListener);
-            ttsSub.remove();
-            ttsCancel.remove();
         };
     }, []);
 
@@ -145,8 +193,14 @@ const ClassroomScreen = ({ navigation, route }) => {
     const [selectionOptions, setSelectionOptions] = useState([]);
     const [correctAnswer, setCorrectAnswer] = useState(null);
 
-    // Sync Ref with State
-    useEffect(() => { isSelectionModalVisibleRef.current = isSelectionModalVisible; }, [isSelectionModalVisible]);
+    useEffect(() => {
+        isSelectionModalVisibleRef.current = isSelectionModalVisible;
+        if (isSelectionModalVisible) {
+            console.log('🎯 [QUIZ-MODAL] opened', { options: selectionOptions, correctAnswer });
+        } else {
+            console.log('🎯 [QUIZ-MODAL] closed');
+        }
+    }, [isSelectionModalVisible, selectionOptions, correctAnswer]);
 
     // NEW: Track status of EACH option individually { "OptionA": "wrong", "OptionB": "idle" }
     const [optionStates, setOptionStates] = useState({});
@@ -201,26 +255,336 @@ const ClassroomScreen = ({ navigation, route }) => {
                 try {
                     geminiLiveService.pauseMic();
                     await new Promise(r => setTimeout(r, 200));
-
                     let cleanText = text.trim();
+                    const normalizedText = normalize(cleanText);
+                    const skipSmartTriggersThisTurn = justFinishedTaskRef.current;
+                    if (skipSmartTriggersThisTurn) {
+                        console.log('🌈 [DEBOUNCE] Skipping SMART triggers in onContentReceived for praise turn.');
+                    }
+
+                    const lessonParenMatch = normalizedText.match(/حرف[^\(]{0,24}\(([^)]+)\)/);
+                    if (lessonParenMatch?.[1]) {
+                        const lessonChar = resolveArabicLetter(lessonParenMatch[1]);
+                        if (lessonChar) {
+                            currentTargetLetterRef.current = lessonChar;
+                            console.log('📘 [LESSON] current letter set:', { lessonName: lessonParenMatch[1], lessonChar });
+                        }
+                    }
+                    const containsDrawText = /drawOnBoard/i.test(cleanText);
+                    const containsQuizText = /showQuiz/i.test(cleanText);
+                    const containsWriteText = /askToWrite/i.test(cleanText);
+                    let fallbackDrawTriggered = false;
+                    let fallbackQuizTriggered = false;
+                    let fallbackWriteTriggered = false;
+
+                    const quizDebounceOverride =
+                        skipSmartTriggersThisTurn &&
+                        (
+                            containsQuizText ||
+                            normalizedText.includes('اختبر') ||
+                            normalizedText.includes('سؤال') ||
+                            normalizedText.includes('اختر') ||
+                            normalizedText.includes('الاجابة الصحيحة') ||
+                            normalizedText.includes('الإجابة الصحيحة') ||
+                            normalizedText.includes('اختر الاجابة') ||
+                            normalizedText.includes('اختر الإجابة')
+                        );
+
+                    if ((!skipSmartTriggersThisTurn || quizDebounceOverride) && !fallbackQuizTriggered) {
+                        let effectiveText = cleanText;
+                        let effectiveNormalized = normalizedText;
+
+                        const prevQuizContext = lastSmartQuizContextRef.current;
+                        const looksLikeContinuation = cleanText.length <= 40 && !normalizedText.includes('سؤال') && !normalizedText.includes('هل هي');
+
+                        if (prevQuizContext && looksLikeContinuation) {
+                            effectiveText = `${prevQuizContext.text} ${cleanText}`;
+                            effectiveNormalized = normalize(effectiveText);
+                        }
+
+                        const hasQuizIntent =
+                            effectiveNormalized.includes('اختبر') ||
+                            effectiveNormalized.includes('سؤال') ||
+                            effectiveNormalized.includes('اختر') ||
+                            effectiveNormalized.includes('هل هي') ||
+                            effectiveNormalized.includes('ايهما') ||
+                            effectiveNormalized.includes('أيّهما') ||
+                            effectiveNormalized.includes('من بين');
+
+                        if (hasQuizIntent) {
+                            if (quizDebounceOverride) {
+                                console.log('🌈 [DEBOUNCE-OVERRIDE] SMART quiz triggered despite praise debounce.');
+                            }
+                            let searchText = effectiveText;
+                            const intentIndex = effectiveNormalized.lastIndexOf('هل هي');
+                            if (intentIndex !== -1) {
+                                searchText = effectiveText.slice(intentIndex);
+                            } else {
+                                const qIndex = effectiveText.lastIndexOf('؟');
+                                if (qIndex !== -1 && qIndex + 1 < effectiveText.length) {
+                                    searchText = effectiveText.slice(qIndex + 1);
+                                }
+                            }
+
+                            const positionMatch = effectiveNormalized.match(/اين\s+يظهر\s+حرف\s*\(([^)]+)\)\s*في\s+كلمه\s*\(([^)]+)\)/);
+                            if (positionMatch) {
+                                const letterName = (positionMatch[1] || '').trim();
+                                const wordRaw = (positionMatch[2] || '').trim();
+                                const letterChar = resolveArabicLetter(letterName) || letterName.charAt(0) || '';
+                                const normalizedWord = normalize(wordRaw).replace(/[^ء-ي]/g, '');
+                                const normalizedLetter = normalize(letterChar).replace(/[^ء-ي]/g, '');
+                                const letterIndex = normalizedLetter ? normalizedWord.indexOf(normalizedLetter) : -1;
+                                const options = ['في أول الكلمة', 'في وسط الكلمة', 'في آخر الكلمة'];
+                                let fallbackAnswer = 'في الكلمة';
+
+                                if (letterIndex === 0) {
+                                    fallbackAnswer = 'في أول الكلمة';
+                                } else if (letterIndex === normalizedWord.length - 1 && letterIndex !== -1) {
+                                    fallbackAnswer = 'في آخر الكلمة';
+                                } else if (letterIndex > 0) {
+                                    fallbackAnswer = 'في وسط الكلمة';
+                                }
+
+                                fallbackQuizTriggered = true;
+                                setSelectionOptions(options);
+                                setCorrectAnswer(fallbackAnswer);
+                                pendingQuizRef.current = true;
+                                console.log('🎯 [SMART-FALLBACK] Position quiz detected:', { letterName, letterChar, wordRaw, normalizedWord, options, fallbackAnswer });
+                                lastSmartQuizContextRef.current = null;
+                            } else {
+                                const optionsRaw = [];
+                                const parenRegex = /\(([^)]+)\)/g;
+                                let match;
+                                while ((match = parenRegex.exec(searchText)) !== null) {
+                                    const opt = (match[1] || '').trim();
+                                    if (!opt) continue;
+                                    if (opt.length > 30) continue;
+                                    if (!optionsRaw.includes(opt)) optionsRaw.push(opt);
+                                }
+
+                                const lessonLetter = currentTargetLetterRef.current || '';
+                                const filteredOptions = optionsRaw.filter(opt => {
+                                    const normalizedOpt = normalize(opt).replace(/[^ء-ي]/g, '');
+                                    if (!normalizedOpt) return false;
+                                    if (lessonLetter) {
+                                        const resolvedFromOpt = resolveArabicLetter(opt);
+                                        if (resolvedFromOpt && resolvedFromOpt === lessonLetter) {
+                                            return false;
+                                        }
+                                    }
+                                    return true;
+                                });
+
+                                if (filteredOptions.length >= 2 && filteredOptions.length <= 4) {
+                                    const fallbackAnswer = filteredOptions[0];
+                                    fallbackQuizTriggered = true;
+                                    setSelectionOptions(filteredOptions);
+                                    setCorrectAnswer(fallbackAnswer);
+                                    pendingQuizRef.current = true;
+                                    console.log('🎯 [SMART-FALLBACK] Quiz detected from text:', { optionsCount: filteredOptions.length, options: filteredOptions, fallbackAnswer });
+                                    lastSmartQuizContextRef.current = null;
+                                } else {
+                                    lastSmartQuizContextRef.current = { text: effectiveText };
+                                }
+                            }
+                        } else {
+                            lastSmartQuizContextRef.current = { text: effectiveText };
+                        }
+                    }
 
                     // 🔧 FALLBACK: Detect tool calls written as text and execute them
                     // drawOnBoard detection
                     const drawMatch = cleanText.match(/`?drawOnBoard\s*\(\s*item\s*=\s*['"]?([^'")\s]+)['"]?\s*\)`?/i);
                     if (drawMatch && drawMatch[1]) {
                         console.log('🎨 [FALLBACK] Detected drawOnBoard as text, executing:', drawMatch[1]);
-                        const item = drawMatch[1];
-                        const drawData = aiService.getDrawData(item);
+                        fallbackDrawTriggered = true;
+                        let item = drawMatch[1];
+
+                        const letterNameMap = {
+                            'alif': 'أ', 'alef': 'أ', 'ba': 'ب', 'baa': 'ب', 'ta': 'ت', 'taa': 'ت',
+                            'tha': 'ث', 'thaa': 'ث', 'jim': 'ج', 'jeem': 'ج', 'ha': 'ح', 'haa': 'ح',
+                            'kha': 'خ', 'khaa': 'خ', 'dal': 'د', 'daal': 'د', 'dhal': 'ذ', 'dhaal': 'ذ',
+                            'ra': 'ر', 'raa': 'ر', 'zay': 'ز', 'zayn': 'ز', 'seen': 'س', 'sin': 'س',
+                            'sheen': 'ش', 'shin': 'ش', 'sad': 'ص', 'saad': 'ص', 'dad': 'ض', 'daad': 'ض',
+                            'tah': 'ط', 'dhah': 'ظ', 'ayn': 'ع', 'ain': 'ع', 'ghayn': 'غ', 'ghain': 'غ',
+                            'fa': 'ف', 'faa': 'ف', 'qaf': 'ق', 'qaaf': 'ق', 'kaf': 'ك', 'kaaf': 'ك',
+                            'lam': 'ل', 'laam': 'ل', 'meem': 'م', 'mim': 'م', 'noon': 'ن', 'nun': 'ن',
+                            'hah': 'ه', 'waw': 'و', 'ya': 'ي', 'yaa': 'ي'
+                        };
+
+                        if (item.startsWith('letter_')) item = item.replace('letter_', '');
+                        const resolvedFromTool = letterNameMap[item.toLowerCase()] || item;
+
+                        let finalItem = resolvedFromTool;
+                        const currentLessonLetter = currentTargetLetterRef.current;
+
+                        if (currentLessonLetter && typeof resolvedFromTool === 'string' && resolvedFromTool.length === 1) {
+                            const normalizedLesson = normalize(currentLessonLetter).replace(/[^ء-ي]/g, '');
+                            const normalizedTool = normalize(resolvedFromTool).replace(/[^ء-ي]/g, '');
+
+                            if (normalizedLesson && normalizedTool && normalizedLesson !== normalizedTool) {
+                                console.log('🎨 [FALLBACK] drawOnBoard letter conflict detected. Using lesson letter instead.', {
+                                    toolLetter: resolvedFromTool,
+                                    lessonLetter: currentLessonLetter
+                                });
+                                finalItem = currentLessonLetter;
+                            } else {
+                                currentTargetLetterRef.current = resolvedFromTool;
+                            }
+                        }
+
+                        console.log('🎨 [FALLBACK] Resolved to:', finalItem);
+                        const drawData = aiService.getDrawData(finalItem);
                         avatarRef.current?.walkToBoard();
                         setTimeout(() => {
-                            whiteboardRef.current?.write(drawData || item, { count: 1, duration: 3000 });
+                            whiteboardRef.current?.write(drawData || finalItem, { count: 1, duration: 3000 });
                         }, 1200);
+                    }
+
+                    // 🎨 SMART FALLBACK: Detect natural language drawing intents
+                    // عندما يقول النموذج "رسمته لك على السبورة" بدون استخدام الأداة
+                    if (!drawMatch && !skipSmartTriggersThisTurn) {
+                        const normalizedText = normalize(cleanText);
+                        const drawKeywords = [
+                            'رسمت', 'سارسم', 'ارسم لك', 'على السبوره', 'على اللوح', 'انظر للسبوره', 'شكل الحرف',
+                            'انظر الى', 'هذا هو حرف', 'حرف ال', 'اللوحة', 'السبورة'
+                        ];
+                        // Also normalize input text aggressively to catching matching substrings
+                        const hasDrawIntent = drawKeywords.some(kw => normalizedText.includes(normalize(kw)));
+
+                        if (hasDrawIntent) {
+                            // استخراج اسم الحرف من النص
+                            const letterNameMap = {
+                                'الالف': 'أ', 'الف': 'أ', 'الباء': 'ب', 'باء': 'ب', 'التاء': 'ت', 'تاء': 'ت',
+                                'الثاء': 'ث', 'ثاء': 'ث', 'الجيم': 'ج', 'جيم': 'ج', 'الحاء': 'ح', 'حاء': 'ح',
+                                'الخاء': 'خ', 'خاء': 'خ', 'الدال': 'د', 'دال': 'د', 'الذال': 'ذ', 'ذال': 'ذ',
+                                'الراء': 'ر', 'راء': 'ر', 'الزاي': 'ز', 'زاي': 'ز', 'السين': 'س', 'سين': 'س',
+                                'الشين': 'ش', 'شين': 'ش', 'الصاد': 'ص', 'صاد': 'ص', 'الضاد': 'ض', 'ضاد': 'ض',
+                                'الطاء': 'ط', 'طاء': 'ط', 'الظاء': 'ظ', 'ظاء': 'ظ', 'العين': 'ع', 'عين': 'ع',
+                                'الغين': 'غ', 'غين': 'غ', 'الفاء': 'ف', 'فاء': 'ف', 'القاف': 'ق', 'قاف': 'ق',
+                                'الكاف': 'ك', 'كاف': 'ك', 'اللام': 'ل', 'لام': 'ل', 'الميم': 'م', 'ميم': 'م',
+                                'النون': 'ن', 'نون': 'ن', 'الهاء': 'ه', 'هاء': 'ه', 'الواو': 'و', 'واو': 'و',
+                                'الياء': 'ي', 'ياء': 'ي'
+                            };
+
+                            let foundLetter = null;
+
+                            // 1. البحث عن كائنات شائعة (Common Objects) أولاً
+                            const commonObjectsMap = {
+                                'تفاحة': 'apple', 'تفاحه': 'apple', 'شجرة': 'tree', 'شجره': 'tree',
+                                'بيت': 'house', 'منزل': 'house', 'سيارة': 'car', 'سياره': 'car',
+                                'كرة': 'ball', 'كره': 'ball', 'زهرة': 'flower', 'وردة': 'flower',
+                                'شمس': 'sun', 'نجمة': 'star', 'نجمه': 'star', 'وجه': 'smile', 'مبتسم': 'smile',
+                                'جمل': 'camel', 'ناقة': 'camel', 'فيل': 'elephant', 'بطة': 'duck', 'بطه': 'duck'
+                            };
+
+                            for (const [name, key] of Object.entries(commonObjectsMap)) {
+                                if (normalizedText.includes(normalize(name))) {
+                                    foundLetter = key;
+                                    console.log('🎨 [SMART-FALLBACK] Found object:', name, '->', key);
+                                    break;
+                                }
+                            }
+
+                            // 2. إذا لم نجد كائناً، نبحث عن اسم الحرف
+                            if (!foundLetter) {
+                                for (const [name, letter] of Object.entries(letterNameMap)) {
+                                    if (normalizedText.includes(normalize(name))) {
+                                        foundLetter = letter;
+                                        console.log('🎨 [SMART-FALLBACK] Found letter name:', name, '->', letter);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            // 3. البحث عن أي نص بين أقواس () أو علامات تنصيص ""
+                            // هذا يسمح بكتابة أي كلمة مثل: (أسد)، (أحبك)، "مدرسة"
+                            if (!foundLetter) {
+                                const quotedText = cleanText.match(/[\(\["'`](.*?)[\)\]"'`]/);
+                                if (quotedText && quotedText[1]) {
+                                    const extracted = quotedText[1].trim();
+                                    if (extracted.length > 0 && extracted.length < 50) {
+                                        foundLetter = extracted;
+                                        console.log('🎨 [SMART-FALLBACK] Found general text to write:', foundLetter);
+                                    }
+                                }
+                            }
+
+                            if (foundLetter) {
+                                console.log('🎨 [SMART-FALLBACK] Drawing detected letter:', foundLetter);
+                                if (typeof foundLetter === 'string' && foundLetter.length === 1) {
+                                    currentTargetLetterRef.current = foundLetter;
+                                }
+                                const drawData = aiService.getDrawData(foundLetter);
+                                avatarRef.current?.walkToBoard();
+                                setTimeout(() => {
+                                    whiteboardRef.current?.write(drawData || foundLetter, { count: 1, duration: 3000 });
+                                }, 1200);
+                                fallbackDrawTriggered = true;
+                            }
+                        }
+                    }
+
+                    if (skipSmartTriggersThisTurn && !fallbackWriteTriggered && !pendingQuizRef.current && !isSelectionModalVisibleRef.current) {
+                        const trainMatch =
+                            normalizedText.match(/نتدرب على كتابه[^\(]{0,24}\(([^)]+)\)/) ||
+                            normalizedText.match(/نتدرب على كتابة[^\(]{0,24}\(([^)]+)\)/);
+                        if (trainMatch?.[1]) {
+                            const requested = trainMatch[1];
+                            const requestedChar = resolveArabicLetter(requested);
+                            const effectiveLetter = currentTargetLetterRef.current || requestedChar || 'أ';
+                            console.log('✍️ [SMART-FALLBACK] Scheduling writing after praise:', { requested, effectiveLetter });
+                            fallbackWriteTriggered = true;
+                            setWritingLetter(effectiveLetter);
+                            pendingWritingRef.current = true;
+                        } else {
+                            const strongWriteMatch =
+                                normalizedText.match(/اكتب\s+الحرف[^\(]{0,24}\(([^)]+)\)/) ||
+                                normalizedText.match(/اكتبي\s+الحرف[^\(]{0,24}\(([^)]+)\)/);
+                            if (strongWriteMatch?.[1]) {
+                                const requested = strongWriteMatch[1];
+                                const requestedChar = resolveArabicLetter(requested);
+                                const effectiveLetter = currentTargetLetterRef.current || requestedChar || 'أ';
+                                console.log('✍️ [SMART-FALLBACK] Explicit write after praise:', { requested, effectiveLetter });
+                                fallbackWriteTriggered = true;
+                                setWritingLetter(effectiveLetter);
+                                pendingWritingRef.current = true;
+                            }
+                        }
+                    }
+
+                    if (!fallbackWriteTriggered && !skipSmartTriggersThisTurn && !fallbackQuizTriggered && !pendingQuizRef.current && !isSelectionModalVisibleRef.current) {
+                        const hasWriteIntent =
+                            normalizedText.includes('اكتب') ||
+                            normalizedText.includes('اكتبي') ||
+                            normalizedText.includes('حاول ان تكتب') ||
+                            normalizedText.includes('حاول أن تكتب') ||
+                            normalizedText.includes('جرب ان تكتب') ||
+                            normalizedText.includes('جرب أن تكتب') ||
+                            normalizedText.includes('نتدرب على كتابة') ||
+                            normalizedText.includes('نتدرّب على كتابة');
+
+                        const hasLetterMention =
+                            normalizedText.includes('حرف') ||
+                            /\(([^)]+)\)/.test(cleanText);
+
+                        if (hasWriteIntent && hasLetterMention) {
+                            const writeParenMatch = normalizedText.match(/حرف[^\(]{0,24}\(([^)]+)\)/) || normalizedText.match(/\(([^)]+)\)/);
+                            const requested = writeParenMatch?.[1] || null;
+                            const requestedChar = resolveArabicLetter(requested);
+                            const effectiveLetter = currentTargetLetterRef.current || requestedChar || 'أ';
+                            console.log('✍️ [SMART-FALLBACK] askToWrite intent detected:', { requested, effectiveLetter });
+                            fallbackWriteTriggered = true;
+                            setWritingLetter(effectiveLetter);
+                            pendingWritingRef.current = true;
+                        }
                     }
 
                     // showQuiz detection
                     const quizMatch = cleanText.match(/`?showQuiz\s*\(\s*question\s*=\s*['"]([^'"]+)['"]\s*,\s*options\s*=\s*\[([^\]]+)\]\s*,\s*answer\s*=\s*['"]([^'"]+)['"]\s*\)`?/i);
                     if (quizMatch) {
                         console.log('🎯 [FALLBACK] Detected showQuiz as text, executing...');
+                        fallbackQuizTriggered = true;
                         const question = quizMatch[1];
                         const optionsStr = quizMatch[2];
                         const answer = quizMatch[3];
@@ -232,11 +596,32 @@ const ClassroomScreen = ({ navigation, route }) => {
                     }
 
                     // askToWrite detection
-                    const writeMatch = cleanText.match(/`?askToWrite\s*\(\s*letter\s*=\s*['"]?([^'")\s]+)['"]?\s*\)`?/i);
+                    const writeMatch =
+                        cleanText.match(/`?askToWrite\s*\(\s*letter\s*=\s*['"]?([^'")\s]+)['"]?\s*\)`?/i) ||
+                        cleanText.match(/askToWrite\s*\(\s*\{\s*letter\s*:\s*['"]([^'"]+)['"]\s*\}\s*\)/i);
                     if (writeMatch && writeMatch[1]) {
-                        console.log('✍️ [FALLBACK] Detected askToWrite as text, executing:', writeMatch[1]);
-                        setWritingLetter(writeMatch[1]);
+                        const requestedLetter = writeMatch[1];
+                        const requestedChar = resolveArabicLetter(requestedLetter);
+                        const effectiveLetter = currentTargetLetterRef.current || requestedChar || 'أ';
+                        console.log('✍️ [FALLBACK] Detected askToWrite as text, executing:', { requestedLetter, effectiveLetter });
+                        fallbackWriteTriggered = true;
+                        setWritingLetter(effectiveLetter);
                         pendingWritingRef.current = true;
+                    }
+
+                    if (containsDrawText && !fallbackDrawTriggered) {
+                        console.log('🧩 [LIVE-HYBRID] drawOnBoard text detected but pattern did not match', { textSnippet: cleanText.slice(0, 120) });
+                    }
+                    if (containsQuizText && !fallbackQuizTriggered) {
+                        console.log('🧩 [LIVE-HYBRID] showQuiz text detected but pattern did not match', { textSnippet: cleanText.slice(0, 120) });
+                    }
+                    if (containsWriteText && !fallbackWriteTriggered) {
+                        console.log('🧩 [LIVE-HYBRID] askToWrite text detected but pattern did not match', { textSnippet: cleanText.slice(0, 120) });
+                    }
+
+                    if (!fallbackDrawTriggered && !fallbackQuizTriggered && !fallbackWriteTriggered &&
+                        !pendingQuizRef.current && !pendingWritingRef.current) {
+                        console.log('🧩 [LIVE-HYBRID] No tools or fallbacks detected for this turn', { textLength: cleanText.length });
                     }
 
                     // نطق النص مع تفعيل التزامن "كلمة بكلمة"
@@ -251,28 +636,42 @@ const ClassroomScreen = ({ navigation, route }) => {
                 } finally {
                     // Only resume if we aren't about to open a modal (Writing/Quiz)
                     setTimeout(() => {
-                        if (!isWritingModalRef.current && !pendingWritingRef.current && !pendingQuizRef.current) {
+                        // Check ALL modal states (Writing & Quiz) + Pending flags
+                        if (!isWritingModalRef.current && !pendingWritingRef.current &&
+                            !pendingQuizRef.current && !isSelectionModalVisibleRef.current) {
                             geminiLiveService.resumeMic();
                         } else {
-                            console.log('🔇 [LIVE-HYBRID] Keeping mic paused for pending modal');
+                            console.log('🔇 [LIVE-HYBRID] Keeping mic paused for pending/active modal');
                         }
                     }, 400);
                 }
             };
 
             geminiLiveService.onToolCall = (name, args) => {
-                console.log('🛠️ Gemini Live Action:', name, args);
+                let safeArgs = args;
+                if (typeof safeArgs === 'string') {
+                    try {
+                        safeArgs = JSON.parse(safeArgs);
+                    } catch (e) {
+                        safeArgs = {};
+                    }
+                }
+
+                console.log('🛠️ Gemini Live Action:', name, safeArgs);
 
                 if (name === 'showQuiz') {
                     console.log('🎯 [LIVE] Quiz pending - will show after speech finishes.');
-                    setSelectionOptions(args.options);
-                    setCorrectAnswer(args.answer);
+                    setSelectionOptions(Array.isArray(safeArgs.options) ? safeArgs.options : []);
+                    setCorrectAnswer(safeArgs.answer);
                     pendingQuizRef.current = true; // Use pending ref to sync with end of speech
                 }
 
                 if (name === 'drawOnBoard') {
-                    const item = args.item;
+                    const item = safeArgs.item;
                     const drawData = aiService.getDrawData(item);
+                    if (typeof item === 'string' && item.length === 1) {
+                        currentTargetLetterRef.current = item;
+                    }
                     avatarRef.current?.walkToBoard();
                     setTimeout(() => {
                         whiteboardRef.current?.write(drawData || item, { count: 1, duration: 3000 });
@@ -280,10 +679,16 @@ const ClassroomScreen = ({ navigation, route }) => {
                 }
 
                 if (name === 'askToWrite') {
-                    console.log('✍️ [LIVE] Asking to write:', args.letter);
-                    setWritingLetter(args.letter);
-                    setIsWritingModalVisible(true);
-                    pendingWritingRef.current = true; // Use pending ref if audio is playing, though modal opens immediately here
+                    if (pendingQuizRef.current || isSelectionModalVisibleRef.current) {
+                        console.log('✍️ [LIVE] askToWrite ignored because quiz is active.');
+                        return;
+                    }
+                    const requestedLetter = safeArgs.letter;
+                    const requestedChar = resolveArabicLetter(requestedLetter);
+                    const effectiveLetter = currentTargetLetterRef.current || requestedChar || 'أ';
+                    console.log('✍️ [LIVE] Asking to write:', { requestedLetter, effectiveLetter });
+                    setWritingLetter(effectiveLetter);
+                    pendingWritingRef.current = true;
                 }
             };
 
@@ -321,6 +726,7 @@ const ClassroomScreen = ({ navigation, route }) => {
 
     const handleOptionSelect = (option) => {
         // QUIZ MODE VALIDATION
+        console.log('🎯 [QUIZ-MODAL] option selected', { option, correctAnswer });
         if (correctAnswer) {
             if (option === correctAnswer) {
                 // ✅ CORRECT
@@ -461,6 +867,25 @@ const ClassroomScreen = ({ navigation, route }) => {
         }
     }, [isWritingModalVisible, isLiveMode]);
 
+    // 🆕 QUIZ MODAL MIC CONTROL (Same logic as writing)
+    useEffect(() => {
+        if (isSelectionModalVisible) {
+            console.log('🎯 Quiz Modal Open: Pausing Voice Listening...');
+            if (isLiveModeRef.current && geminiLiveService) {
+                geminiLiveService.pauseMic();
+            }
+            arabicVoiceService.cancel();
+            updateStatus('idle');
+            setIsMicActive(false);
+        } else {
+            console.log('🎯 Quiz Modal Closed: Resuming check...');
+            // Only resume if Writing Modal is NOT open (to avoid conflict)
+            if (!isWritingModalRef.current && isLiveModeRef.current && geminiLiveService && !isMutedRef.current && statusRef.current === 'idle') {
+                geminiLiveService.resumeMic();
+            }
+        }
+    }, [isSelectionModalVisible, isLiveMode]);
+
     useEffect(() => {
         initializeClassroom();
         return () => {
@@ -549,6 +974,59 @@ const ClassroomScreen = ({ navigation, route }) => {
 
 
 
+    const letterNamesForTTS = {
+        'أ': 'الألف',
+        'ا': 'الألف',
+        'ب': 'الباء',
+        'ت': 'التاء',
+        'ث': 'الثاء',
+        'ج': 'الجيم',
+        'ح': 'الحاء',
+        'خ': 'الخاء',
+        'د': 'الدال',
+        'ذ': 'الذال',
+        'ر': 'الراء',
+        'ز': 'الزاي',
+        'س': 'السين',
+        'ش': 'الشين',
+        'ص': 'الصاد',
+        'ض': 'الضاد',
+        'ط': 'الطاء',
+        'ظ': 'الظاء',
+        'ع': 'العين',
+        'غ': 'الغين',
+        'ف': 'الفاء',
+        'ق': 'القاف',
+        'ك': 'الكاف',
+        'ل': 'اللام',
+        'م': 'الميم',
+        'ن': 'النون',
+        'ه': 'الهاء',
+        'و': 'الواو',
+        'ي': 'الياء'
+    };
+
+    const looksLikeCodeForChild = (text) => {
+        if (!text) return false;
+        const base = text.trim();
+        if (!base) return false;
+        return /[A-Za-z{}[\];=<>]|["'`]{2,}|showQuiz|drawOnBoard|askToWrite|function|return|optionsCount|fallbackAnswer|options\s*:|question\s*:|answer\s*:/i.test(base);
+    };
+
+    const prepareTextForTTS = (text) => {
+        if (!text) return '';
+        let result = text;
+        result = result.replace(/حرف\s*\(\s*([\u0600-\u06FF])\s*\)/g, (m, ch) => {
+            const name = letterNamesForTTS[ch] || ch;
+            return `حرف ${name}`;
+        });
+        result = result.replace(/\(\s*([\u0600-\u06FF])\s*\)/g, (m, ch) => {
+            const name = letterNamesForTTS[ch] || ch;
+            return name;
+        });
+        return result;
+    };
+
     const speakResponse = async (response) => {
         await arabicVoiceService.cancel();
         updateStatus('speaking');
@@ -581,27 +1059,37 @@ const ClassroomScreen = ({ navigation, route }) => {
                     duration: drawContent.length > 50 ? 4000 : 2500
                 });
             }, 1200);
-        } else if (response.action !== 'practice_writing') {
-            whiteboardRef.current?.clear();
         }
 
         // 2. UNIFIED GAPLESS SPEECH 🎤 (Single-Shot Mode)
         // Using "Smart Timer" for Cinema-Style Subtitles (Robust & Fast)
         // 2. UNIFIED GAPLESS SPEECH 🎤 (Single-Shot Mode)
         // Using "Smart Timer" for Cinema-Style Subtitles (Robust & Fast)
-        const rawTtsText = (response.voiceText || response.text || "").trim(); // Keep raw for logic
+        const rawTtsText = (response.voiceText || response.text || "").trim();
         let ttsText = rawTtsText
             .replace(/^\s*<speak>/i, '').replace(/<\/speak>\s*$/i, '')
-            .replace(/[*#_~]/g, '') // Strip all markdown formatting symbols
-            .replace(/[\[\`]?\w+\(.*?\)[\]\`\.]?/g, '') // Remove function calls from speech
-            .replace(/askToWrite|drawOnBoard|showQuiz/g, '')
+            .replace(/[*#_~]/g, '')
+            // Remove any tool-like calls (even if multi-line)
+            .replace(/askToWrite\s*\([\s\S]*?\)/gi, '')
+            .replace(/showQuiz\s*\([\s\S]*?\)/gi, '')
+            .replace(/drawOnBoard\s*\([\s\S]*?\)/gi, '')
+            .replace(/askToWrite|drawOnBoard|showQuiz/gi, '')
+            .replace(/`[^`]*`/g, '')
             .trim();
+
+        const stillLooksLikeCode = looksLikeCodeForChild(ttsText);
+        if (stillLooksLikeCode) {
+            console.log('🧼 [TTS-SANITIZER] Detected residual code pattern in TTS text. Replacing with safe narration.');
+            ttsText = 'لَدَيَّ سُؤَالٌ أَوْ نَشَاطٌ لَكَ. انْظُرْ إِلَى الشَّاشَةِ وَاتَّبِعِ التَّعْلِيمَاتِ، ثُمَّ اخْتَرِ الْإِجَابَةَ الصَّحِيحَةَ أَوِ اكْتُبِ الْحَرْفَ الْمَطْلُوبَ.';
+        }
 
         // Prepare Subtitles
         const cleanFullText = ttsText
-            .replace(/<[^>]+>/g, '')  // Remove SSML tags
-            .replace(/[\[\`]?\w+\(.*?\)[\]\`\.]?/g, '') // Remove function calls like [askToWrite(...)]
-            .replace(/askToWrite|drawOnBoard|showQuiz/g, ''); // Remove stray function names
+            .replace(/<[^>]+>/g, '')
+            .replace(/askToWrite\s*\([\s\S]*?\)/gi, '')
+            .replace(/showQuiz\s*\([\s\S]*?\)/gi, '')
+            .replace(/drawOnBoard\s*\([\s\S]*?\)/gi, '')
+            .replace(/askToWrite|drawOnBoard|showQuiz/gi, '');
 
         // Granular splitting for Live Mode (word-by-word feel)
         const splitRegex = isLiveModeRef.current ? /(\s+)/ : /([.؟!،,]+\s+)/;
@@ -664,9 +1152,12 @@ const ClassroomScreen = ({ navigation, route }) => {
 
             console.log('🎬 Executing Unified Gapless Playback (Smart Timer)...');
 
-            // Just speak the clean text (google handles pauses naturally)
-            // No marks needed for audio, simpler request
-            await arabicVoiceService.speak(ttsText, {
+            const spokenPrepared = prepareTextForTTS(ttsText);
+            const spokenText = looksLikeCodeForChild(spokenPrepared)
+                ? 'لَدَيَّ سُؤَالٌ أَوْ نَشَاطٌ لَكَ. انْظُرْ إِلَى الشَّاشَةِ وَاتَّبِعِ التَّعْلِيمَاتِ، ثُمَّ اخْتَرِ الْإِجَابَةَ الصَّحِيحَةَ أَوِ اكْتُبِ الْحَرْفَ الْمَطْلُوبَ.'
+                : spokenPrepared;
+
+            await arabicVoiceService.speak(spokenText, {
                 onPlayStart: () => avatarRef.current?.startTalking(),
                 onVisemeChange: (viseme) => avatarRef.current?.speakVisually(viseme),
                 emotion: response.emotion
@@ -700,23 +1191,15 @@ const ClassroomScreen = ({ navigation, route }) => {
             console.log('🌈 [DEBOUNCE] Skipping triggers during praise turn for turn protection.');
             justFinishedTaskRef.current = false; // CONSUME THE SHIELD - it's a one-turn protection
         } else {
+            // ⚠️ DISABLED: Drawing detection here is redundant and happens too late (after speech).
+            // We now rely on onContentReceived (SMART FALLBACK) to trigger drawing immediately.
             // 1. MULTI-DRAWING DETECTION (Teacher Drawing)
-            // Extract all matches of drawOnBoard(item='...')
-            const drawMatches = [...rawTtsText.matchAll(/drawOnBoard\(item=['"]?([a-zA-Z0-9_\u0600-\u06FF]+)['"]?\)/g)];
-            const textDrawMatches = [];
-
-            // Also check for natural language drawing intents if no code matches or in addition
-            const extendedKeywords = [...drawingKeywords, 'سأقوم برسم', 'انظر للسبورة', 'لنبدا برسم', 'لنرسم', 'برسم', 'سأكتب', 'لنكتب'];
-            if (extendedKeywords.some(kw => normText.includes(normalize(kw))) && drawMatches.length === 0) {
-                const letterMatch = normText.match(/حرف\s+[\("']?([\u0600-\u06FF]+)[\)"']?/);
-                if (letterMatch && letterMatch[1]) {
-                    textDrawMatches.push(letterMatch[1]);
-                }
-            }
+            // const drawMatches = [...rawTtsText.matchAll(/drawOnBoard\(item=['"]?([a-zA-Z0-9_\u0600-\u06FF]+)['"]?\)/g)];
+            // ... (Code disabled) ...
 
             // Execute all drawings found
-            const allItemsToDraw = [...drawMatches.map(m => m[1]), ...textDrawMatches];
-            let teacherDidDraw = allItemsToDraw.length > 0;
+            const allItemsToDraw = []; // Empty prevents late drawing
+            let teacherDidDraw = false; // Prevents writing modal logic from thinking teacher just drew here
 
             allItemsToDraw.forEach((item, index) => {
                 let finalItem = item;
@@ -724,11 +1207,30 @@ const ClassroomScreen = ({ navigation, route }) => {
                 // Mapping from English/Phonetic names to Arabic characters
                 const nameMap = {
                     'الف': 'أ', 'باء': 'ب', 'تاء': 'ت', 'ثاء': 'ث', 'جيم': 'ج', 'حاء': 'ح', 'خاء': 'خ', 'دال': 'د', 'ذال': 'ذ', 'راء': 'ر', 'زاي': 'ز', 'سين': 'س', 'شين': 'ش', 'صاد': 'ص', 'ضاد': 'ض', 'طاء': 'ط', 'ظاء': 'ظ', 'عين': 'ع', 'غين': 'غ', 'فاء': 'ف', 'قاف': 'ق', 'كاف': 'ك', 'لام': 'ل', 'ميم': 'م', 'نون': 'ن', 'هاء': 'ه', 'واو': 'و', 'ياء': 'ي',
-                    // English placeholders
+                    // English letter names (used by Gemini)
+                    'alif': 'أ', 'alef': 'أ', 'ba': 'ب', 'baa': 'ب', 'ta': 'ت', 'taa': 'ت',
+                    'tha': 'ث', 'thaa': 'ث', 'jim': 'ج', 'jeem': 'ج', 'ha': 'ح', 'haa': 'ح',
+                    'kha': 'خ', 'khaa': 'خ', 'dal': 'د', 'daal': 'د', 'dhal': 'ذ', 'dhaal': 'ذ',
+                    'ra': 'ر', 'raa': 'ر', 'zay': 'ز', 'zayn': 'ز', 'seen': 'س', 'sin': 'س',
+                    'sheen': 'ش', 'shin': 'ش', 'sad': 'ص', 'saad': 'ص', 'dad': 'ض', 'daad': 'ض',
+                    'tah': 'ط', 'dhah': 'ظ', 'ayn': 'ع', 'ain': 'ع', 'ghayn': 'غ', 'ghain': 'غ',
+                    'fa': 'ف', 'faa': 'ف', 'qaf': 'ق', 'qaaf': 'ق', 'kaf': 'ك', 'kaaf': 'ك',
+                    'lam': 'ل', 'laam': 'ل', 'meem': 'م', 'mim': 'م', 'noon': 'ن', 'nun': 'ن',
+                    'hah': 'ه', 'waw': 'و', 'ya': 'ي', 'yaa': 'ي',
+                    // Single letter shortcuts
                     'a': 'أ', 'b': 'ب', 't': 'ت', 'th': 'ث', 'j': 'ج', 'h': 'ح', 'kh': 'خ', 'd': 'د', 'z': 'ز', 'r': 'ر', 's': 'س', 'sh': 'ش', 'S': 'ص', 'D': 'ض', 'T': 'ط', 'Z': 'ظ', 'E': 'ع', 'G': 'غ', 'f': 'ف', 'q': 'ق', 'k': 'ك', 'l': 'ل', 'm': 'م', 'n': 'ن', 'w': 'و', 'y': 'ي'
                 };
+
+                // الكلمات الشائعة التي يجب تجاهلها (ليست حروفاً)
+                const ignoredWords = ['على', 'علي', 'هذا', 'هذه', 'ذلك', 'تلك', 'من', 'الى', 'في', 'عن', 'ان', 'كان', 'هل', 'ما', 'لا'];
+                const cleanItem = normalize(finalItem);
+                if (ignoredWords.includes(cleanItem)) {
+                    console.log('🎨 [QUEUE-DRAW] Skipping common word:', finalItem);
+                    return; // Skip this item
+                }
+
                 if (finalItem.startsWith('letter_')) finalItem = finalItem.replace('letter_', '');
-                finalItem = nameMap[finalItem] || finalItem;
+                finalItem = nameMap[finalItem.toLowerCase()] || nameMap[finalItem] || finalItem;
 
                 console.log(`🎨 [QUEUE-DRAW] Drawing item ${index + 1}:`, finalItem);
 
@@ -758,17 +1260,24 @@ const ClassroomScreen = ({ navigation, route }) => {
                     pendingWritingRef.current = true;
 
                     const codeMatch = rawTtsText.match(/letter=['"]?([a-zA-Z0-9_\u0600-\u06FF]+)['"]?/);
+                    let effectiveLetter = null;
+
                     if (codeMatch && codeMatch[1]) {
-                        setWritingLetter(codeMatch[1]);
+                        const fromCode = resolveArabicLetter(codeMatch[1]) || codeMatch[1].charAt(0);
+                        effectiveLetter = fromCode;
                     } else {
-                        const letterMatch = fullCleanText.match(/حرف\s+([\u0600-\u06FF]+)/);
+                        const letterMatch = fullCleanText.match(/حرف\s*\(?\s*([\u0600-\u06FF]+)\s*\)?/);
                         if (letterMatch && letterMatch[1]) {
                             let extracted = letterMatch[1];
                             if (extracted === 'ألف') extracted = 'أ';
                             if (extracted === 'باء') extracted = 'ب';
-                            setWritingLetter(extracted.charAt(0));
+                            const fromText = resolveArabicLetter(extracted) || extracted.charAt(0);
+                            effectiveLetter = fromText;
                         }
                     }
+
+                    if (!effectiveLetter) effectiveLetter = currentTargetLetterRef.current || 'أ';
+                    setWritingLetter(effectiveLetter);
                 }
             }
 

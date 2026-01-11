@@ -74,16 +74,20 @@ const HandwritingModal = ({ visible, letter, onClose, onSuccess, onFailure }) =>
 
     useEffect(() => {
         if (visible) {
+            console.log('✍️ [WRITE-MODAL] opened', { letter });
             setPaths([]);
             setCurrentPath('');
             setCheckStatus('drawing');
             overlayOpacity.setValue(0);
             scaleAnim.setValue(0);
+        } else {
+            console.log('✍️ [WRITE-MODAL] closed', { letter });
         }
-    }, [visible]);
+    }, [visible, letter]);
 
     const handleClear = () => {
         if (checkStatus !== 'drawing') return;
+        console.log('✍️ [WRITE-MODAL] clear pressed');
         setPaths([]);
         setCurrentPath('');
     };
@@ -182,10 +186,12 @@ const HandwritingModal = ({ visible, letter, onClose, onSuccess, onFailure }) =>
         if (checkStatus !== 'drawing') return;
 
         if (paths.length < 1) {
+            console.log('✍️ [WRITE-MODAL] submit with no ink');
             triggerShake();
             return;
         }
 
+        console.log('✍️ [WRITE-MODAL] submit', { pathsCount: paths.length });
         setCheckStatus('checking');
 
         // Verify Logic
@@ -193,12 +199,14 @@ const HandwritingModal = ({ visible, letter, onClose, onSuccess, onFailure }) =>
 
         setTimeout(() => {
             if (isValid) {
+                console.log('✍️ [WRITE-MODAL] validation success');
                 setCheckStatus('success');
                 animateOverlay();
                 setTimeout(() => {
                     if (onSuccess) onSuccess();
                 }, 1500);
             } else {
+                console.log('✍️ [WRITE-MODAL] validation failure');
                 setCheckStatus('failure');
                 animateOverlay();
                 setTimeout(() => {
