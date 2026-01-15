@@ -1,9 +1,12 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { firebaseService } from './FirebaseService';
 
 const GOOGLE_API_KEY = 'AIzaSyDHjklmJ4NjIP0qFspkVxzmNRhS1qkAYOE';
 
-// مكتبة رسومات الحروف العربية
+// ============================================================================
+// 🔤 مكتبة رسومات الحروف العربية - الشكل المنفصل (Isolated Form)
+// ============================================================================
 const ARABIC_ALPHABET_PATHS = {
     'أ': 'M 60 80 L 60 30 M 60 15 A 3 3 0 1 1 60 14.9',
     'ا': 'M 60 80 L 60 20',
@@ -43,7 +46,46 @@ const ARABIC_ALPHABET_PATHS = {
     'آ': 'M 60 80 L 60 20 M 50 10 Q 60 5 70 10',
 };
 
+// ============================================================================
+// 🔤 أشكال الحروف في مواضع مختلفة (Initial, Medial, Final)
+// ============================================================================
+const ARABIC_LETTER_FORMS = {
+    // حرف الباء
+    'ب_بداية': 'M 10 50 Q 50 70 90 50 L 100 50 M 50 80 A 3 3 0 1 1 50 79.9',  // بـ
+    'ب_وسط': 'M 10 50 L 100 50 M 55 80 A 3 3 0 1 1 55 79.9',                    // ـبـ
+    'ب_نهاية': 'M 10 50 Q 50 70 90 50 M 50 80 A 3 3 0 1 1 50 79.9',             // ـب
+    
+    // حرف التاء
+    'ت_بداية': 'M 10 60 Q 50 80 90 60 L 100 60 M 40 45 A 2 2 0 1 1 40 44.9 M 70 45 A 2 2 0 1 1 70 44.9',
+    'ت_وسط': 'M 10 60 L 100 60 M 45 45 A 2 2 0 1 1 45 44.9 M 65 45 A 2 2 0 1 1 65 44.9',
+    'ت_نهاية': 'M 10 60 Q 50 80 90 60 M 40 45 A 2 2 0 1 1 40 44.9 M 70 45 A 2 2 0 1 1 70 44.9',
+    
+    // حرف العين
+    'ع_بداية': 'M 80 30 L 50 50 Q 30 70 50 85 L 100 85',
+    'ع_وسط': 'M 10 50 L 30 50 Q 50 60 70 50 L 100 50',
+    'ع_نهاية': 'M 10 50 L 50 50 Q 30 70 50 85 Q 70 95 90 80',
+    
+    // حرف الميم
+    'م_بداية': 'M 10 70 Q 50 90 80 70 L 100 70',
+    'م_وسط': 'M 10 60 L 30 60 Q 50 75 70 60 L 100 60',
+    'م_نهاية': 'M 10 70 Q 50 90 80 70 Q 90 50 70 40 Q 50 30 40 50',
+    
+    // حرف السين
+    'س_بداية': 'M 10 70 Q 25 50 40 70 Q 55 50 70 70 L 100 70',
+    'س_وسط': 'M 10 65 Q 30 50 50 65 Q 70 50 90 65 L 100 65',
+    'س_نهاية': 'M 10 70 Q 25 50 40 70 Q 55 50 70 70 Q 85 50 100 70',
+    
+    // حرف النون
+    'ن_بداية': 'M 10 60 Q 50 80 90 60 L 100 60 M 50 40 A 3 3 0 1 1 50 39.9',
+    'ن_وسط': 'M 10 60 L 100 60 M 55 40 A 3 3 0 1 1 55 39.9',
+    'ن_نهاية': 'M 10 60 Q 50 80 90 60 M 50 40 A 3 3 0 1 1 50 39.9',
+};
+
+// ============================================================================
+// 🔢 الأرقام العربية والإنجليزية
+// ============================================================================
 const DRAWING_LIBRARY = {
+    // أرقام إنجليزية
     '1': 'M 60 20 L 60 80 M 50 80 L 70 80',
     '2': 'M 30 30 Q 60 10 80 30 Q 90 50 60 60 L 30 80 L 90 80',
     '3': 'M 30 25 Q 60 15 80 30 Q 90 45 60 55 Q 90 65 80 80 Q 60 95 30 85',
@@ -54,6 +96,8 @@ const DRAWING_LIBRARY = {
     '8': 'M 60 50 Q 30 35 40 20 Q 60 5 80 20 Q 95 40 60 50 Q 25 60 35 80 Q 55 95 80 80 Q 95 65 60 50',
     '9': 'M 40 75 Q 70 80 80 50 Q 85 20 55 15 Q 25 15 25 40 Q 25 60 55 60 Q 80 55 80 40',
     '0': 'M 60 20 Q 30 20 30 50 Q 30 80 60 80 Q 90 80 90 50 Q 90 20 60 20',
+    
+    // أرقام عربية
     '١': 'M 60 20 L 60 80',
     '٢': 'M 40 30 Q 60 20 80 40 Q 70 60 50 80',
     '٣': 'M 35 25 Q 55 20 70 35 Q 75 50 55 55 Q 75 60 70 75 Q 55 85 35 80',
@@ -65,49 +109,227 @@ const DRAWING_LIBRARY = {
     '٩': 'M 70 80 A 25 25 0 1 1 70 30',
     '٠': 'M 60 80 A 3 3 0 1 1 60 79.9',
 
-    // --- SHAPES & FUN OBJECTS ---
-    'apple': 'M 50 40 Q 30 20 20 50 Q 20 80 50 90 Q 80 80 80 50 Q 70 20 50 40 M 50 40 Q 50 20 60 10', // apple / تفاحة
-    'tree': 'M 50 70 L 50 95 M 50 70 Q 20 70 20 40 Q 20 10 50 10 Q 80 10 80 40 Q 80 70 50 70', // tree / شجرة
-    'house': 'M 20 50 L 50 20 L 80 50 L 80 90 L 20 90 L 20 50 M 40 90 L 40 70 L 60 70 L 60 90', // house / بيت
-    'car': 'M 20 60 L 30 40 L 70 40 L 80 60 L 90 60 L 90 80 L 10 80 L 10 60 L 20 60 M 30 80 A 5 5 0 1 0 30 80 M 70 80 A 5 5 0 1 0 70 80', // car / سيارة
-    'ball': 'M 50 50 A 30 30 0 1 1 50 49.9 M 20 50 L 80 50 M 50 20 L 50 80', // ball / كرة
-    'flower': 'M 50 50 A 10 10 0 1 0 50 50 M 50 40 Q 50 10 70 20 Q 50 40 50 50 M 50 60 Q 50 90 30 80 Q 50 60 50 50 M 60 50 Q 90 50 80 30 Q 60 50 50 50 M 40 50 Q 10 50 20 70 Q 40 50 50 50 M 50 90 L 50 100', // flower / زهرة
-    'sun': 'M 50 50 A 15 15 0 1 1 50 49.9 M 50 30 L 50 10 M 50 70 L 50 90 M 70 50 L 90 50 M 30 50 L 10 50 M 65 35 L 80 20 M 35 65 L 20 80 M 65 65 L 80 80 M 35 35 L 20 20', // sun / شمس
-    'star': 'M 50 20 L 60 40 L 85 40 L 65 55 L 75 80 L 50 65 L 25 80 L 35 55 L 15 40 L 40 40 L 50 20', // star / نجمة
-    'smile': 'M 50 50 A 30 30 0 1 1 50 49.9 M 35 40 A 3 3 0 1 1 35 39.9 M 65 40 A 3 3 0 1 1 65 39.9 M 35 65 Q 50 80 65 65', // smile / وجه سعيد
+    // ============================================================================
+    // ➕ الرموز الرياضية
+    // ============================================================================
+    '+': 'M 50 20 L 50 80 M 20 50 L 80 50',                          // زائد
+    '-': 'M 20 50 L 80 50',                                          // ناقص
+    '×': 'M 25 25 L 75 75 M 75 25 L 25 75',                          // ضرب
+    '÷': 'M 20 50 L 80 50 M 50 25 A 3 3 0 1 1 50 24.9 M 50 75 A 3 3 0 1 1 50 74.9', // قسمة
+    '=': 'M 20 40 L 80 40 M 20 60 L 80 60',                          // يساوي
+    '<': 'M 70 20 L 30 50 L 70 80',                                  // أصغر من
+    '>': 'M 30 20 L 70 50 L 30 80',                                  // أكبر من
+    '≤': 'M 70 15 L 30 45 L 70 75 M 20 85 L 80 85',                  // أصغر أو يساوي
+    '≥': 'M 30 15 L 70 45 L 30 75 M 20 85 L 80 85',                  // أكبر أو يساوي
+    '≠': 'M 20 40 L 80 40 M 20 60 L 80 60 M 30 20 L 70 80',          // لا يساوي
+    '%': 'M 25 25 A 5 5 0 1 1 25 24.9 M 75 75 A 5 5 0 1 1 75 74.9 M 30 70 L 70 30', // نسبة مئوية
+    '√': 'M 20 50 L 35 65 L 50 20 L 80 20',                          // جذر تربيعي
+    '∞': 'M 30 50 Q 40 30 50 50 Q 60 70 70 50 Q 60 30 50 50 Q 40 70 30 50', // ما لا نهاية
+
+    // ============================================================================
+    // 🎨 الأشكال والرسومات
+    // ============================================================================
+    'apple': 'M 50 40 Q 30 20 20 50 Q 20 80 50 90 Q 80 80 80 50 Q 70 20 50 40 M 50 40 Q 50 20 60 10',
+    'تفاحة': 'M 50 40 Q 30 20 20 50 Q 20 80 50 90 Q 80 80 80 50 Q 70 20 50 40 M 50 40 Q 50 20 60 10',
+    'tree': 'M 50 70 L 50 95 M 50 70 Q 20 70 20 40 Q 20 10 50 10 Q 80 10 80 40 Q 80 70 50 70',
+    'شجرة': 'M 50 70 L 50 95 M 50 70 Q 20 70 20 40 Q 20 10 50 10 Q 80 10 80 40 Q 80 70 50 70',
+    'house': 'M 20 50 L 50 20 L 80 50 L 80 90 L 20 90 L 20 50 M 40 90 L 40 70 L 60 70 L 60 90',
+    'بيت': 'M 20 50 L 50 20 L 80 50 L 80 90 L 20 90 L 20 50 M 40 90 L 40 70 L 60 70 L 60 90',
+    'منزل': 'M 20 50 L 50 20 L 80 50 L 80 90 L 20 90 L 20 50 M 40 90 L 40 70 L 60 70 L 60 90',
+    'car': 'M 20 60 L 30 40 L 70 40 L 80 60 L 90 60 L 90 80 L 10 80 L 10 60 L 20 60 M 30 80 A 5 5 0 1 0 30 80 M 70 80 A 5 5 0 1 0 70 80',
+    'سيارة': 'M 20 60 L 30 40 L 70 40 L 80 60 L 90 60 L 90 80 L 10 80 L 10 60 L 20 60 M 30 80 A 5 5 0 1 0 30 80 M 70 80 A 5 5 0 1 0 70 80',
+    'ball': 'M 50 50 A 30 30 0 1 1 50 49.9 M 20 50 L 80 50 M 50 20 L 50 80',
+    'كرة': 'M 50 50 A 30 30 0 1 1 50 49.9 M 20 50 L 80 50 M 50 20 L 50 80',
+    'flower': 'M 50 50 A 10 10 0 1 0 50 50 M 50 40 Q 50 10 70 20 Q 50 40 50 50 M 50 60 Q 50 90 30 80 Q 50 60 50 50 M 60 50 Q 90 50 80 30 Q 60 50 50 50 M 40 50 Q 10 50 20 70 Q 40 50 50 50 M 50 90 L 50 100',
+    'زهرة': 'M 50 50 A 10 10 0 1 0 50 50 M 50 40 Q 50 10 70 20 Q 50 40 50 50 M 50 60 Q 50 90 30 80 Q 50 60 50 50 M 60 50 Q 90 50 80 30 Q 60 50 50 50 M 40 50 Q 10 50 20 70 Q 40 50 50 50 M 50 90 L 50 100',
+    'وردة': 'M 50 50 A 10 10 0 1 0 50 50 M 50 40 Q 50 10 70 20 Q 50 40 50 50 M 50 60 Q 50 90 30 80 Q 50 60 50 50 M 60 50 Q 90 50 80 30 Q 60 50 50 50 M 40 50 Q 10 50 20 70 Q 40 50 50 50 M 50 90 L 50 100',
+    'sun': 'M 50 50 A 15 15 0 1 1 50 49.9 M 50 30 L 50 10 M 50 70 L 50 90 M 70 50 L 90 50 M 30 50 L 10 50 M 65 35 L 80 20 M 35 65 L 20 80 M 65 65 L 80 80 M 35 35 L 20 20',
+    'شمس': 'M 50 50 A 15 15 0 1 1 50 49.9 M 50 30 L 50 10 M 50 70 L 50 90 M 70 50 L 90 50 M 30 50 L 10 50 M 65 35 L 80 20 M 35 65 L 20 80 M 65 65 L 80 80 M 35 35 L 20 20',
+    'star': 'M 50 20 L 60 40 L 85 40 L 65 55 L 75 80 L 50 65 L 25 80 L 35 55 L 15 40 L 40 40 L 50 20',
+    'نجمة': 'M 50 20 L 60 40 L 85 40 L 65 55 L 75 80 L 50 65 L 25 80 L 35 55 L 15 40 L 40 40 L 50 20',
+    'smile': 'M 50 50 A 30 30 0 1 1 50 49.9 M 35 40 A 3 3 0 1 1 35 39.9 M 65 40 A 3 3 0 1 1 65 39.9 M 35 65 Q 50 80 65 65',
+    'وجه': 'M 50 50 A 30 30 0 1 1 50 49.9 M 35 40 A 3 3 0 1 1 35 39.9 M 65 40 A 3 3 0 1 1 65 39.9 M 35 65 Q 50 80 65 65',
+    'مبتسم': 'M 50 50 A 30 30 0 1 1 50 49.9 M 35 40 A 3 3 0 1 1 35 39.9 M 65 40 A 3 3 0 1 1 65 39.9 M 35 65 Q 50 80 65 65',
 };
+
+// ============================================================================
+// 🛠️ دوال مساعدة للتحويل والمعالجة
+// ============================================================================
+
+/**
+ * تحويل الأرقام الإنجليزية إلى عربية
+ */
+function convertToArabicNumerals(text) {
+    if (!text) return text;
+    const map = {
+        '0': '٠', '1': '١', '2': '٢', '3': '٣', '4': '٤',
+        '5': '٥', '6': '٦', '7': '٧', '8': '٨', '9': '٩'
+    };
+    return text.replace(/[0-9]/g, digit => map[digit] || digit);
+}
+
+/**
+ * تحويل الأرقام العربية إلى إنجليزية (للمعالجة الداخلية)
+ */
+function convertToEnglishNumerals(text) {
+    if (!text) return text;
+    const map = {
+        '٠': '0', '١': '1', '٢': '2', '٣': '3', '٤': '4',
+        '٥': '5', '٦': '6', '٧': '7', '٨': '8', '٩': '9'
+    };
+    return text.replace(/[٠-٩]/g, digit => map[digit] || digit);
+}
+
+/**
+ * تحويل الرموز الرياضية إلى نص عربي للنطق
+ */
+function convertMathSymbolsToArabic(text) {
+    if (!text) return text;
+    return text
+        .replace(/\+/g, ' زَائِدْ ')
+        .replace(/\-/g, ' نَاقِصْ ')
+        .replace(/×/g, ' ضَرْبْ ')
+        .replace(/÷/g, ' قِسْمَةْ ')
+        .replace(/=/g, ' يُسَاوِي ')
+        .replace(/</g, ' أَصْغَرْ مِنْ ')
+        .replace(/>/g, ' أَكْبَرْ مِنْ ')
+        .replace(/≤/g, ' أَصْغَرْ أَوْ يُسَاوِي ')
+        .replace(/≥/g, ' أَكْبَرْ أَوْ يُسَاوِي ')
+        .replace(/≠/g, ' لَا يُسَاوِي ')
+        .replace(/%/g, ' بِالْمِئَةْ ')
+        .replace(/√/g, ' جَذْرْ ')
+        .replace(/∞/g, ' مَا لَا نِهَايَةْ ')
+        .replace(/\s+/g, ' ')
+        .trim();
+}
 
 class AIService {
     constructor() {
         this.context = [];
-        this.userProfile = { name: '', grade: '', gradeId: 'Grade1', interests: [], gradeVerified: false };
+        this.userProfile = {
+            name: '',
+            grade: '',
+            gradeId: 'Grade1',
+            interests: [],
+            gradeVerified: false,
+            // نظام الذاكرة الموسع
+            lastLesson: '',          // آخر درس (مثل: "حرف العين")
+            lastTopic: '',           // آخر موضوع (مثل: "كتابة الحرف")
+            totalSessions: 0,        // عدد الجلسات الكلي
+            lastSessionDate: null,   // تاريخ آخر جلسة
+            isFirstTime: true        // هل هذه أول مرة؟
+        };
     }
 
     async loadMemory() {
         try {
+            // 1. Load from Local Storage (Fast)
             const data = await AsyncStorage.getItem('nora_memory');
             if (data) {
                 const parsed = JSON.parse(data);
                 this.context = parsed.context || [];
                 if (parsed.userProfile) {
                     this.userProfile = { ...this.userProfile, ...parsed.userProfile };
+                    console.log('📱 [Memory] Loaded local profile:', this.userProfile.name);
                 }
             }
-        } catch (e) { }
+
+            // 2. Load from Firebase (Cloud Sync)
+            // لجلب أحدث مستوى ومعلومات للطالب من قاعدة البيانات
+            const cloudProfile = await firebaseService.getStudentData();
+            if (cloudProfile) {
+                console.log('☁️ [Memory] Found cloud profile, syncing...');
+                this.userProfile = { ...this.userProfile, ...cloudProfile };
+                
+                // Update local storage with synced data
+                await AsyncStorage.setItem('nora_memory', JSON.stringify({
+                    context: this.context.slice(-20),
+                    userProfile: this.userProfile
+                }));
+            }
+        } catch (e) {
+            console.error('❌ [Memory] Error loading memory:', e);
+        }
     }
 
     async saveMemory() {
         try {
+            // 1. Save locally
             await AsyncStorage.setItem('nora_memory', JSON.stringify({
                 context: this.context.slice(-20),
                 userProfile: this.userProfile
             }));
-        } catch (e) { }
+
+            // 2. Save to Firebase Database
+            // حفظ معلومات الطالب ومستواه في قاعدة البيانات
+            await firebaseService.saveStudentData(this.userProfile);
+        } catch (e) {
+            console.error('❌ [Memory] Error saving memory:', e);
+        }
     }
 
     setUserProfile(profile) {
         this.userProfile = { ...this.userProfile, ...profile };
         this.saveMemory();
+    }
+
+    /**
+     * تحديث معلومات الجلسة الحالية
+     */
+    updateSession(updates = {}) {
+        const now = new Date().toISOString();
+        this.userProfile = {
+            ...this.userProfile,
+            ...updates,
+            lastSessionDate: now,
+            isFirstTime: false
+        };
+        this.saveMemory();
+        console.log('📊 [SESSION] Updated:', this.userProfile);
+    }
+
+    /**
+     * بدء جلسة جديدة
+     */
+    startNewSession() {
+        this.userProfile.totalSessions = (this.userProfile.totalSessions || 0) + 1;
+        this.userProfile.lastSessionDate = new Date().toISOString();
+        this.saveMemory();
+        console.log(`🎓 [SESSION] Started session #${this.userProfile.totalSessions}`);
+    }
+
+    /**
+     * تحديث آخر درس
+     */
+    updateLastLesson(lesson, topic = '') {
+        this.userProfile.lastLesson = lesson;
+        if (topic) this.userProfile.lastTopic = topic;
+        this.saveMemory();
+        console.log(`📚 [LESSON] Updated: ${lesson}${topic ? ` - ${topic}` : ''}`);
+    }
+
+    /**
+     * الحصول على سياق الترحيب لـ Gemini
+     */
+    getGreetingContext() {
+        const { name, grade, isFirstTime, lastLesson, totalSessions, lastSessionDate } = this.userProfile;
+        
+        if (isFirstTime) {
+            return {
+                type: 'first_visit',
+                message: `هذه أول مرة تلتقي فيها بالطفل ${name || 'البطل'}. رحبي به بحرارة وقولي له: "أَهْلًا وَسَهْلًا بِكَ يَا ${name || 'بطل'}! لَقَدْ عَرَفْتُ أَنَّكَ بَطَلٌ فِي ${grade || 'الصَّفِّ الأول'}، هَذَا رَائِع! أَنَا الْمُعَلِّمَةُ نُورَا، وَهَذا فصلنا الدراسي المذهل. قُلْ لِي يَا بَطَل.. بِمَاذَا تُحِبُّ أَنْ نَبْدَأَ رِحْلَتَنَا الْيَوْمَ؟" ثم انتظري رده.`
+            };
+        } else {
+            const sessionInfo = `هذه الجلسة رقم ${totalSessions || 1} مع الطفل ${name || 'البطل'}.`;
+            const lessonInfo = lastLesson ? 
+                `آخر درس كان: "${lastLesson}". ذكّريه بذلك بطريقة ودودة.` : 
+                'لم يكمل أي درس بعد.';
+            
+            return {
+                type: 'returning_visit',
+                message: `${sessionInfo} ${lessonInfo} رحبي به بحرارة وقولي شيئاً مثل: "أَهْلا بِعَوْدَتِكَ يَا ${name || 'بطل'}! لَقَدْ اشْتَقْتُ اليكْ! ${lastLesson ? `هَلْ تَذْكُرُ أَيْنَ كُنَّا؟ لَقَدْ وَصَلْنَا فِي الْمَرَّةِ الْمَاضِيَةِ إِلَى ${lastLesson}. مَا رَأْيُكَ؟ هَلْ نُكْمِلُ درسنا عن ${lastLesson} لِتُصْبِحَ مُحْتَرِفًا فِيهِ، أَمْ تُرِيدُ أَنْ نَبْدَأَ شَيْئًا جَدِيدًا الْيَوْمَ؟` : 'مَاذَا تُحِبُّ أَنْ نَتَعَلَّمَ الْيَوْمَ؟'}" ثم انتظري رده. نوّعي في الرسالة قليلاً في كل مرة لتكون طبيعية.`
+            };
+        }
     }
 
     cleanForTTS(text) {
@@ -124,22 +346,63 @@ class AIService {
 
     getDrawData(key) {
         if (!key) return null;
-        let normalizedKey = key.trim().replace(/[ًٌٍَُِّْ]/g, '').toLowerCase();
+        
+        // تحويل الأرقام الإنجليزية إلى عربية تلقائياً
+        let processedKey = convertToArabicNumerals(key);
+        let normalizedKey = processedKey.trim().replace(/[ًٌٍَُِّْ]/g, '').toLowerCase();
 
-        // Arabic-to-English Mapping & English Code Handling
+        // ============================================================================
+        // 1️⃣ التحقق من أشكال الحروف المختلفة (بداية/وسط/نهاية)
+        // ============================================================================
+        if (ARABIC_LETTER_FORMS[normalizedKey]) {
+            console.log(`📐 [DRAW] Found letter form: ${normalizedKey}`);
+            return ARABIC_LETTER_FORMS[normalizedKey];
+        }
+
+        // ============================================================================
+        // 2️⃣ التحقق من الرموز الرياضية مباشرة
+        // ============================================================================
+        if (DRAWING_LIBRARY[normalizedKey]) {
+            console.log(`🔢 [DRAW] Found math symbol or number: ${normalizedKey}`);
+            return DRAWING_LIBRARY[normalizedKey];
+        }
+
+        // ============================================================================
+        // 3️⃣ معالجة الكلمات العربية (قاموس الترجمة)
+        // ============================================================================
         const dictionary = {
-            'تفاحة': 'apple', 'تفاحه': 'apple',
-            'شجرة': 'tree', 'شجره': 'tree',
-            'بيت': 'house', 'منزل': 'house',
-            'سيارة': 'car', 'سياره': 'car',
-            'كرة': 'ball', 'كره': 'ball',
-            'زهرة': 'flower', 'وردة': 'flower',
-            'شمس': 'sun',
-            'نجمة': 'star', 'نجمه': 'star',
-            'وجه': 'smile', 'مبتسم': 'smile'
+            'تفاحة': 'تفاحة', 'تفاحه': 'تفاحة',
+            'شجرة': 'شجرة', 'شجره': 'شجرة',
+            'بيت': 'بيت', 'منزل': 'منزل',
+            'سيارة': 'سيارة', 'سياره': 'سيارة',
+            'كرة': 'كرة', 'كره': 'كرة',
+            'زهرة': 'زهرة', 'وردة': 'وردة',
+            'شمس': 'شمس',
+            'نجمة': 'نجمة', 'نجمه': 'نجمة',
+            'وجه': 'وجه', 'مبتسم': 'مبتسم',
+            // إضافة الكلمات الإنجليزية
+            'apple': 'تفاحة',
+            'tree': 'شجرة',
+            'house': 'بيت',
+            'car': 'سيارة',
+            'ball': 'كرة',
+            'flower': 'زهرة',
+            'sun': 'شمس',
+            'star': 'نجمة',
+            'smile': 'وجه'
         };
 
-        // Handle "letter_x" format from Gemini
+        if (dictionary[normalizedKey]) {
+            const mappedKey = dictionary[normalizedKey];
+            if (DRAWING_LIBRARY[mappedKey]) {
+                console.log(`🎨 [DRAW] Found shape via dictionary: ${normalizedKey} → ${mappedKey}`);
+                return DRAWING_LIBRARY[mappedKey];
+            }
+        }
+
+        // ============================================================================
+        // 4️⃣ معالجة صيغة "letter_x" من Gemini
+        // ============================================================================
         if (normalizedKey.startsWith('letter_')) {
             const char = normalizedKey.split('_')[1];
             const englishToArabic = {
@@ -159,10 +422,15 @@ class AIService {
                 'laam': 'ل', 'lam': 'ل', 'meem': 'م', 'mim': 'م', 'noon': 'ن', 'nun': 'ن',
                 'hah': 'ه', 'waw': 'و', 'yaa': 'ي', 'ya': 'ي'
             };
-            if (englishToArabic[char]) return englishToArabic[char];
+            if (englishToArabic[char]) {
+                console.log(`🔤 [DRAW] Converted letter_${char} → ${englishToArabic[char]}`);
+                return englishToArabic[char];
+            }
         }
 
-        // Also check for standalone letter names (without letter_ prefix)
+        // ============================================================================
+        // 5️⃣ معالجة أسماء الحروف بالإنجليزية (بدون letter_)
+        // ============================================================================
         const letterNames = {
             'alif': 'أ', 'alef': 'أ', 'baa': 'ب', 'ba': 'ب', 'taa': 'ت', 'ta': 'ت',
             'thaa': 'ث', 'tha': 'ث', 'jeem': 'ج', 'jim': 'ج', 'haa': 'ح', 'ha': 'ح',
@@ -174,27 +442,57 @@ class AIService {
             'laam': 'ل', 'lam': 'ل', 'meem': 'م', 'mim': 'م', 'noon': 'ن', 'nun': 'ن',
             'hah': 'ه', 'waw': 'و', 'yaa': 'ي', 'ya': 'ي'
         };
-        if (letterNames[normalizedKey]) return letterNames[normalizedKey];
-
-        if (dictionary[normalizedKey]) {
-            normalizedKey = dictionary[normalizedKey];
+        if (letterNames[normalizedKey]) {
+            console.log(`🔤 [DRAW] Converted letter name: ${normalizedKey} → ${letterNames[normalizedKey]}`);
+            return letterNames[normalizedKey];
         }
 
-        // FORCE PLAIN TEXT FOR LETTERS
-        if (/^[\u0600-\u06FF]$/.test(normalizedKey)) return normalizedKey;
+        // ============================================================================
+        // 6️⃣ إرجاع الحروف العربية المفردة كنص (بدون SVG)
+        // ============================================================================
+        if (/^[\u0600-\u06FF]$/.test(normalizedKey)) {
+            console.log(`✍️ [DRAW] Single Arabic letter as text: ${normalizedKey}`);
+            return normalizedKey;
+        }
 
-        // Try exact match first
-        // if (ARABIC_ALPHABET_PATHS[normalizedKey]) return ARABIC_ALPHABET_PATHS[normalizedKey]; // DEPRECATED for letters
-        if (DRAWING_LIBRARY[normalizedKey]) return DRAWING_LIBRARY[normalizedKey];
-
-        // Try first character (only if it's a single Arabic letter)
+        // ============================================================================
+        // 7️⃣ محاولة أخيرة: البحث في المكتبات بالحرف الأول
+        // ============================================================================
         if (normalizedKey.length === 1) {
             const firstChar = normalizedKey.charAt(0);
-            if (ARABIC_ALPHABET_PATHS[firstChar]) return ARABIC_ALPHABET_PATHS[firstChar];
-            if (DRAWING_LIBRARY[firstChar]) return DRAWING_LIBRARY[firstChar];
+            if (ARABIC_ALPHABET_PATHS[firstChar]) {
+                console.log(`📝 [DRAW] Found in ARABIC_ALPHABET_PATHS: ${firstChar}`);
+                return ARABIC_ALPHABET_PATHS[firstChar];
+            }
+            if (DRAWING_LIBRARY[firstChar]) {
+                console.log(`📝 [DRAW] Found in DRAWING_LIBRARY: ${firstChar}`);
+                return DRAWING_LIBRARY[firstChar];
+            }
         }
 
+        console.log(`⚠️ [DRAW] No drawing found for: ${key}, returning null (will render as text)`);
         return null; // Return null so the UI can decide (e.g. render as text)
+    }
+
+    /**
+     * تحضير النص للنطق: تحويل الرموز الرياضية والأرقام إلى نص عربي
+     */
+    prepareTextForSpeech(text) {
+        if (!text) return '';
+        
+        // 1. تحويل الرموز الرياضية إلى كلمات عربية
+        let processedText = convertMathSymbolsToArabic(text);
+        
+        // 2. تحويل الأرقام الإنجليزية إلى عربية (لنطق أفضل)
+        processedText = convertToArabicNumerals(processedText);
+        
+        // 3. تنظيف النص من الأكواد والرموز غير المرغوبة
+        processedText = this.cleanForTTS(processedText);
+        
+        console.log(`🎙️ [TTS-PREP] Original: "${text}"`);
+        console.log(`🎙️ [TTS-PREP] Prepared: "${processedText}"`);
+        
+        return processedText;
     }
 
     async chat(userMessage) {
@@ -230,7 +528,7 @@ class AIService {
 
             return {
                 text: aiRawText,
-                voiceText: this.cleanForTTS(aiRawText)
+                voiceText: this.prepareTextForSpeech(aiRawText)
             };
         } catch (error) {
             console.error('❌ [AIService] Chat Error:', error.message || error);
@@ -239,4 +537,17 @@ class AIService {
     }
 }
 
+// ============================================================================
+// 📤 تصدير الخدمة والدوال المساعدة
+// ============================================================================
 export const aiService = new AIService();
+
+// تصدير الدوال المساعدة للاستخدام في ملفات أخرى
+export {
+    convertToArabicNumerals,
+    convertToEnglishNumerals,
+    convertMathSymbolsToArabic,
+    ARABIC_ALPHABET_PATHS,
+    ARABIC_LETTER_FORMS,
+    DRAWING_LIBRARY
+};

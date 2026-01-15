@@ -89,7 +89,20 @@ const styles = StyleSheet.create({
     },
 });
 
+import { subscriptionService } from './src/services/SubscriptionService';
+
 function App() {
+    React.useEffect(() => {
+        const initServices = async () => {
+            await subscriptionService.init();
+        };
+        initServices();
+
+        return () => {
+            subscriptionService.shutdown();
+        };
+    }, []);
+
     return (
         <ErrorBoundary>
             <SafeAreaProvider>

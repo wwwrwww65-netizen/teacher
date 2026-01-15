@@ -221,6 +221,9 @@ const ClassroomScreen = ({ navigation, route }) => {
                 await Voice.destroy();
             } catch (e) { }
 
+            // 🧠 بدء جلسة جديدة في الذاكرة
+            aiService.startNewSession();
+
             await geminiLiveService.connect(userName, aiService.userProfile.grade);
 
             // Force Audio Unlock
@@ -268,6 +271,9 @@ const ClassroomScreen = ({ navigation, route }) => {
                         if (lessonChar) {
                             currentTargetLetterRef.current = lessonChar;
                             console.log('📘 [LESSON] current letter set:', { lessonName: lessonParenMatch[1], lessonChar });
+                            
+                            // 🧠 تحديث الذاكرة بآخر درس
+                            aiService.updateLastLesson(`حرف ${lessonParenMatch[1]}`, 'تعلم الحروف');
                         }
                     }
                     const containsDrawText = /drawOnBoard/i.test(cleanText);
@@ -949,10 +955,15 @@ const ClassroomScreen = ({ navigation, route }) => {
                 // Better: Check a boolean flag if we saved it.
                 const isVerified = userData.gradeVerified || (grade !== 'KG1');
 
-                aiService.setUserProfile(name, grade, userData.interests);
+                // 3. Update AI Service with FULL profile
+                aiService.setUserProfile({
+                    ...userData, // Load everything (lastLesson, sessions, etc)
+                    name: name,
+                    grade: grade,
+                    gradeVerified: isVerified
+                });
 
-                // Force set verification status in AI Service (we need to add this method or property setter)
-                aiService.userProfile.gradeVerified = isVerified;
+                console.log('✅ AI Service Profile Sync:', aiService.userProfile);
 
                 // 4. Save back cleaned version if changed
                 if (name !== userData.name) {

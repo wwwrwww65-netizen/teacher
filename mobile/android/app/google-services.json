@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "369507394696",
+    "project_id": "tiny-teacher-36af2",
+    "storage_bucket": "tiny-teacher-36af2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369507394696:android:b9b08b74c15ea29dbbab3d",
+        "android_client_info": {
+          "package_name": "com.tinyteacher"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBmFV8lOLRz6WTnHTbjWbnNs1BjEhJuMts"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

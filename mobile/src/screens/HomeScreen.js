@@ -5,14 +5,35 @@ import SmartBackground from '../components/SmartBackground';
 import Card from '../components/Card';
 import { theme } from '../config/theme';
 import { lessons } from '../data/lessons';
+import SubscriptionModal from '../components/SubscriptionModal';
+import { subscriptionService } from '../services/SubscriptionService';
 
 const HomeScreen = ({ navigation }) => {
     const [user, setUser] = useState(null);
+    const [isSubscribed, setIsSubscribed] = useState(false);
+    const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
     useEffect(() => {
         console.log('🏠 HomeScreen Mounted');
         loadUser();
+        checkSubscription();
+
+        subscriptionService.onSubscriptionChange = (status) => {
+            setIsSubscribed(status);
+            if (status) {
+                setShowSubscriptionModal(false);
+            }
+        };
+
+        return () => {
+            subscriptionService.onSubscriptionChange = null;
+        };
     }, []);
+
+    const checkSubscription = async () => {
+        const subscribed = await subscriptionService.checkSubscriptionStatus();
+        setIsSubscribed(subscribed);
+    };
 
     const loadUser = async () => {
         const userData = await AsyncStorage.getItem('user');
@@ -29,6 +50,11 @@ const HomeScreen = ({ navigation }) => {
     return (
         <SmartBackground type="sky">
             <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+            
+            <SubscriptionModal 
+                visible={showSubscriptionModal} 
+                onClose={() => setShowSubscriptionModal(false)} 
+            />
 
             {/* Header */}
             <View style={styles.header}>
@@ -36,12 +62,24 @@ const HomeScreen = ({ navigation }) => {
                     <Text style={styles.greeting}>مرحباً، {user?.name || 'طالب'}! 👋</Text>
                     <Text style={styles.subtitle}>جاهز للتعلم اليوم؟</Text>
                 </View>
-                <TouchableOpacity
-                    style={styles.avatar}
-                    onPress={() => navigation.navigate('Profile')}
-                >
-                    <Text style={styles.avatarText}>{user?.avatar || '👤'}</Text>
-                </TouchableOpacity>
+                
+                <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+                    {!isSubscribed && (
+                        <TouchableOpacity 
+                            style={styles.premiumButton}
+                            onPress={() => setShowSubscriptionModal(true)}
+                        >
+                            <Text style={styles.premiumButtonText}>💎 اشترك</Text>
+                        </TouchableOpacity>
+                    )}
+                    
+                    <TouchableOpacity
+                        style={styles.avatar}
+                        onPress={() => navigation.navigate('Profile')}
+                    >
+                        <Text style={styles.avatarText}>{user?.avatar || '👤'}</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
 
             {/* Progress Card */}
@@ -277,6 +315,23 @@ const styles = StyleSheet.create({
     lessonLevel: {
         fontSize: theme.fontSize.xs,
         color: theme.colors.textSecondary,
+    },
+    premiumButton: {
+        backgroundColor: '#FFD700', // Gold
+        paddingHorizontal: 15,
+        paddingVertical: 8,
+        borderRadius: 20,
+        marginRight: 10,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+    },
+    premiumButtonText: {
+        color: '#000',
+        fontWeight: 'bold',
+        fontSize: 14,
     },
 });
 
