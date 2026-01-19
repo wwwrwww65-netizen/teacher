@@ -78,17 +78,22 @@ const StudentSetupScreen = ({ navigation }) => {
         }
 
         try {
-            // Save for ClassroomScreen (AI Context)
+            // 1. Prepare User Data
             const userProfile = {
                 name: name.trim(),
-                grade: selectedGrade.label, // Use friendly label
+                grade: selectedGrade.label,
                 gradeId: selectedGrade.id,
                 gradeVerified: true,
-                interests: []
+                interests: [],
+                isFirstTime: true // Explicitly set as first time for AI greeting
             };
-            await AsyncStorage.setItem('userProfile', JSON.stringify(userProfile));
 
-            // Save for HomeScreen (UI Display)
+            // 2. Save via AIService (Handles Firebase Sync + Memory)
+            // This ensures data goes to: Local Storage ('nora_memory') AND Firebase ('students/{id}')
+            const { aiService } = require('../services/AIService'); 
+            aiService.setUserProfile(userProfile);
+
+            // 3. Save for Legacy UI components (HomeScreen displays)
             const userData = {
                 name: name.trim(),
                 level: 1,
@@ -99,7 +104,7 @@ const StudentSetupScreen = ({ navigation }) => {
             await AsyncStorage.setItem('user', JSON.stringify(userData));
 
             // Navigate to Home
-            console.log('✅ Student Setup Complete:', userProfile);
+            console.log('✅ Student Setup Complete & Synced:', userProfile);
             navigation.replace('Home');
         } catch (error) {
             console.error('Failed to save setup:', error);

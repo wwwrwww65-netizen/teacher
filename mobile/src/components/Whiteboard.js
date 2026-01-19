@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useImperativeHandle, forwardRef } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
-import Svg, { Path, Rect } from 'react-native-svg';
+import Svg, { Path, Rect, Text as SvgText } from 'react-native-svg';
 import Animated, {
     useAnimatedProps,
     useSharedValue,
@@ -17,7 +17,9 @@ const BOARD_HEIGHT = 200;
 
 const Whiteboard = forwardRef((props, ref) => {
     const [paths, setPaths] = useState([]);
+    const [texts, setTexts] = useState([]); // 🆕 Store text elements
     const [currentPath, setCurrentPath] = useState(null);
+    const [currentText, setCurrentText] = useState(null); // 🆕 Current text being displayed
 
     // Animation value for the current drawing path (0 to 1)
     const drawProgress = useSharedValue(0);
@@ -25,23 +27,42 @@ const Whiteboard = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         // Method to start writing text/drawing
         write: (svgPathData, duration = 2000) => {
-            // Reset progress
-            drawProgress.value = 0;
-            setCurrentPath(svgPathData);
+            // 🔍 Check if it's an SVG path or plain text
+            const isSvgPath = typeof svgPathData === 'string' && 
+                              (svgPathData.startsWith('M ') || svgPathData.startsWith('m '));
+            
+            if (isSvgPath) {
+                // 🎨 Draw SVG path
+                drawProgress.value = 0;
+                setCurrentPath(svgPathData);
+                setCurrentText(null);
 
-            // Animate drawing
-            drawProgress.value = withTiming(1, {
-                duration: duration,
-                easing: Easing.linear
-            }, (finished) => {
-                if (finished) {
-                    runOnJS(finalizePath)(svgPathData);
-                }
-            });
+                // Animate drawing
+                drawProgress.value = withTiming(1, {
+                    duration: duration,
+                    easing: Easing.linear
+                }, (finished) => {
+                    if (finished) {
+                        runOnJS(finalizePath)(svgPathData);
+                    }
+                });
+            } else {
+                // 📝 Display plain text
+                console.log('📝 [BOARD] Displaying text:', svgPathData);
+                setCurrentText(svgPathData);
+                setCurrentPath(null);
+                
+                // Auto-finalize text after duration
+                setTimeout(() => {
+                    finalizeText(svgPathData);
+                }, duration);
+            }
         },
         clear: () => {
             setPaths([]);
+            setTexts([]);
             setCurrentPath(null);
+            setCurrentText(null);
             drawProgress.value = 0;
         }
     }));
@@ -50,6 +71,11 @@ const Whiteboard = forwardRef((props, ref) => {
         setPaths(prev => [...prev, pathData]);
         setCurrentPath(null);
         drawProgress.value = 0;
+    };
+    
+    const finalizeText = (textData) => {
+        setTexts(prev => [...prev, textData]);
+        setCurrentText(null);
     };
 
     const animatedProps = useAnimatedProps(() => {
@@ -70,7 +96,7 @@ const Whiteboard = forwardRef((props, ref) => {
                     {/* Existing Paths (Already drawn) */}
                     {paths.map((d, index) => (
                         <Path
-                            key={index}
+                            key={`path-${index}`}
                             d={d}
                             stroke="#2c3e50"
                             strokeWidth="3"
@@ -78,6 +104,22 @@ const Whiteboard = forwardRef((props, ref) => {
                             strokeLinecap="round"
                             strokeLinejoin="round"
                         />
+                    ))}
+                    
+                    {/* Existing Texts (Already displayed) */}
+                    {texts.map((txt, index) => (
+                        <SvgText
+                            key={`text-${index}`}
+                            x={BOARD_WIDTH / 2}
+                            y={BOARD_HEIGHT / 2}
+                            fontSize="80"
+                            fontWeight="bold"
+                            fill="#2c3e50"
+                            textAnchor="middle"
+                            alignmentBaseline="central"
+                        >
+                            {txt}
+                        </SvgText>
                     ))}
 
                     {/* Current Animating Path */}
@@ -91,6 +133,21 @@ const Whiteboard = forwardRef((props, ref) => {
                             strokeLinejoin="round"
                             animatedProps={animatedProps}
                         />
+                    )}
+                    
+                    {/* Current Text */}
+                    {currentText && (
+                        <SvgText
+                            x={BOARD_WIDTH / 2}
+                            y={BOARD_HEIGHT / 2}
+                            fontSize="80"
+                            fontWeight="bold"
+                            fill="#2c3e50"
+                            textAnchor="middle"
+                            alignmentBaseline="central"
+                        >
+                            {currentText}
+                        </SvgText>
                     )}
                 </Svg>
             </View>

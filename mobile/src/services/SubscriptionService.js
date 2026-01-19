@@ -1,10 +1,12 @@
 import Purchases from 'react-native-purchases';
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { firebaseService } from './FirebaseService';
 
-// RevenueCat API Keys (سنحتاج لإنشاء حساب مجاني على revenuecat.com)
+// RevenueCat API Keys
 const REVENUECAT_API_KEY = {
-    android: 'YOUR_GOOGLE_API_KEY', // ستحصل عليه من لوحة تحكم RevenueCat
-    ios: 'YOUR_APPLE_API_KEY'
+    android: 'test_SlnfOQIzwtfAVFIpotTUsRTHQJQ',
+    ios: 'test_SlnfOQIzwtfAVFIpotTUsRTHQJQ'
 };
 
 class SubscriptionService {
@@ -15,16 +17,27 @@ class SubscriptionService {
 
     async init() {
         try {
-            // تهيئة RevenueCat - معطل مؤقتاً حتى يتم إضافة API Key
-            // await Purchases.configure({
-            //     apiKey: REVENUECAT_API_KEY.android,
-            //     appUserID: await this.getUserId()
-            // });
+            // 1. Fetch Remote Config
+            const config = await firebaseService.getAppConfig();
+            
+            // 2. Determine Keys
+            const rcKeyAndroid = config?.api_keys?.revenuecat_android || REVENUECAT_API_KEY.android;
+            const rcKeyIOS = config?.api_keys?.revenuecat_ios || REVENUECAT_API_KEY.ios;
+            
+            const apiKey = Platform.OS === 'ios' ? rcKeyIOS : rcKeyAndroid;
+
+            // تهيئة RevenueCat
+            await Purchases.configure({
+                apiKey: apiKey,
+                appUserID: await this.getUserId(),
+                // تعطيل الرسائل التلقائية لتجنب خطأ BillingWrapper
+                shouldShowInAppMessagesAutomatically: false
+            });
 
             // التحقق من حالة الاشتراك
             await this.checkSubscriptionStatus();
 
-            console.log('✅ [Subscription] Service initialized (RevenueCat disabled)');
+            console.log('✅ [Subscription] RevenueCat initialized successfully');
         } catch (err) {
             console.warn('❌ [Subscription] Init error:', err);
         }

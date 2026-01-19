@@ -314,10 +314,14 @@ class AIService {
     getGreetingContext() {
         const { name, grade, isFirstTime, lastLesson, totalSessions, lastSessionDate } = this.userProfile;
         
+        console.log('👋 [GREETING] Getting greeting context:', { name, grade, isFirstTime, lastLesson, totalSessions });
+        
         if (isFirstTime) {
+            const message = `أَهْلًا وَسَهْلًا بِكَ يَا ${name || 'بطل'}! لَقَدْ عَرَفْتُ أَنَّكَ بَطَلٌ فِي ${grade || 'الصَّفِّ الأول'}، هَذَا رَائِع! أَنَا الْمُعَلِّمَةُ نُورَا، وَهَذَا فُصُلُنَا الْدِّرَاسِيُّ الْمُذهِلُ. كَيْفَ تُحِبُّ أَنْ نَبْدَأَ رِحْلَتَنَا الْيَوْمَ؟`;
+            console.log('👋 [GREETING] First visit greeting:', message);
             return {
                 type: 'first_visit',
-                message: `هذه أول مرة تلتقي فيها بالطفل ${name || 'البطل'}. رحبي به بحرارة وقولي له: "أَهْلًا وَسَهْلًا بِكَ يَا ${name || 'بطل'}! لَقَدْ عَرَفْتُ أَنَّكَ بَطَلٌ فِي ${grade || 'الصَّفِّ الأول'}، هَذَا رَائِع! أَنَا الْمُعَلِّمَةُ نُورَا، وَهَذا فصلنا الدراسي المذهل. قُلْ لِي يَا بَطَل.. بِمَاذَا تُحِبُّ أَنْ نَبْدَأَ رِحْلَتَنَا الْيَوْمَ؟" ثم انتظري رده.`
+                message: message
             };
         } else {
             const sessionInfo = `هذه الجلسة رقم ${totalSessions || 1} مع الطفل ${name || 'البطل'}.`;
@@ -325,9 +329,11 @@ class AIService {
                 `آخر درس كان: "${lastLesson}". ذكّريه بذلك بطريقة ودودة.` : 
                 'لم يكمل أي درس بعد.';
             
+            const message = `${sessionInfo} ${lessonInfo} أَهْلاً بِعَوْدَتِكَ يَا ${name || 'بطل'}! لَقَدْ اشْتَقْتُ إليكْ! ${lastLesson ? `هَلْ تَذْكُرُ أَيْنَ كُنَّا؟ لَقَدْ وَصَلْنَا فِي الْمَرَّةِ الْمَاضِيَةِ إِلَى ${lastLesson}. مَا رَأْيُكَ؟ هَلْ نُكْمِلُ الْدَّرْسَ الْيَوْمَ؟` : 'مَاذَا تُحِبُّ أَنْ نَتَعَلَّمَ الْيَوْمَ؟'}`;
+            console.log('👋 [GREETING] Returning visit greeting:', message);
             return {
                 type: 'returning_visit',
-                message: `${sessionInfo} ${lessonInfo} رحبي به بحرارة وقولي شيئاً مثل: "أَهْلا بِعَوْدَتِكَ يَا ${name || 'بطل'}! لَقَدْ اشْتَقْتُ اليكْ! ${lastLesson ? `هَلْ تَذْكُرُ أَيْنَ كُنَّا؟ لَقَدْ وَصَلْنَا فِي الْمَرَّةِ الْمَاضِيَةِ إِلَى ${lastLesson}. مَا رَأْيُكَ؟ هَلْ نُكْمِلُ درسنا عن ${lastLesson} لِتُصْبِحَ مُحْتَرِفًا فِيهِ، أَمْ تُرِيدُ أَنْ نَبْدَأَ شَيْئًا جَدِيدًا الْيَوْمَ؟` : 'مَاذَا تُحِبُّ أَنْ نَتَعَلَّمَ الْيَوْمَ؟'}" ثم انتظري رده. نوّعي في الرسالة قليلاً في كل مرة لتكون طبيعية.`
+                message: message
             };
         }
     }

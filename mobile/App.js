@@ -90,11 +90,13 @@ const styles = StyleSheet.create({
 });
 
 import { subscriptionService } from './src/services/SubscriptionService';
+import geminiLiveService from './src/services/GeminiLiveService';
 
 function App() {
     React.useEffect(() => {
         const initServices = async () => {
             await subscriptionService.init();
+            geminiLiveService.initializeWarmUpConnection();
         };
         initServices();
 

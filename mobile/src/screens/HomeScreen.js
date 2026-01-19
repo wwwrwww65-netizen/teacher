@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, StatusBar, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import SmartBackground from '../components/SmartBackground';
 import Card from '../components/Card';
 import { theme } from '../config/theme';
 import { lessons } from '../data/lessons';
@@ -12,11 +11,47 @@ const HomeScreen = ({ navigation }) => {
     const [user, setUser] = useState(null);
     const [isSubscribed, setIsSubscribed] = useState(false);
     const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+    
+    // 🎨 Animated Background - Multiple layers
+    const animatedValue1 = useRef(new Animated.Value(0)).current;
+    const animatedValue2 = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         console.log('🏠 HomeScreen Mounted');
         loadUser();
         checkSubscription();
+
+        // 🌈 Start gradient animations (different speeds)
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(animatedValue1, {
+                    toValue: 1,
+                    duration: 4000, // ⚡ أسرع
+                    useNativeDriver: false,
+                }),
+                Animated.timing(animatedValue1, {
+                    toValue: 0,
+                    duration: 4000,
+                    useNativeDriver: false,
+                }),
+            ])
+        ).start();
+
+        // Layer 2 - slower
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(animatedValue2, {
+                    toValue: 1,
+                    duration: 6000,
+                    useNativeDriver: false,
+                }),
+                Animated.timing(animatedValue2, {
+                    toValue: 0,
+                    duration: 6000,
+                    useNativeDriver: false,
+                }),
+            ])
+        ).start();
 
         subscriptionService.onSubscriptionChange = (status) => {
             setIsSubscribed(status);
@@ -47,9 +82,26 @@ const HomeScreen = ({ navigation }) => {
         return (user.points % 100) / 100;
     };
 
+    // 🎨 Animated colors - more contrast
+    const backgroundColor1 = animatedValue1.interpolate({
+        inputRange: [0, 0.5, 1],
+        outputRange: ['#0f0c29', '#302b63', '#0f0c29'] // Deep purple to blue
+    });
+
+    const backgroundColor2 = animatedValue2.interpolate({
+        inputRange: [0, 0.5, 1],
+        outputRange: ['#24243e', '#0f0c29', '#24243e'] // Overlay layer
+    });
+
     return (
-        <SmartBackground type="sky">
-            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+        <View style={{ flex: 1 }}>
+            {/* 🌈 Animated Background - Layer 1 */}
+            <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: backgroundColor1 }]} />
+            
+            {/* 🌈 Animated Background - Layer 2 (overlay) */}
+            <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: backgroundColor2, opacity: 0.5 }]} />
+
+            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
             
             <SubscriptionModal 
                 visible={showSubscriptionModal} 
@@ -161,10 +213,11 @@ const HomeScreen = ({ navigation }) => {
                                 </View>
                             </View>
                         </Card>
-                    ))}
+                    ))
+                }
                 </View>
             </ScrollView>
-        </SmartBackground>
+        </View>
     );
 };
 
@@ -175,26 +228,40 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: theme.spacing.lg,
         paddingTop: StatusBar.currentHeight ? StatusBar.currentHeight + 20 : 50,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)', // 🌑 أغمق للوضوح
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+        shadowColor: '#FFFFFF',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
     },
     greeting: {
         fontSize: theme.fontSize.xl,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
+        fontWeight: 'bold',
+        color: '#FFFFFF', // ⚪ أبيض
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 5,
     },
     subtitle: {
         fontSize: theme.fontSize.md,
-        color: theme.colors.textSecondary,
+        color: 'rgba(255, 255, 255, 0.95)',
         marginTop: theme.spacing.xs,
     },
     avatar: {
         width: 50,
         height: 50,
-        borderRadius: theme.borderRadius.round,
-        backgroundColor: theme.colors.primary,
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, 0.25)', // ❄️ ثلجي
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 2,
-        borderColor: '#fff',
+        borderColor: '#FFFFFF',
+        shadowColor: '#FFFFFF',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
         elevation: 5
     },
     avatarText: {
@@ -203,7 +270,16 @@ const styles = StyleSheet.create({
     progressCard: {
         marginHorizontal: theme.spacing.lg,
         marginBottom: theme.spacing.lg,
-        backgroundColor: 'rgba(255,255,255,0.95)'
+        backgroundColor: 'rgba(0, 0, 0, 0.5)', // 🌑 أغمق للوضوح
+        borderWidth: 2,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: 20,
+        padding: 20,
+        shadowColor: '#FFFFFF',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.6,
+        shadowRadius: 15,
+        elevation: 10
     },
     progressHeader: {
         flexDirection: 'row',
@@ -213,31 +289,40 @@ const styles = StyleSheet.create({
     },
     levelText: {
         fontSize: theme.fontSize.lg,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        textShadowColor: 'rgba(135, 206, 235, 0.8)',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
     },
     pointsText: {
         fontSize: theme.fontSize.sm,
-        color: theme.colors.textSecondary,
+        color: 'rgba(255, 255, 255, 0.9)',
         marginTop: theme.spacing.xs,
     },
     trophy: {
         fontSize: 40,
     },
     progressBar: {
-        height: 8,
-        backgroundColor: theme.colors.border,
-        borderRadius: theme.borderRadius.round,
+        height: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: 10,
         overflow: 'hidden',
         marginBottom: theme.spacing.sm,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.5)',
     },
     progressFill: {
         height: '100%',
-        backgroundColor: theme.colors.primary,
+        backgroundColor: '#FFD700', // 🌟 ذهبي
+        shadowColor: '#FFD700',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 1,
+        shadowRadius: 10,
     },
     progressText: {
         fontSize: theme.fontSize.xs,
-        color: theme.colors.textSecondary,
+        color: 'rgba(255, 255, 255, 0.9)',
         textAlign: 'center',
     },
     content: {
@@ -248,10 +333,13 @@ const styles = StyleSheet.create({
     },
     sectionTitle: {
         fontSize: theme.fontSize.lg,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
         marginHorizontal: theme.spacing.lg,
         marginBottom: theme.spacing.md,
+        textShadowColor: 'rgba(135, 206, 235, 0.6)',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 8,
     },
     quickActions: {
         flexDirection: 'row',
@@ -261,26 +349,43 @@ const styles = StyleSheet.create({
     quickAction: {
         flex: 1,
         aspectRatio: 1,
-        borderRadius: theme.borderRadius.lg,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
-        ...theme.shadows.md,
+        backgroundColor: 'rgba(0, 0, 0, 0.4)', // 🌑 أغمق للوضوح
         borderWidth: 2,
-        borderColor: '#fff'
+        borderColor: 'rgba(255, 255, 255, 0.4)',
+        shadowColor: '#FFFFFF',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.7,
+        shadowRadius: 15,
+        elevation: 8
     },
     quickActionIcon: {
         fontSize: 40,
         marginBottom: theme.spacing.sm,
     },
     quickActionText: {
-        color: theme.colors.textLight,
+        color: '#FFFFFF',
         fontSize: theme.fontSize.sm,
-        fontWeight: theme.fontWeight.semibold,
+        fontWeight: 'bold',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
     },
     lessonCard: {
         marginHorizontal: theme.spacing.lg,
         marginBottom: theme.spacing.md,
-        backgroundColor: 'rgba(255,255,255,0.95)'
+        backgroundColor: 'rgba(0, 0, 0, 0.45)', // 🌑 أغمق للوضوح
+        borderWidth: 2,
+        borderColor: 'rgba(255, 255, 255, 0.3)',
+        borderRadius: 15,
+        padding: 15,
+        shadowColor: '#FFFFFF',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.5,
+        shadowRadius: 12,
+        elevation: 6
     },
     lessonContent: {
         flexDirection: 'row',
@@ -295,13 +400,13 @@ const styles = StyleSheet.create({
     },
     lessonTitle: {
         fontSize: theme.fontSize.md,
-        fontWeight: theme.fontWeight.bold,
-        color: theme.colors.text,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
         marginBottom: theme.spacing.xs,
     },
     lessonDescription: {
         fontSize: theme.fontSize.sm,
-        color: theme.colors.textSecondary,
+        color: 'rgba(255, 255, 255, 0.85)',
         marginBottom: theme.spacing.sm,
     },
     lessonMeta: {
@@ -310,28 +415,33 @@ const styles = StyleSheet.create({
     },
     lessonDuration: {
         fontSize: theme.fontSize.xs,
-        color: theme.colors.textSecondary,
+        color: 'rgba(255, 255, 255, 0.8)',
     },
     lessonLevel: {
         fontSize: theme.fontSize.xs,
-        color: theme.colors.textSecondary,
+        color: 'rgba(255, 255, 255, 0.8)',
     },
     premiumButton: {
-        backgroundColor: '#FFD700', // Gold
+        backgroundColor: 'rgba(255, 215, 0, 0.3)', // 🌟 ذهبي شفاف
         paddingHorizontal: 15,
         paddingVertical: 8,
         borderRadius: 20,
         marginRight: 10,
-        elevation: 3,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
+        borderWidth: 2,
+        borderColor: '#FFD700',
+        shadowColor: '#FFD700',
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.8,
+        shadowRadius: 10,
+        elevation: 5,
     },
     premiumButtonText: {
-        color: '#000',
+        color: '#FFFFFF',
         fontWeight: 'bold',
         fontSize: 14,
+        textShadowColor: 'rgba(255, 215, 0, 0.8)',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 5,
     },
 });
 

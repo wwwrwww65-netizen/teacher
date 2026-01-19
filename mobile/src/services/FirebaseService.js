@@ -74,6 +74,29 @@ class FirebaseService {
             console.error('❌ [Firebase] Error updating student level:', error);
         }
     }
+
+    /**
+     * استرجاع إعدادات التطبيق (المفاتيح، التعليمات، التوجيهات)
+     * Retrieves global app configuration (API keys, System Prompts)
+     */
+    async getAppConfig() {
+        try {
+            const doc = await firestore().collection('app_config').doc('global_settings').get();
+            if (doc.exists) {
+                const data = doc.data();
+                console.log('✅ [Firebase] App config QUERY SUCCESS!');
+                console.log('📋 [Firebase] Loaded API Keys for:', Object.keys(data.api_keys || {}));
+                console.log('🧠 [Firebase] AI Model set to:', data.ai_settings?.model_name);
+                return data;
+            } else {
+                console.log('⚠️ [Firebase] No remote config found, using defaults.');
+                return null;
+            }
+        } catch (error) {
+            console.error('❌ [Firebase] Error getting app config:', error);
+            return null;
+        }
+    }
 }
 
 export const firebaseService = new FirebaseService();

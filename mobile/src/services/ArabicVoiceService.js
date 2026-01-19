@@ -6,6 +6,7 @@ import RNFS from 'react-native-fs';
 import SoundPlayer from 'react-native-sound-player';
 import { generateVisemeTimeline } from '../utils/arabicVisemes';
 import { GOOGLE_API_KEY } from '../config/constants';
+import { firebaseService } from './FirebaseService';
 
 class ArabicVoiceService {
     constructor() {
@@ -27,19 +28,46 @@ class ArabicVoiceService {
                     this.currentSpeakResolve = null;
                 }
             });
+            
+            // Fetch API Key dynamically
+            const config = await firebaseService.getAppConfig();
+            this.apiKey = config?.api_keys?.google_gemini || GOOGLE_API_KEY;
+            
             this.isInitialized = true;
         } catch (error) {
             console.error('❌ Error initializing voice service:', error);
         }
     }
 
+    // 🔧 Helper: تنظيف ومعالجة النص لتحسين النطق
+    _preprocessText(text) {
+        if (!text) return "";
+        let processed = text;
+
+        // 1. إزالة التشكيل من الحرف الأخير قبل علامات الوقف لضمان "الوقف بالسكون"
+        // يحذف الفتحة/الضمة/الكسرة/التنوين إذا جاءت قبل ؟ ! . ،
+        // مثال: "الْيَوْمَ؟" تصبح "الْيَوْم؟" فينطقها "الْيَوْمْ"
+        processed = processed.replace(/[\u064B-\u065F]+(?=\s*[؟?!.,])/g, '');
+
+        // 2. معالجة علامات الترقيم (تقليل الوقت ليكون طبيعياً أكثر)
+        processed = processed.replace(/([.?!؟])/g, '$1 <break time="200ms"/>'); 
+        processed = processed.replace(/([،,])/g, '$1 <break time="100ms"/>');
+
+        return processed;
+    }
+
     async fetchGoogleTTS(text, retryCount = 0) {
-        const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_API_KEY}`;
-        const ssmlText = text.startsWith('<speak>') ? text : `<speak>${text}</speak>`;
+        const key = this.apiKey || GOOGLE_API_KEY;
+        const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${key}`;
+        
+        // ✨ تطبيق المعالجة المسبقة
+        const cleanText = this._preprocessText(text.replace(/<[^>]+>/g, '')); 
+        const ssmlText = `<speak>${cleanText}</speak>`;
+
         const body = {
             input: { ssml: ssmlText },
             voice: { languageCode: 'ar-XA', name: 'ar-XA-Chirp3-HD-Sulafat', ssmlGender: 'FEMALE' },
-            audioConfig: { audioEncoding: 'MP3', speakingRate: 1.0, pitch: 0.0, volumeGainDb: 0.0 }
+            audioConfig: { audioEncoding: 'MP3', speakingRate: 1.0, pitch: 0.0, volumeGainDb: 0.0 } // ⚡ عودة للسرعة الطبيعية
         };
         try {
             const response = await axios.post(url, body, { timeout: 15000 });
@@ -81,13 +109,29 @@ class ArabicVoiceService {
     async speak(text, options = {}) {
         await this.initialize();
         try {
-            const audioContent = await this.fetchGoogleTTS(text);
+            console.log('🔊 [TEACHER-SPEAK] Teacher starting to speak:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
+            
+            // ⚡ تحسين: استخدام الصوت المُحمّل مسبقاً إن وجد
+            let audioContent;
+            if (options.preloadedAudio) {
+                console.log('⚡ [TTS-FAST] Using preloaded audio!');
+                audioContent = options.preloadedAudio;
+            } else {
+                console.log('⏱️ [TTS-SLOW] Fetching audio now (no preload)...');
+                audioContent = await this.fetchGoogleTTS(text);
+            }
+            
             console.log('📊 [TTS-DEBUG] Audio Size:', audioContent?.length);
             const path = await this.prepareAudioFile(audioContent);
-            return await this.playAudioFile(path, text, options);
+            
+            console.log('🔊 [TEACHER-SPEAK] Teacher audio prepared, starting playback...');
+            const result = await this.playAudioFile(path, text, options);
+            console.log('🔊 [TEACHER-SPEAK] Teacher finished speaking');
+            return result;
         } catch (error) {
             console.log('🎤 [TTS] Fallback to System TTS');
             Tts.speak(text.replace(/<[^>]+>/g, ''));
+            console.log('🔊 [TEACHER-SPEAK] Teacher spoke via fallback TTS');
             return true;
         }
     }
