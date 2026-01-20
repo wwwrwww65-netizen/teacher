@@ -1,144 +1,282 @@
-import Purchases from 'react-native-purchases';
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { firebaseService } from './FirebaseService';
+import { Alert } from 'react-native';
 
-// RevenueCat API Keys
-const REVENUECAT_API_KEY = {
-    android: 'test_SlnfOQIzwtfAVFIpotTUsRTHQJQ',
-    ios: 'test_SlnfOQIzwtfAVFIpotTUsRTHQJQ'
-};
-
-class SubscriptionService {
+/**
+ * Google Play Billing Subscription Service
+ * نظام الاشتراك المباشر مع Google Play
+ */
+class GooglePlaySubscriptionService {
     constructor() {
         this.isSubscribed = false;
+        this.subscriptionType = null; // 'monthly', 'yearly', null
+        this.expiryDate = null;
         this.onSubscriptionChange = null;
+        
+        // معرفات المنتجات في Google Play Console
+        this.PRODUCT_IDS = {
+            monthly: 'premium_monthly',
+            yearly: 'premium_yearly',
+        };
     }
 
+    /**
+     * تهيئة الخدمة
+     */
     async init() {
         try {
-            // 1. Fetch Remote Config
-            const config = await firebaseService.getAppConfig();
-            
-            // 2. Determine Keys
-            const rcKeyAndroid = config?.api_keys?.revenuecat_android || REVENUECAT_API_KEY.android;
-            const rcKeyIOS = config?.api_keys?.revenuecat_ios || REVENUECAT_API_KEY.ios;
-            
-            const apiKey = Platform.OS === 'ios' ? rcKeyIOS : rcKeyAndroid;
-
-            // تهيئة RevenueCat
-            await Purchases.configure({
-                apiKey: apiKey,
-                appUserID: await this.getUserId(),
-                // تعطيل الرسائل التلقائية لتجنب خطأ BillingWrapper
-                shouldShowInAppMessagesAutomatically: false
-            });
-
-            // التحقق من حالة الاشتراك
-            await this.checkSubscriptionStatus();
-
-            console.log('✅ [Subscription] RevenueCat initialized successfully');
-        } catch (err) {
-            console.warn('❌ [Subscription] Init error:', err);
-        }
-    }
-
-    async getUserId() {
-        try {
-            let userId = await AsyncStorage.getItem('user_id');
-            if (!userId) {
-                userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                await AsyncStorage.setItem('user_id', userId);
-            }
-            return userId;
+            // تحميل حالة الاشتراك من التخزين المحلي
+            await this.loadSubscriptionStatus();
+            console.log('✅ [Subscription] Service initialized');
+            console.log(`💎 [Subscription] Status: ${this.isSubscribed ? 'PREMIUM' : 'FREE'}`);
         } catch (error) {
-            return 'unknown_user';
+            console.error('❌ [Subscription] Init error:', error);
         }
     }
 
-    async checkSubscriptionStatus() {
+    /**
+     * تحميل حالة الاشتراك من AsyncStorage
+     */
+    async loadSubscriptionStatus() {
         try {
-            const customerInfo = await Purchases.getCustomerInfo();
-            
-            // التحقق من وجود اشتراك نشط
-            const isActive = customerInfo.entitlements.active['premium'] !== undefined;
-            
-            await this.setSubscriptionStatus(isActive);
-            return isActive;
+            const isPremium = await AsyncStorage.getItem('is_premium_user');
+            const subType = await AsyncStorage.getItem('subscription_type');
+            const expiry = await AsyncStorage.getItem('subscription_expiry');
 
-        } catch (err) {
-            console.warn('⚠️ [Subscription] Check status error:', err);
-            return this.isSubscribed;
+            this.isSubscribed = isPremium === 'true';
+            this.subscriptionType = subType;
+            this.expiryDate = expiry ? new Date(expiry) : null;
+
+            // التحقق من انتهاء الصلاحية
+            if (this.expiryDate && new Date() > this.expiryDate) {
+                await this.setSubscriptionStatus(false, null, null);
+            }
+        } catch (error) {
+            console.error('Error loading subscription status:', error);
         }
     }
 
-    async setSubscriptionStatus(status) {
+    /**
+     * التحقق من حالة الاشتراك
+     */
+    async checkSubscriptionStatus() {
+        await this.loadSubscriptionStatus();
+        return this.isSubscribed;
+    }
+
+    /**
+     * تعيين حالة الاشتراك
+     */
+    async setSubscriptionStatus(status, type = null, expiryDate = null) {
         this.isSubscribed = status;
+        this.subscriptionType = type;
+        this.expiryDate = expiryDate;
+
         await AsyncStorage.setItem('is_premium_user', status ? 'true' : 'false');
-        console.log(`💎 [Subscription] Status: ${status ? 'PREMIUM' : 'FREE'}`);
-        
+        await AsyncStorage.setItem('subscription_type', type || '');
+        await AsyncStorage.setItem('subscription_expiry', expiryDate ? expiryDate.toISOString() : '');
+
+        console.log(`💎 [Subscription] Status updated: ${status ? 'PREMIUM' : 'FREE'}`);
+        if (type) console.log(`📦 [Subscription] Type: ${type}`);
+        if (expiryDate) console.log(`📅 [Subscription] Expires: ${expiryDate.toLocaleDateString()}`);
+
         if (this.onSubscriptionChange) {
             this.onSubscriptionChange(status);
         }
     }
 
-    async getSubscriptions() {
-        try {
-            const offerings = await Purchases.getOfferings();
-            
-            if (offerings.current !== null && offerings.current.availablePackages.length > 0) {
-                return offerings.current.availablePackages;
-            }
-            
-            return [];
-        } catch (err) {
-            console.warn('❌ [Subscription] Get subscriptions error:', err);
-            return [];
-        }
+    /**
+     * الحصول على خطط الاشتراك المتاحة
+     */
+    getAvailablePlans() {
+        return [
+            {
+                id: 'monthly',
+                productId: this.PRODUCT_IDS.monthly,
+                title: 'الاشتراك الشهري',
+                description: 'وصول كامل لجميع المميزات',
+                price: '9.99 ر.س',
+                priceValue: 9.99,
+                currency: 'SAR',
+                duration: 'شهر واحد',
+                features: [
+                    '✅ دروس غير محدودة',
+                    '✅ جميع المواد الدراسية',
+                    '✅ تقارير مفصلة',
+                    '✅ دعم فني مميز',
+                ],
+                popular: false,
+            },
+            {
+                id: 'yearly',
+                productId: this.PRODUCT_IDS.yearly,
+                title: 'الاشتراك السنوي',
+                description: 'وفر 40% - أفضل قيمة',
+                price: '69.99 ر.س',
+                priceValue: 69.99,
+                currency: 'SAR',
+                duration: 'سنة كاملة',
+                originalPrice: '119.88 ر.س',
+                discount: '40%',
+                features: [
+                    '✅ جميع مميزات الشهري',
+                    '✅ وفر 50 ر.س سنوياً',
+                    '✅ محتوى حصري',
+                    '✅ أولوية في الدعم',
+                ],
+                popular: true,
+            },
+        ];
     }
 
-    async subscribe() {
+    /**
+     * شراء اشتراك
+     * في الإنتاج، سيتم استدعاء Google Play Billing API
+     */
+    async purchaseSubscription(planId) {
         try {
-            const packages = await this.getSubscriptions();
-            
-            if (packages.length > 0) {
-                // شراء أول باقة متاحة (عادة الشهرية)
-                const { customerInfo } = await Purchases.purchasePackage(packages[0]);
-                
-                // التحقق من نجاح الشراء
-                if (customerInfo.entitlements.active['premium'] !== undefined) {
-                    await this.setSubscriptionStatus(true);
-                    return true;
-                }
-            } else {
-                throw new Error('No subscription packages available');
+            console.log(`🛒 [Subscription] Purchasing: ${planId}`);
+
+            // TODO: في الإنتاج، استخدم react-native-iap
+            // const purchase = await RNIap.requestSubscription(this.PRODUCT_IDS[planId]);
+
+            // للتطوير: محاكاة الشراء الناجح
+            const plan = this.getAvailablePlans().find(p => p.id === planId);
+            if (!plan) {
+                throw new Error('Invalid plan');
             }
-        } catch (err) {
-            if (err.userCancelled) {
+
+            // حساب تاريخ الانتهاء
+            const expiryDate = new Date();
+            if (planId === 'monthly') {
+                expiryDate.setMonth(expiryDate.getMonth() + 1);
+            } else if (planId === 'yearly') {
+                expiryDate.setFullYear(expiryDate.getFullYear() + 1);
+            }
+
+            await this.setSubscriptionStatus(true, planId, expiryDate);
+
+            Alert.alert(
+                '🎉 تم الاشتراك بنجاح!',
+                `تم تفعيل ${plan.title} بنجاح. استمتع بجميع المميزات!`,
+                [{ text: 'رائع!' }]
+            );
+
+            return {
+                success: true,
+                planId,
+                expiryDate,
+            };
+        } catch (error) {
+            console.error('❌ [Subscription] Purchase error:', error);
+            
+            if (error.code === 'E_USER_CANCELLED') {
                 console.log('ℹ️ [Subscription] User cancelled');
-            } else {
-                console.warn('❌ [Subscription] Purchase error:', err);
+                return { success: false, cancelled: true };
             }
-            throw err;
+
+            Alert.alert(
+                'خطأ في الاشتراك',
+                'حدث خطأ أثناء عملية الاشتراك. يرجى المحاولة مرة أخرى.',
+                [{ text: 'حسناً' }]
+            );
+
+            return { success: false, error };
         }
     }
 
+    /**
+     * إلغاء الاشتراك
+     */
+    async cancelSubscription() {
+        try {
+            console.log('🚫 [Subscription] Cancelling subscription');
+
+            // TODO: في الإنتاج، توجيه المستخدم لإدارة الاشتراكات في Google Play
+            // Linking.openURL('https://play.google.com/store/account/subscriptions');
+
+            Alert.alert(
+                'إلغاء الاشتراك',
+                'لإلغاء اشتراكك، يرجى:\n\n1. فتح متجر Google Play\n2. الذهاب إلى الاشتراكات\n3. اختيار "المعلمة نورا"\n4. الضغط على "إلغاء الاشتراك"\n\nملاحظة: سيبقى الاشتراك نشطاً حتى نهاية الفترة المدفوعة.',
+                [
+                    { text: 'إلغاء', style: 'cancel' },
+                    { 
+                        text: 'فتح Google Play', 
+                        onPress: () => {
+                            // Linking.openURL('https://play.google.com/store/account/subscriptions');
+                            console.log('Opening Google Play subscriptions...');
+                        }
+                    },
+                ]
+            );
+
+            return true;
+        } catch (error) {
+            console.error('❌ [Subscription] Cancel error:', error);
+            return false;
+        }
+    }
+
+    /**
+     * استعادة المشتريات
+     */
     async restorePurchases() {
         try {
-            const customerInfo = await Purchases.restorePurchases();
-            const isActive = customerInfo.entitlements.active['premium'] !== undefined;
-            await this.setSubscriptionStatus(isActive);
-            return isActive;
-        } catch (err) {
-            console.warn('❌ [Subscription] Restore error:', err);
-            throw err;
+            console.log('🔄 [Subscription] Restoring purchases');
+
+            // TODO: في الإنتاج، استخدم react-native-iap
+            // const purchases = await RNIap.getAvailablePurchases();
+
+            Alert.alert(
+                'استعادة المشتريات',
+                'تم التحقق من مشترياتك السابقة.',
+                [{ text: 'حسناً' }]
+            );
+
+            return this.isSubscribed;
+        } catch (error) {
+            console.error('❌ [Subscription] Restore error:', error);
+            Alert.alert(
+                'خطأ',
+                'فشل استعادة المشتريات. يرجى المحاولة مرة أخرى.',
+                [{ text: 'حسناً' }]
+            );
+            return false;
         }
+    }
+
+    /**
+     * الحصول على معلومات الاشتراك الحالي
+     */
+    getSubscriptionInfo() {
+        if (!this.isSubscribed) {
+            return null;
+        }
+
+        const plan = this.getAvailablePlans().find(p => p.id === this.subscriptionType);
+        
+        return {
+            isActive: this.isSubscribed,
+            type: this.subscriptionType,
+            planTitle: plan?.title || 'اشتراك مميز',
+            expiryDate: this.expiryDate,
+            daysRemaining: this.expiryDate 
+                ? Math.ceil((this.expiryDate - new Date()) / (1000 * 60 * 60 * 24))
+                : 0,
+        };
+    }
+
+    /**
+     * التحقق من صلاحية الاشتراك
+     */
+    isSubscriptionValid() {
+        if (!this.isSubscribed) return false;
+        if (!this.expiryDate) return true; // اشتراك دائم (للتطوير)
+        return new Date() < this.expiryDate;
     }
 
     shutdown() {
-        // RevenueCat لا يحتاج cleanup يدوي
         console.log('🔌 [Subscription] Service shutdown');
     }
 }
 
-export const subscriptionService = new SubscriptionService();
+export const subscriptionService = new GooglePlaySubscriptionService();

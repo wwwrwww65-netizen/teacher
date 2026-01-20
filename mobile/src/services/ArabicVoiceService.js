@@ -5,7 +5,7 @@ import axios from 'axios';
 import RNFS from 'react-native-fs';
 import SoundPlayer from 'react-native-sound-player';
 import { generateVisemeTimeline } from '../utils/arabicVisemes';
-import { GOOGLE_API_KEY } from '../config/constants';
+// import { GOOGLE_API_KEY } from '../config/constants';
 import { firebaseService } from './FirebaseService';
 
 class ArabicVoiceService {
@@ -44,14 +44,23 @@ class ArabicVoiceService {
         if (!text) return "";
         let processed = text;
 
-        // 1. إزالة التشكيل من الحرف الأخير قبل علامات الوقف لضمان "الوقف بالسكون"
-        // يحذف الفتحة/الضمة/الكسرة/التنوين إذا جاءت قبل ؟ ! . ،
-        // مثال: "الْيَوْمَ؟" تصبح "الْيَوْم؟" فينطقها "الْيَوْمْ"
-        processed = processed.replace(/[\u064B-\u065F]+(?=\s*[؟?!.,])/g, '');
+        // تعريف علامات الوقف الصريحة (بما فيها الأقواس والرموز)
+        const stopChars = "[:.؟?!,،؛»«(){}\\[\\]\"'\\-]";
+        
+        // 1. قاعدة التاء المربوطة (ة):
+        // تحويل "ة" إلى "ه" عند الوقف (قبل أي علامة وقف أو نهاية النص)
+        const reTaa = new RegExp("(\\u0629)([\\u064B-\\u065F]*)(?=\\s*(" + stopChars + "|$))", "g");
+        processed = processed.replace(reTaa, 'ه');
 
-        // 2. معالجة علامات الترقيم (تقليل الوقت ليكون طبيعياً أكثر)
-        processed = processed.replace(/([.?!؟])/g, '$1 <break time="200ms"/>'); 
-        processed = processed.replace(/([،,])/g, '$1 <break time="100ms"/>');
+        // 2. إزالة التشكيل (ما عدا الشدة \u0651) من الحرف الأخير قبل الوقف
+        // النطاق تشكيل بدون الشدة: \u064B-\u0650 و \u0652-\u065F
+        const reDiacritics = new RegExp("[\\u064B-\\u0650\\u0652-\\u065F]+(?=\\s*(" + stopChars + "|$))", "g");
+        processed = processed.replace(reDiacritics, '');
+
+        // 3. معالجة علامات الترقيم (فواصل زمنية)
+        processed = processed.replace(/([.?!؟])/g, '$1 <break time="400ms"/>'); 
+        processed = processed.replace(/([،,])/g, '$1 <break time="200ms"/>');
+        processed = processed.replace(/([»«()])/g, ' ');
 
         return processed;
     }

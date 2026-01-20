@@ -1,4 +1,4 @@
-import { GOOGLE_API_KEY } from '../config/constants';
+// import { GOOGLE_API_KEY } from '../config/constants'; // Deprecated via Firebase
 import LiveAudioStream from 'react-native-live-audio-stream';
 import { aiService } from './AIService';
 import { firebaseService } from './FirebaseService';
@@ -157,6 +157,7 @@ class GeminiLiveService {
              // 0. Fetch User Profile from Storage (Synchronously as possible)
             let userName = 'تلميذ';
             let userGrade = 'الصف الأول';
+            let userAge = '6';
             
             try {
                 const storedProfile = await AsyncStorage.getItem('nora_memory');
@@ -165,12 +166,19 @@ class GeminiLiveService {
                     if (parsed.userProfile) {
                         userName = parsed.userProfile.name || userName;
                         userGrade = parsed.userProfile.grade || userGrade;
-                        console.log(`🔥 [WARM-UP] Found user profile: ${userName}, ${userGrade}`);
+                        userAge = parsed.userProfile.age || userAge;
+                        this._lastUserAge = userAge; 
+                        console.log(`🔥 [WARM-UP] Found user profile: ${userName}, ${userGrade}, Age: ${userAge}`);
                     }
                 }
             } catch (e) {
                 console.warn('⚠️ [WARM-UP] Failed to load user profile, using defaults.');
             }
+
+            // Save context used for warm-up to validate reuse later
+            this._warmUpUserName = userName;
+            this._warmUpUserGrade = userGrade;
+            this._warmUpUserAge = userAge;
 
             // جلب System Prompt من Firebase
             const config = await firebaseService.getAppConfig();
@@ -193,6 +201,7 @@ ${remotePrompt}
 ═══════════════════════════════════════════════════════════════
 • الاسم: ${userName}
 • الصف الدراسي: ${userGrade}
+• العمر: ${userAge} سنوات
 `;
             
             this._warmUpSystemPrompt = finalSystemPrompt; // Store for verification
@@ -262,6 +271,18 @@ ${remotePrompt}
                                                 }
                                             },
                                             required: ["letter"]
+                                        }
+                                    },
+                                    {
+                                        name: "markLessonComplete",
+                                        description: "حفظ تقدم الطالب. استدعي هذه الأداة فوراً عند الانتهاء من تعلم درس أو حرف أو رقم بنجاح. هذا يساعدني في تذكر أين توقفنا.",
+                                        parameters: {
+                                            type: "OBJECT",
+                                            properties: {
+                                                lesson: { type: "STRING", description: "عنوان الدرس (مثال: 'حرف الباء', 'الرقم ٥')" },
+                                                topic: { type: "STRING", description: "تفاصيل اختيارية (مثال: 'تعلم الكتابة', 'نطق الحرف')" }
+                                            },
+                                            required: ["lesson"]
                                         }
                                     }
                                 ]
@@ -353,7 +374,11 @@ ${remotePrompt}
     }
 
 
-    async connect(userName = 'هاشم', userGrade = 'الصف الثالث') {
+    async connect(userName = 'هاشم', userGrade = 'الصف الثالث', userAge = '8') {
+        this._lastUserName = userName;
+        this._lastGrade = userGrade;
+        this._lastUserAge = userAge; // Save for Prompt Context
+
         if (this.isConnecting || this.isConnected) {
             console.log('📡 [LIVE] Connection already in progress or connected. Skipping.');
             return Promise.resolve(true);
@@ -371,10 +396,20 @@ ${remotePrompt}
             // ⚡ Wait for warm-up to complete
             await this.waitForWarmUp();
             
-            // Check if we can reuse the warm-up connection
+            // ⚡ Check if we can reuse the warm-up connection
+            // MUST MATCH NAME, GRADE, and AGE to ensure context is correct
+            const isContextMatch = 
+                this._warmUpUserName === userName;
+                
+            if (!isContextMatch && this.warmUpConnection) {
+                console.log(`⚠️ [LIVE] Warm-up context mismatch (WarmUp: ${this._warmUpUserName} vs Request: ${userName}). Skipping reuse.`);
+                // We don't close it here necessarily, just don't reuse it.
+            }
+
             if (this.warmUpConnection && 
                 this.warmUpConnection.readyState === WebSocket.OPEN && 
-                this.isWarmUpReady) {
+                this.isWarmUpReady &&
+                isContextMatch) {
                     
                 console.log('🚀 [LIVE] FAST START: Reusing warm-up connection!');
                 this.ws = this.warmUpConnection;
@@ -502,6 +537,18 @@ ${remotePrompt}
 
 ──────────────────────────────────────────────────────────────
 
+💾 markLessonComplete - لِحِفْظ التَّقَدُّم:
+
+   مَتَى تَسْتَخْدِمِينَهَا؟
+   ✓ عِنْدَمَا يُنْهِي الطِّفْل تَعَلُّم حَرْف أَوْ رَقَم بِنَجَاح.
+   ✓ قَبْلَ الانْتِقَال إِلَى مَوْضُوع جَدِيد.
+   ✓ يُسَاعِدُنِي هَذَا فِي تَذَكُّر آخِر مَا دَرَسْنَاه!
+
+   مِثَال:
+   markLessonComplete(lesson="حَرْف البَاء", topic="كِتَابَة")
+
+──────────────────────────────────────────────────────────────
+
 💡 القَاعِدَة الذَّهَبِيَّة:
    1. اسْتَدْعِي الأَدَاة أَوَّلًا (كَـ FUNCTION CALL)
    2. ثُمَّ تَكَلَّمِي بِلُغَة طَبِيعِيَّة مَع الطِّفْل
@@ -595,14 +642,25 @@ ${remotePrompt}
 - لَا تَنْسَيْ الإِيمُوجِي مَعَ الكَلِمَاتِ عَلَى السَّبُّورَة!`;
             
             // دمج التعليمات العامة من السيرفر مع سياق الطالب الحالي (الاسم، الصف، الترحيب)
+            // ⚡ IMPORTANT: Recalculate context here to ensure freshness
+            const freshUserName = userName || 'تلميذ';
+            const freshUserGrade = userGrade || 'أولى';
+            const freshUserAge = (this._lastUserAge || '6'); // Default to 6 if unknown
+            
             const finalSystemPrompt = `
 ${remotePrompt}
 
 ═══════════════════════════════════════════════════════════════
 👤 بيانات الطالب (CONTEXT):
 ═══════════════════════════════════════════════════════════════
-• الاسم: ${userName}
-• الصف الدراسي: ${userGrade}
+• الاسم: ${freshUserName}
+• الصف الدراسي: ${freshUserGrade}
+• العمر: ${freshUserAge} سنوات
+
+⚠️ تعليمات الترحيب:
+1. رحبي بالطالب باسمه (${freshUserName}) فوراً.
+2. لا تقترحي موضوعاً محدداً (مثل "حرف جديد") إلا إذا طلب هو.
+3. اسأليه: "ماذا تريد أن نتعلم اليوم يا ${freshUserName}؟" أو "كيف حالك اليوم يا ${freshUserName}؟".
 `;
 
             console.log('🧠 [LIVE] System Prompt Prepared with Context length:', finalSystemPrompt.length);
@@ -676,6 +734,18 @@ ${remotePrompt}
                                                 }
                                             },
                                             required: ["letter"]
+                                        }
+                                    },
+                                    {
+                                        name: "markLessonComplete",
+                                        description: "حفظ تقدم الطالب. استدعي هذه الأداة فوراً عند الانتهاء من تعلم درس أو حرف أو رقم بنجاح. هذا يساعدني في تذكر أين توقفنا.",
+                                        parameters: {
+                                            type: "OBJECT",
+                                            properties: {
+                                                lesson: { type: "STRING", description: "عنوان الدرس (مثال: 'حرف الباء', 'الرقم ٥')" },
+                                                topic: { type: "STRING", description: "تفاصيل اختيارية (مثال: 'تعلم الكتابة', 'نطق الحرف')" }
+                                            },
+                                            required: ["lesson"]
                                         }
                                     }
                                 ]
@@ -825,6 +895,14 @@ ${remotePrompt}
                     const fnCall = part.functionCall || part.function_call;
                     if (fnCall) {
                         console.log('⚡ [LIVE] Function Call Detected:', fnCall.name);
+                        
+                        // 🆕 Handle Memory Update Tool
+                        if (fnCall.name === 'markLessonComplete') {
+                            const { lesson, topic } = fnCall.args || {};
+                            console.log(`💾 [LIVE] Marking Lesson Complete: ${lesson} (${topic})`);
+                            aiService.updateLastLesson(lesson, topic);
+                        }
+
                         if (this.onToolCall) {
                             this.onToolCall(fnCall.name, fnCall.args);
                         }
@@ -946,7 +1024,36 @@ ${remotePrompt}
         console.log('🎯 [VAD] Client-side Voice Activity Detection enabled (800ms silence threshold)');
     }
     
-    // 🆕 دالة حساب الطاقة الصوتية
+    // 🆕 دالة حساب الطاقة الصوتية (Audio Energy Calculation)
+    _calculateAudioEnergy(base64Data) {
+        try {
+            // تحويل Base64 إلى Buffer
+            const buffer = Buffer.from(base64Data, 'base64');
+            
+            // حساب RMS (Root Mean Square) للطاقة الصوتية
+            let sum = 0;
+            const samples = buffer.length / 2; // 16-bit audio = 2 bytes per sample
+            
+            for (let i = 0; i < buffer.length; i += 2) {
+                // قراءة 16-bit sample (Little Endian)
+                const sample = buffer.readInt16LE(i);
+                sum += sample * sample;
+            }
+            
+            const rms = Math.sqrt(sum / samples);
+            
+            // تسجيل تشخيصي (كل 200 حزمة)
+            if (this._audioPacketCount % 200 === 0) {
+                console.log(`🔊 [VAD-DEBUG] Audio Energy: ${Math.round(rms)}, Speaking: ${this._userSpeaking}`);
+            }
+            
+            return rms;
+        } catch (e) {
+            // في حالة الخطأ، نفترض أن هناك صوت (لتجنب التوقف)
+            return 1000;
+        }
+    }
+    
     // دالة لإرسال رسالة الترحيب
     _sendGreetingMessage(greetingContext) {
         // نستخدم setTimeout لضمان أن WebSocket جاهز

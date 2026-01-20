@@ -7,7 +7,7 @@
 export const API_KEYS = {
     // 1. Google Cloud / Gemini API Key
     // يستخدم للذكاء الاصطناعي (Gemini Pro) وتحويل النص لصوت (Google TTS)
-    GOOGLE_API_KEY: "AIzaSyCd4HQDcNeF6WztPhTOhUbcoiqZi79Q5ug",
+    GOOGLE_API_KEY: "",
 };
 
 export const API_CONFIG = {

@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { firebaseService } from './FirebaseService';
 
-const GOOGLE_API_KEY = 'AIzaSyDHjklmJ4NjIP0qFspkVxzmNRhS1qkAYOE';
+// Google API Key removed - fetching from FirebaseService
 
 // ============================================================================
 // 🔤 مكتبة رسومات الحروف العربية - الشكل المنفصل (Isolated Form)

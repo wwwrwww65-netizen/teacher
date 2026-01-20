@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useState, useRef } from 'react';
-import { View, StyleSheet, Image, Animated, Easing, I18nManager } from 'react-native';
+import { View, StyleSheet, Image, Animated, Easing, I18nManager, ScrollView } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
 // إنشاء مكون Path قابل للتحريك
@@ -93,37 +93,89 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
     const renderTextDrawings = () => {
         return drawingsToRender
             .filter(d => d.type === 'text')
-            .map((drawItem) => (
-                <View
-                    key={drawItem.key}
-                    style={{
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                        top: (drawItem.offset.y / 300) * 100 + '%',
-                        transform: [
-                            { translateY: -25 }  // Fine-tuned vertical alignment
-                        ],
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                    }}
-                >
-                    <Animated.Text
+            .map((drawItem) => {
+                const textLength = drawItem.content?.toString().length || 1;
+                const isLongText = textLength > 100; // نص طويل (مثل الحديث)
+                
+                // حساب حجم الخط بناءً على طول النص
+                let fontSize;
+                if (textLength > 500) {
+                    fontSize = 11; // زيادة الحجم
+                } else if (textLength > 300) {
+                    fontSize = 13; // زيادة الحجم
+                } else if (textLength > 200) {
+                    fontSize = 16; // زيادة الحجم
+                } else if (textLength > 100) {
+                    fontSize = 20; // زيادة الحجم
+                } else {
+                    fontSize = Math.max(30, Math.min(55, 280 / textLength)); // نص قصير
+                }
+                
+                fontSize *= drawItem.scale;
+                
+                // حساب lineHeight ديناميكياً
+                let lineHeight;
+                if (isLongText) {
+                    // lineHeight كبير جداً لملء السبورة
+                    if (textLength > 500) {
+                        lineHeight = fontSize * 1.6; // تقليل بسيط (كان 1.8)
+                    } else if (textLength > 300) {
+                        lineHeight = fontSize * 2.2; // تقليل بسيط (كان 2.5)
+                    } else if (textLength > 200) {
+                        lineHeight = fontSize * 3.0; // تقليل بسيط (كان 3.5)
+                    } else {
+                        lineHeight = fontSize * 4.0; // تقليل بسيط (كان 5.0)
+                    }
+                } else {
+                    lineHeight = fontSize * 1.5;
+                }
+                
+                return (
+                    <View
+                        key={drawItem.key}
                         style={{
-                            fontSize: Math.max(30, Math.min(55, 280 / (drawItem.content?.toString().length || 1))) * drawItem.scale,
-                            fontWeight: 'bold',
-                            color: 'white',
-                            textAlign: 'center',
-                            opacity: progress,
-                            textShadowColor: 'rgba(255, 255, 255, 0.4)',
-                            textShadowOffset: { width: 0, height: 0 },
-                            textShadowRadius: 8,
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            bottom: 0,
+                            paddingHorizontal: isLongText ? 8 : 0,
+                            paddingVertical: isLongText ? 8 : 0,
                         }}
                     >
-                        {drawItem.content}
-                    </Animated.Text>
-                </View>
-            ));
+                        <View
+                            style={{
+                                flex: 1,
+                                justifyContent: 'center', // ← العودة للوسط (أفضل خيار)
+                                alignItems: isLongText ? 'flex-end' : 'center',
+                            }}
+                        >
+                            <Animated.Text
+                                style={{
+                                    fontSize,
+                                    fontWeight: 'bold',
+                                    color: 'white',
+                                    textAlign: isLongText ? 'justify' : 'center', // ⬅️ تغيير إلى ضبط (Justify) لترتيب النص
+                                    alignSelf: isLongText ? 'flex-end' : 'center', // ⬅️ إضافة المحاذاة الذاتية لليمين
+                                    opacity: progress,
+                                    textShadowColor: 'rgba(255, 255, 255, 0.4)',
+                                    textShadowOffset: { width: 0, height: 0 },
+                                    textShadowRadius: 8,
+                                    lineHeight: lineHeight,
+                                    width: isLongText ? '100%' : undefined,
+                                    writingDirection: 'rtl', 
+                                    transform: [
+                                        { rotate: '-3deg' }, 
+                                        { skewX: '-10deg' } 
+                                    ], 
+                                }}
+                            >
+                                {drawItem.content}
+                            </Animated.Text>
+                        </View>
+                    </View>
+                );
+            });
     };
 
     return (

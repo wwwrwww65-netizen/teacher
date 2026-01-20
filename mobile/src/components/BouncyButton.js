@@ -7,7 +7,7 @@ import Animated, {
     withTiming,
 } from 'react-native-reanimated';
 import { theme } from '../config/theme';
-import { soundService } from '../services/SoundService';
+import GlobalAudioService from '../services/GlobalAudioService';
 
 /**
  * BouncyButton
@@ -36,7 +36,8 @@ const BouncyButton = ({
             damping: 15,
             stiffness: 300,
         });
-        soundService.play(soundName);
+        // 🎵 Play click sound
+        GlobalAudioService.playClickSound();
     };
 
     const handlePressOut = () => {

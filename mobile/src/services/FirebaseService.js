@@ -1,4 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 class FirebaseService {
@@ -9,6 +10,13 @@ class FirebaseService {
     // Get a unique ID for the device/user (ID الجهاز أو المستخدم)
     async getUserId() {
         try {
+            // Priority 1: Auth User
+            const currentUser = auth().currentUser;
+            if (currentUser) {
+                return currentUser.uid;
+            }
+            
+            // Priority 2: Local Guest ID
             let userId = await AsyncStorage.getItem('user_id');
             if (!userId) {
                 userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -95,6 +103,21 @@ class FirebaseService {
         } catch (error) {
             console.error('❌ [Firebase] Error getting app config:', error);
             return null;
+        }
+    }
+
+    /**
+     * حذف بيانات الطالب
+     * Deletes student data from Firestore
+     */
+    async deleteStudentData() {
+        try {
+            const userId = await this.getUserId();
+            await this.collection.doc(userId).delete();
+            console.log('✅ [Firebase] Student data deleted successfully');
+        } catch (error) {
+            console.error('❌ [Firebase] Error deleting student data:', error);
+            throw error;
         }
     }
 }

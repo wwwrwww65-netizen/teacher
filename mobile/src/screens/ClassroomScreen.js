@@ -37,6 +37,7 @@ import { LIVE_AUDIO_HTML } from '../services/LiveAudioBridge';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import GlobalAudioService from '../services/GlobalAudioService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -321,6 +322,17 @@ const ClassroomScreen = ({ navigation, route }) => {
     const liveAudioBridgeRef = useRef(null);
     const justFinishedTaskRef = useRef(false); // New: preventing praise re-triggers
 
+    // 🎵 Control Global Background Music
+    useEffect(() => {
+        // Stop global music when entering classroom
+        GlobalAudioService.stopAppBackgroundMusic();
+        
+        return () => {
+            // Resume global music when leaving classroom
+            GlobalAudioService.playAppBackgroundMusic();
+        };
+    }, []);
+
     useEffect(() => { isLiveModeRef.current = isLiveMode; }, [isLiveMode]);
 
     const updateStatus = (newStatus) => {
@@ -459,9 +471,10 @@ const ClassroomScreen = ({ navigation, route }) => {
 
             const finalName = overrideName || userName;
             const finalGrade = overrideGrade || aiService.userProfile.grade;
-            console.log('🔗 Connecting to Gemini with:', { finalName, finalGrade });
+            const finalAge = aiService.userProfile.age || '6';
+            console.log('🔗 Connecting to Gemini with:', { finalName, finalGrade, finalAge });
             
-            await geminiLiveService.connect(finalName, finalGrade);
+            await geminiLiveService.connect(finalName, finalGrade, finalAge);
 
             // Force Audio Unlock
             setTimeout(() => {
@@ -514,7 +527,7 @@ const ClassroomScreen = ({ navigation, route }) => {
                     }
                     
                     // 🧹 Clean tool calls from text before displaying/TTS
-                    const cleanText = rawText.replace(/\s*`?(?:drawOnBoard|askToWrite|showQuiz)\s*\([^)]*\)\s*`?/gi, ' ').trim();
+                    let cleanText = rawText.replace(/\s*`?(?:drawOnBoard|askToWrite|showQuiz)\s*\([^)]*\)\s*`?/gi, ' ').trim();
                     console.log('🧹 [CLEAN] Removed tool calls. Raw len:', rawText.length, 'Clean len:', cleanText.length);
                     
                     const normalizedText = normalize(cleanText);
@@ -1532,28 +1545,28 @@ const ClassroomScreen = ({ navigation, route }) => {
         let name = 'بَطَل'; // Default
 
         try {
-            const userDataStr = await AsyncStorage.getItem('userProfile');
+            const userDataStr = await AsyncStorage.getItem('nora_memory');
             if (userDataStr) {
                 const userData = JSON.parse(userDataStr);
                 console.log('📂 Loaded User Profile (Raw):', userData);
 
                 // 1. Sanitize Name immediately
-                if (userData.name) {
+                if (userData.userProfile && userData.userProfile.name) {
                     // eslint-disable-next-line no-misleading-character-class
-                    name = userData.name.replace(/[^\u0621-\u064A\u064B-\u065F\u0671-\u06D3\u06F0-\u06F9a-zA-Z\s]/g, '').trim();
+                    name = userData.userProfile.name.replace(/[^\u0621-\u064A\u064B-\u065F\u0671-\u06D3\u06F0-\u06F9a-zA-Z\s]/g, '').trim();
                 }
 
                 // 2. Resolve Grade
-                const grade = userData.grade || 'KG1';
+                const grade = (userData.userProfile && userData.userProfile.grade) || 'KG1';
 
                 // 3. Update AI Service with verification status
                 // We assume if a grade exists in storage and is not default KG1 (or if we explicitly saved it), it's verified.
                 // Better: Check a boolean flag if we saved it.
-                const isVerified = userData.gradeVerified || (grade !== 'KG1');
+                const isVerified = (userData.userProfile && userData.userProfile.gradeVerified) || (grade !== 'KG1');
 
                 // 3. Update AI Service with FULL profile
                 aiService.setUserProfile({
-                    ...userData, // Load everything (lastLesson, sessions, etc)
+                    ...(userData.userProfile || {}), // Load everything (lastLesson, sessions, etc)
                     name: name,
                     grade: grade,
                     gradeVerified: isVerified
@@ -1562,9 +1575,13 @@ const ClassroomScreen = ({ navigation, route }) => {
                 console.log('✅ AI Service Profile Sync:', aiService.userProfile);
 
                 // 4. Save back cleaned version if changed
-                if (name !== userData.name) {
-                    console.log('🧹 Cleaned name on load:', userData.name, '->', name);
-                    AsyncStorage.setItem('userProfile', JSON.stringify({ ...userData, name, gradeVerified: isVerified }));
+                if (userData.userProfile && name !== userData.userProfile.name) {
+                    console.log('🧹 Cleaned name on load:', userData.userProfile.name, '->', name);
+                    const updatedData = {
+                        ...userData,
+                        userProfile: { ...userData.userProfile, name, gradeVerified: isVerified }
+                    };
+                    AsyncStorage.setItem('nora_memory', JSON.stringify(updatedData));
                 }
             }
         } catch (e) { console.log('No user profile found', e); }
@@ -1624,6 +1641,14 @@ const ClassroomScreen = ({ navigation, route }) => {
     const prepareTextForTTS = (text) => {
         if (!text) return '';
         let result = text;
+        
+        // 🧹 تنظيف Markdown formatting
+        result = result.replace(/\*\*([^*]+)\*\*/g, '$1'); // **bold** → bold
+        result = result.replace(/\*([^*]+)\*/g, '$1'); // *italic* → italic
+        result = result.replace(/_([^_]+)_/g, '$1'); // _underline_ → underline
+        result = result.replace(/^\s*[\*\-]\s+/gm, ''); // * list item → list item
+        
+        // تنظيف الأحرف العربية في الأقواس
         result = result.replace(/حرف\s*\(\s*([\u0600-\u06FF])\s*\)/g, (m, ch) => {
             const name = letterNamesForTTS[ch] || ch;
             return `حرف ${name}`;
@@ -2350,14 +2375,14 @@ const styles = StyleSheet.create({
     fullScreenLayer: {
         position: 'absolute',
         top: 0, bottom: 0, left: 0, right: 0,
-        zIndex: 0
+        zIndex: 0 // ⬇️ إعادة الطبقة للخلف ليظهر النص (لأن الخلفية والمعلمة طبقة واحدة)
     },
     boardOverlay: {
         position: 'absolute',
         top: '20%',
         left: '10%',
-        width: width * 0.40,
-        height: width * 0.35,
+        width: width * 0.48, 
+        height: width * 0.65, // زيادة الارتفاع (كان 0.58) لتغطية الأسفل تماماً
         zIndex: 5,
         borderRadius: 8
     },
