@@ -50,7 +50,12 @@ const BouncyButton = ({
 
     return (
         <TouchableOpacity
-            onPress={onPress}
+            onPress={(e) => {
+                if (!disabled) {
+                   console.log('👇 [UI] Button Pressed');
+                   if (onPress) onPress(e);
+                }
+            }}
             onPressIn={handlePressIn}
             onPressOut={handlePressOut}
             activeOpacity={1} // Disable default opacity change, we use scale

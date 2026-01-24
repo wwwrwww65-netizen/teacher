@@ -205,6 +205,13 @@ function convertMathSymbolsToArabic(text) {
 
 class AIService {
     constructor() {
+        this.reset();
+    }
+
+    /**
+     * تصفير الذاكرة والملف الشخصي تماماً (عند تسجيل الخروج)
+     */
+    reset() {
         this.context = [];
         this.userProfile = {
             name: '',
@@ -212,13 +219,13 @@ class AIService {
             gradeId: 'Grade1',
             interests: [],
             gradeVerified: false,
-            // نظام الذاكرة الموسع
-            lastLesson: '',          // آخر درس (مثل: "حرف العين")
-            lastTopic: '',           // آخر موضوع (مثل: "كتابة الحرف")
-            totalSessions: 0,        // عدد الجلسات الكلي
-            lastSessionDate: null,   // تاريخ آخر جلسة
-            isFirstTime: true        // هل هذه أول مرة؟
+            lastLesson: '',
+            lastTopic: '',
+            totalSessions: 0,
+            lastSessionDate: null,
+            isFirstTime: true
         };
+        console.log('🧹 [AIService] Memory has been totally reset.');
     }
 
     async loadMemory() {

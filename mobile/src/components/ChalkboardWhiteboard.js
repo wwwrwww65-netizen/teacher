@@ -44,6 +44,15 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
             console.log('📝 [BOARD] showImage called', { uri });
             setDrawings([]);
             setImageUri(uri);
+            
+            // Trigger animation
+            progress.setValue(0);
+            Animated.spring(progress, {
+                toValue: 1,
+                tension: 40,
+                friction: 7,
+                useNativeDriver: true,
+            }).start();
         },
         clear: () => {
             console.log('📝 [BOARD] clear called');
@@ -164,10 +173,12 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
                                     lineHeight: lineHeight,
                                     width: isLongText ? '100%' : undefined,
                                     writingDirection: 'rtl', 
-                                    transform: [
-                                        { rotate: '-3deg' }, 
-                                        { skewX: '-10deg' } 
-                                    ], 
+                                    // transform removal: Making text "Normal" and straight as requested
+                                    // transform: [
+                                    //    { rotate: '-3deg' }, 
+                                    //    { skewX: '-10deg' } 
+                                    // ], 
+                                    fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif', // Ensure normal system font
                                 }}
                             >
                                 {drawItem.content}
@@ -182,11 +193,27 @@ const ChalkboardWhiteboard = forwardRef((props, ref) => {
         <View style={styles.container}>
             <View style={styles.drawingArea}>
                 {imageUri ? (
-                    <Image
-                        source={{ uri: imageUri }}
-                        style={styles.homeworkImage}
-                        resizeMode="contain"
-                    />
+                    <Animated.View 
+                        style={[
+                            styles.imageWrapper,
+                            {
+                                opacity: progress,
+                                transform: [
+                                    { scale: progress.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) },
+                                    { translateY: progress.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) },
+                                    { rotate: '-1deg' }
+                                ]
+                            }
+                        ]}
+                    >
+                        <Image
+                            source={{ uri: imageUri }}
+                            style={styles.homeworkImage}
+                            resizeMode="cover"
+                        />
+                        {/* Decorative Tape/Corner for Premium Look */}
+                        <View style={styles.tapeDecor} />
+                    </Animated.View>
                 ) : (
                     <>
                         <Svg
@@ -235,11 +262,33 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
+    imageWrapper: {
+        width: '85%',
+        height: '85%',
+        backgroundColor: '#FFF',
+        padding: 6,
+        borderRadius: 4,
+        // High quality shadow for "stuck on board" look
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 10,
+    },
     homeworkImage: {
-        width: '90%',
-        height: '90%',
-        borderRadius: 5,
-        transform: [{ rotate: '-2deg' }],
+        width: '100%',
+        height: '100%',
+        borderRadius: 2,
+    },
+    tapeDecor: {
+        position: 'absolute',
+        top: -10,
+        left: '40%',
+        width: 40,
+        height: 15,
+        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+        borderRadius: 2,
+        transform: [{ rotate: '5deg' }],
     },
 });
 

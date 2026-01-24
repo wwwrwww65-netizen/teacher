@@ -7,7 +7,8 @@ import {
     TouchableOpacity, 
     Dimensions, 
     Alert,
-    Animated 
+    Animated,
+    Image
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
@@ -106,8 +107,9 @@ const ProfileScreen = ({ navigation }) => {
             {
                 text: 'نعم',
                 onPress: async () => {
-                    await AsyncStorage.removeItem('user');
-                    navigation.replace('StudentSetup');
+                    await authService.signOut();
+                    await AsyncStorage.clear();
+                    navigation.replace('Login');
                 }
             }
         ]);
@@ -116,15 +118,15 @@ const ProfileScreen = ({ navigation }) => {
     // Dynamic stickers based on achievements
     const getStickers = () => {
         const allStickers = [
-            { id: 1, icon: '🦁', name: 'الأسد الشجاع', unlocked: true, requirement: 'البداية' },
-            { id: 2, icon: '🚀', name: 'رائد الفضاء', unlocked: stats.totalSessions >= 5, requirement: '5 جلسات' },
-            { id: 3, icon: '🎨', name: 'الفنان الصغير', unlocked: stats.completedLessons >= 3, requirement: '3 دروس' },
-            { id: 4, icon: '👑', name: 'ملك الحروف', unlocked: stats.completedLessons >= 10, requirement: '10 دروس' },
-            { id: 5, icon: '🌟', name: 'النجم الساطع', unlocked: stats.totalSessions >= 10, requirement: '10 جلسات' },
-            { id: 6, icon: '🏆', name: 'البطل الخارق', unlocked: stats.totalPoints >= 100, requirement: '100 نقطة' },
-            { id: 7, icon: '📚', name: 'عاشق القراءة', unlocked: stats.completedLessons >= 5, requirement: '5 دروس' },
-            { id: 8, icon: '🎯', name: 'المثابر', unlocked: stats.streak >= 3, requirement: '3 أيام متتالية' },
-            { id: 9, icon: '💎', name: 'الجوهرة النادرة', unlocked: stats.achievements >= 5, requirement: '5 إنجازات' },
+            { id: 1, icon: '🦁', name: 'الأسد الشجاع  ', unlocked: true, requirement: 'البداية' },
+            { id: 2, icon: '🚀', name: 'رائد الفضاء  ', unlocked: stats.totalSessions >= 5, requirement: '5 جلسات' },
+            { id: 3, icon: '🎨', name: 'الفنان الصغير  ', unlocked: stats.completedLessons >= 3, requirement: '3 دروس' },
+            { id: 4, icon: '👑', name: 'ملك الحروف  ', unlocked: stats.completedLessons >= 10, requirement: '10 دروس' },
+            { id: 5, icon: '🌟', name: 'النجم الساطع  ', unlocked: stats.totalSessions >= 10, requirement: '10 جلسات' },
+            { id: 6, icon: '🏆', name: 'البطل الخارق  ', unlocked: stats.totalPoints >= 100, requirement: '100 نقطة' },
+            { id: 7, icon: '📚', name: 'عاشق القراءة  ', unlocked: stats.completedLessons >= 5, requirement: '5 دروس' },
+            { id: 8, icon: '🎯', name: 'المثابر  ', unlocked: stats.streak >= 3, requirement: '3 أيام متتالية' },
+            { id: 9, icon: '💎', name: 'الجوهرة النادرة  ', unlocked: stats.achievements >= 5, requirement: '5 إنجازات' },
         ];
         return allStickers;
     };
@@ -220,11 +222,11 @@ const ProfileScreen = ({ navigation }) => {
                         colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.1)']}
                         style={styles.headerButton}
                     >
-                        <Text style={styles.backIcon}>←</Text>
+                        <Text style={styles.backIcon}>→</Text>
                     </LinearGradient>
                 </TouchableOpacity>
                 
-                <Text style={styles.headerTitle}>غرفتي 🏠</Text>
+                <Text style={styles.headerTitle}>غرفتي 🏠  </Text>
                 
                 <TouchableOpacity onPress={() => navigation.navigate('Settings')} style={styles.settingsButton}>
                     <LinearGradient
@@ -262,7 +264,21 @@ const ProfileScreen = ({ navigation }) => {
                                 style={styles.avatarRing}
                             >
                                 <View style={styles.avatarInner}>
-                                    <Text style={styles.avatarEmoji}>{user?.avatar || '🦁'}</Text>
+                                    {user?.gender === 'boy' ? (
+                                        <Image 
+                                            source={require('../assets/boy_avatar.png')} 
+                                            style={styles.profileAvatarImage}
+                                            resizeMode="contain"
+                                        />
+                                    ) : user?.gender === 'girl' ? (
+                                        <Image 
+                                            source={require('../assets/girl_avatar.png')} 
+                                            style={styles.profileAvatarImage}
+                                            resizeMode="contain"
+                                        />
+                                    ) : (
+                                        <Text style={styles.avatarEmoji}>{user?.avatar || '🦁'}</Text>
+                                    )}
                                 </View>
                             </LinearGradient>
                             
@@ -272,14 +288,22 @@ const ProfileScreen = ({ navigation }) => {
                                     colors={['#FF6B6B', '#EE5A6F']}
                                     style={styles.levelGradient}
                                 >
-                                    <Text style={styles.levelText}>المستوى {user?.level || 1}</Text>
+                                    <View style={{width: '100%', alignItems: 'center'}}>
+                                        <Text style={styles.levelText}>المستوى {user?.level || 1}  </Text>
+                                    </View>
                                 </LinearGradient>
                             </View>
                         </View>
 
                         {/* Name */}
-                        <Text style={styles.heroName}>{userProfile?.name || user?.name || 'البطل'}</Text>
-                        <Text style={styles.heroGrade}>{userProfile?.grade || 'KG1'}</Text>
+                        <View style={{ width: '100%', alignItems: 'center' }}>
+                            <Text style={[styles.heroName, { textAlign: 'center', width: '100%' }]}>
+                                {(userProfile?.name || user?.name || 'البطل') + '  '}
+                            </Text>
+                            <Text style={[styles.heroGrade, { textAlign: 'center', width: '100%' }]}>
+                                {(userProfile?.grade || 'KG1') + '  '}
+                            </Text>
+                        </View>
 
                         {/* Progress Bar */}
                         <View style={styles.progressSection}>
@@ -292,7 +316,7 @@ const ProfileScreen = ({ navigation }) => {
                                 />
                             </View>
                             <Text style={styles.progressText}>
-                                {getNextLevelPoints()} نقطة للمستوى التالي
+                                {getNextLevelPoints()} نقطة للمستوى التالي  
                             </Text>
                         </View>
                     </LinearGradient>
@@ -300,7 +324,7 @@ const ProfileScreen = ({ navigation }) => {
 
                 {/* Stats Grid */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>📊 إحصائياتي</Text>
+                    <Text style={[styles.sectionTitle, { marginBottom: 20 }]}>📊 إحصائياتي  </Text>
                     <View style={styles.statsGrid}>
                         <View style={styles.statCard}>
                             <LinearGradient
@@ -309,7 +333,7 @@ const ProfileScreen = ({ navigation }) => {
                             >
                                 <Text style={styles.statIcon}>🎯</Text>
                                 <Text style={styles.statValue}>{stats.totalSessions}</Text>
-                                <Text style={styles.statLabel}>جلسة</Text>
+                                <Text style={styles.statLabel}>جلسة  </Text>
                             </LinearGradient>
                         </View>
 
@@ -320,7 +344,11 @@ const ProfileScreen = ({ navigation }) => {
                             >
                                 <Text style={styles.statIcon}>📚</Text>
                                 <Text style={styles.statValue}>{stats.completedLessons}</Text>
-                                <Text style={styles.statLabel}>درس مكتمل</Text>
+                                <Text 
+                                    style={styles.statLabel}
+                                    numberOfLines={2}
+                                    adjustsFontSizeToFit
+                                >درس مكتمل  </Text>
                             </LinearGradient>
                         </View>
 
@@ -331,7 +359,7 @@ const ProfileScreen = ({ navigation }) => {
                             >
                                 <Text style={styles.statIcon}>⭐</Text>
                                 <Text style={styles.statValue}>{user?.points || 0}</Text>
-                                <Text style={styles.statLabel}>نقطة</Text>
+                                <Text style={styles.statLabel}>نقطة  </Text>
                             </LinearGradient>
                         </View>
 
@@ -342,7 +370,7 @@ const ProfileScreen = ({ navigation }) => {
                             >
                                 <Text style={styles.statIcon}>🔥</Text>
                                 <Text style={styles.statValue}>{stats.streak}</Text>
-                                <Text style={styles.statLabel}>يوم متتالي</Text>
+                                <Text style={styles.statLabel}>يوم متتالي  </Text>
                             </LinearGradient>
                         </View>
                     </View>
@@ -351,7 +379,7 @@ const ProfileScreen = ({ navigation }) => {
                 {/* Achievements/Stickers */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>🏆 مجموعة الملصقات</Text>
+                        <Text style={styles.sectionTitle}>🏆 مجموعة الملصقات  </Text>
                         <View style={styles.achievementBadge}>
                             <Text style={styles.achievementText}>
                                 {getStickers().filter(s => s.unlocked).length}/{getStickers().length}
@@ -450,6 +478,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    profileAvatarImage: {
+        width: '100%',
+        height: '100%',
+    },
     avatarEmoji: {
         fontSize: 64,
     },
@@ -485,8 +517,12 @@ const styles = StyleSheet.create({
     },
     heroGrade: {
         fontSize: 16,
-        color: 'rgba(255, 255, 255, 0.9)',
+        color: '#FFFFFF',
+        fontWeight: '600',
         marginBottom: 20,
+        textShadowColor: 'rgba(0, 0, 0, 0.2)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     progressSection: {
         width: '100%',
@@ -571,9 +607,14 @@ const styles = StyleSheet.create({
         textShadowRadius: 4,
     },
     statLabel: {
-        fontSize: 13,
-        color: 'rgba(255, 255, 255, 0.9)',
+        fontSize: 12, // Increased slightly from 11
+        color: '#FFFFFF', // Solid white
         marginTop: 4,
+        textAlign: 'center',
+        fontWeight: 'bold', // Bold text
+        textShadowColor: 'rgba(0, 0, 0, 0.2)', // Text shadow
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 2,
     },
     stickerGrid: {
         flexDirection: 'row',
@@ -620,7 +661,7 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         textAlign: 'center',
         marginTop: 4,
-        paddingHorizontal: 4,
+        paddingHorizontal: 8, // Increased padding
         textShadowColor: 'rgba(0, 0, 0, 0.3)',
         textShadowOffset: { width: 0, height: 1 },
         textShadowRadius: 2,

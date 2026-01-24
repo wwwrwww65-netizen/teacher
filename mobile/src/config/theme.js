@@ -117,4 +117,10 @@ export const theme = {
             elevation: 4,
         }
     },
+    
+    fonts: {
+        regular: 'Almarai', // Changed from Almarai-Regular
+        bold: 'Almarai',
+        extraBold: 'Almarai',
+    },
 };

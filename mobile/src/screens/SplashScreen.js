@@ -114,10 +114,10 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 48,
-        fontWeight: 'bold', // Changed from 800 for better serif support
+        fontWeight: 'bold', 
         color: '#5D4037', 
         marginBottom: 12,
-        fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif', // Elegant Serif Font
+        fontFamily: 'Almarai', // Updated to use our new global font
         textShadowColor: 'rgba(255, 255, 255, 0.5)',
         textShadowOffset: { width: 0, height: 2 },
         textShadowRadius: 4,
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
         color: '#8D6E63', 
         fontWeight: '600',
         letterSpacing: 1,
-        fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif', // Elegant Serif Font
+        fontFamily: 'Almarai', // Updated to use our new global font
     },
     circle: {
         // ... (rest of styles remain unchanged)

@@ -38,6 +38,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import GlobalAudioService from '../services/GlobalAudioService';
+import { curriculumSearchService } from '../services/CurriculumSearchService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -57,6 +58,8 @@ const normalize = (text) => {
 const resolveArabicLetter = (input) => {
     if (!input) return null;
     const raw = String(input).trim();
+    // 🔢 Allow numbers (Arabic/English) to pass through as-is
+    if (/^[\d\u0660-\u0669]+$/.test(raw)) return raw;
     if (raw.length === 1) return raw;
 
     const cleaned = normalize(raw).replace(/[^ء-ي0-9]/g, '');
@@ -311,6 +314,24 @@ const ClassroomScreen = ({ navigation, route }) => {
     const whiteboardRef = useRef(null);
     const currentTargetLetterRef = useRef(null);
 
+    // استلام بيانات الدرس والمنهج (إذا وجدت)
+    // استلام بيانات الدرس والمنهج والصور
+    const { lessonType, curriculumContent, lessonTitle, lessonImages } = route.params || {};
+    const lessonImagesRef = useRef(lessonImages || []); // 📸 Store images in ref
+    const curriculumContentRef = useRef(curriculumContent);
+    const lessonTypeRef = useRef(lessonType);
+    const lessonTitleRef = useRef(lessonTitle);
+
+    useEffect(() => {
+        if (curriculumContent) {
+            console.log('📚 [CLASSROOM] Curriculum Content Received:', { 
+                type: lessonType, 
+                title: lessonTitle,
+                contentLength: curriculumContent.length 
+            });
+        }
+    }, [curriculumContent]);
+
     const [status, setStatus] = useState('initializing');
     const statusRef = useRef('initializing');
     const [transcript, setTranscript] = useState('');
@@ -319,6 +340,7 @@ const ClassroomScreen = ({ navigation, route }) => {
     const transcriptScrollRef = useRef(null);
     const [isLiveMode, setIsLiveMode] = useState(true);
     const isLiveModeRef = useRef(true);
+    const isMountedRef = useRef(true); // 🛡️ Track mount state to prevent zombies
     const liveAudioBridgeRef = useRef(null);
     const justFinishedTaskRef = useRef(false); // New: preventing praise re-triggers
 
@@ -458,6 +480,14 @@ const ClassroomScreen = ({ navigation, route }) => {
         isLiveModeRef.current = true; // LOCK IMMEDIATELY
 
         try {
+            // 🆕 Disconnect existing session if any (to allow restart with new curriculum)
+            if (geminiLiveService.isConnected || geminiLiveService.isConnecting) {
+                console.log('🔄 [LIVE] Disconnecting existing session for restart...');
+                geminiLiveService.disconnect();
+                // Wait a bit for the socket to actually close and state to settle
+                await new Promise(r => setTimeout(r, 800));
+            }
+
             // KILL OLD VOICE COMPLETELY
             await arabicVoiceService.cancel();
             try {
@@ -472,9 +502,28 @@ const ClassroomScreen = ({ navigation, route }) => {
             const finalName = overrideName || userName;
             const finalGrade = overrideGrade || aiService.userProfile.grade;
             const finalAge = aiService.userProfile.age || '6';
-            console.log('🔗 Connecting to Gemini with:', { finalName, finalGrade, finalAge });
             
-            await geminiLiveService.connect(finalName, finalGrade, finalAge);
+            // تحضير سياق المنهج (إذا وجد)
+            const curriculumContext = curriculumContentRef.current ? {
+                content: curriculumContentRef.current,
+                title: lessonTitleRef.current,
+                type: lessonTypeRef.current
+            } : null;
+
+            console.log('🔗 Connecting to Gemini with:', { finalName, finalGrade, finalAge, hasCurriculum: !!curriculumContext });
+            
+            await geminiLiveService.connect(finalName, finalGrade, finalAge, curriculumContext);
+            
+            // 📸 Send Images if available AND no pre-existing curriculum content
+            // (If curriculumContent exists, it likely already includes the image analysis)
+            if (lessonImagesRef.current && lessonImagesRef.current.length > 0 && !curriculumContentRef.current) {
+                console.log('📸 [CLASSROOM] Found attached images (without curriculum), sending to AI...', lessonImagesRef.current.length);
+                setTimeout(() => {
+                    geminiLiveService.sendImages(lessonImagesRef.current);
+                }, 2000);
+            } else if (lessonImagesRef.current && lessonImagesRef.current.length > 0 && curriculumContentRef.current) {
+                console.log('✅ [CLASSROOM] Images attached but skipping Live-Send because Curriculum Content is present (Pre-analyzed).');
+            }
 
             // Force Audio Unlock
             setTimeout(() => {
@@ -502,6 +551,10 @@ const ClassroomScreen = ({ navigation, route }) => {
             };
 
             geminiLiveService.onContentReceived = async (text) => {
+                if (!isMountedRef.current) {
+                    console.log('🛑 [LIVE] Component unmounted, ignoring received content.');
+                    return;
+                }
                 console.log('🚀 [LIVE-HYBRID] Full Text Ready. Starting Sync-Speech.');
                 console.log('🎤 [TEACHER-RECEIVED] Teacher received content to speak:', text.substring(0, 150) + (text.length > 150 ? '...' : ''));
                 console.log('📢 [TEACHER-RECEIVED] Full content received:', text);
@@ -514,12 +567,18 @@ const ClassroomScreen = ({ navigation, route }) => {
                     
                     // ⚡ CRITICAL FIX: ابدأ تحميل الصوت فوراً (Pre-warm)
                     // هذا يحدث بالتوازي مع معالجة النص!
-                    const prewarmText = rawText.replace(/\s*`?(?:drawOnBoard|askToWrite|showQuiz)\s*\([^)]*\)\s*`?/gi, ' ').trim();
+                    // نقوم بتنظيف شامل لجميع الأدوات بما فيها markLessonComplete
+                    const cleanToolsRegex = /\s*`?(?:drawOnBoard|askToWrite|showQuiz|markLessonComplete)\s*\([^)]*\)\s*`?/gi;
+                    const prewarmText = rawText.replace(cleanToolsRegex, ' ').trim();
+                    
                     let audioPreloadPromise = null;
                     if (prewarmText.length > 10) {
                         console.log('⚡ [TTS-PREWARM] Starting audio download in background...');
-                        audioPreloadPromise = arabicVoiceService.fetchGoogleTTS(prewarmText)
-                            .then(audio => ({ audioContent: audio, text: prewarmText }))
+                        // نستخدم دالة prepareTextForTTS أيضاً لضمان نظافة تامة قبل الإرسال
+                        const ultraSafeText = prepareTextForTTS(prewarmText);
+                        
+                        audioPreloadPromise = arabicVoiceService.fetchGoogleTTS(ultraSafeText)
+                            .then(audio => ({ audioContent: audio, text: ultraSafeText }))
                             .catch(e => {
                                 console.warn('⚠️ [TTS-PREWARM] Failed:', e);
                                 return null;
@@ -527,8 +586,8 @@ const ClassroomScreen = ({ navigation, route }) => {
                     }
                     
                     // 🧹 Clean tool calls from text before displaying/TTS
-                    let cleanText = rawText.replace(/\s*`?(?:drawOnBoard|askToWrite|showQuiz)\s*\([^)]*\)\s*`?/gi, ' ').trim();
-                    console.log('🧹 [CLEAN] Removed tool calls. Raw len:', rawText.length, 'Clean len:', cleanText.length);
+                    let cleanText = rawText.replace(cleanToolsRegex, ' ').trim();
+                    console.log('🧹 [CLEAN] Removed tool calls including markLessonComplete. Raw len:', rawText.length, 'Clean len:', cleanText.length);
                     
                     const normalizedText = normalize(cleanText);
                     const skipSmartTriggersThisTurn = justFinishedTaskRef.current;
@@ -921,7 +980,7 @@ const ClassroomScreen = ({ navigation, route }) => {
                                     console.log('⚠️ [SMART-FALLBACK] No SVG drawing found, displaying as text:', foundLetter);
                                 }
                                 
-                                avatarRef.current?.walkToBoard();
+                                avatarRef.current?.walkToRight();
                                 setTimeout(() => {
                                     // 🔧 If it's a list (comma separated), slow down drawing
                                     const isList = foundLetter.includes('،') || foundLetter.includes(',');
@@ -943,7 +1002,7 @@ const ClassroomScreen = ({ navigation, route }) => {
                             if (listMatch && hasContext) {
                                 const listContent = listMatch[0];
                                 console.log('🎨 [SMART-FALLBACK] Detected list pattern context:', listContent);
-                                avatarRef.current?.walkToBoard();
+                                avatarRef.current?.walkToRight();
                                 setTimeout(() => {
                                     whiteboardRef.current?.write(listContent, { count: 1, duration: 5000 });
                                 }, 1200);
@@ -1087,8 +1146,17 @@ const ClassroomScreen = ({ navigation, route }) => {
                         rawText.match(/askToWrite\s*\(\s*\{\s*letter\s*:\s*['"]([^'"]+)['"]\s*\}\s*\)/i);
                     if (writeMatch && writeMatch[1]) {
                         const requestedLetter = writeMatch[1];
-                        const requestedChar = resolveArabicLetter(requestedLetter);
-                        const effectiveLetter = currentTargetLetterRef.current || requestedChar || 'أ';
+                        // Try to resolve standard letter name first
+                        let requestedChar = resolveArabicLetter(requestedLetter);
+                        
+                        // If strict resolution failed, but input is a specific Arabic char/word, use it directly
+                        if (!requestedChar && requestedLetter && /^[\u0600-\u06FF\s]+$/.test(requestedLetter)) {
+                             requestedChar = requestedLetter.trim();
+                        }
+
+                        // PRIORITY FIX: Use tool's requested char FIRST. Only fallback to ref if tool arg was invalid.
+                        const effectiveLetter = requestedChar || currentTargetLetterRef.current || 'أ';
+                        
                         console.log('✍️ [FALLBACK] Detected askToWrite as text, executing:', { requestedLetter, effectiveLetter });
                         fallbackWriteTriggered = true;
                         setWritingLetter(effectiveLetter);
@@ -1133,6 +1201,12 @@ const ClassroomScreen = ({ navigation, route }) => {
                 } finally {
                     // Only resume if we aren't about to open a modal (Writing/Quiz)
                     setTimeout(() => {
+                        // 🛑 SECURITY CHECK: If unmounted, do nothing
+                        if (!isMountedRef.current) {
+                             console.log('🛑 [AUTO-RESUME] Aborted: Component unmounted.');
+                             return;
+                        }
+
                         // Check ALL modal states (Writing & Quiz) + Pending flags
                         if (!isWritingModalRef.current && !pendingWritingRef.current &&
                             !pendingQuizRef.current && !isSelectionModalVisibleRef.current) {
@@ -1180,7 +1254,7 @@ const ClassroomScreen = ({ navigation, route }) => {
                     if (typeof item === 'string' && item.length === 1) {
                         currentTargetLetterRef.current = item;
                     }
-                    avatarRef.current?.walkToBoard();
+                    avatarRef.current?.walkToRight();
                     setTimeout(() => {
                         whiteboardRef.current?.write(drawData || item, { count: 1, duration: 3000 });
                     }, 1200);
@@ -1410,6 +1484,7 @@ const ClassroomScreen = ({ navigation, route }) => {
         initializeClassroom();
         return () => {
             console.log('🧹 [CLEANUP] Cleaning up ClassroomScreen...');
+            isMountedRef.current = false; // 🛡️ Mark as unmounted immediately
             
             // إيقاف جميع الأصوات
             try { arabicVoiceService.stop(); } catch (e) {}
@@ -1527,16 +1602,35 @@ const ClassroomScreen = ({ navigation, route }) => {
     const requestPermissions = async () => {
         if (Platform.OS === 'android') {
             try {
-                const grants = await PermissionsAndroid.requestMultiple([
-                    PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-                    PermissionsAndroid.PERMISSIONS.CAMERA,
-                    PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-                    PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-                ]);
+                // Request ONLY Audio for classroom start
+                await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO);
             } catch (err) {
                 console.warn(err);
             }
         }
+    };
+
+    const requestCameraPermissions = async () => {
+        if (Platform.OS === 'android') {
+            try {
+                const permissions = [
+                    PermissionsAndroid.PERMISSIONS.CAMERA,
+                ];
+                
+                // Add storage permissions for Android 12 and below
+                if (Platform.Version < 33) {
+                    permissions.push(PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE);
+                    permissions.push(PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE);
+                }
+                
+                await PermissionsAndroid.requestMultiple(permissions);
+                return true;
+            } catch (err) {
+                console.warn(err);
+                return false;
+            }
+        }
+        return true;
     };
 
     const initializeClassroom = async () => {
@@ -1635,20 +1729,32 @@ const ClassroomScreen = ({ navigation, route }) => {
         if (!text) return false;
         const base = text.trim();
         if (!base) return false;
-        return /[A-Za-z{}[\];=<>]|["'`]{2,}|showQuiz|drawOnBoard|askToWrite|function|return|optionsCount|fallbackAnswer|options\s*:|question\s*:|answer\s*:/i.test(base);
+        // 🛠️ RELAXED: Removed < > from strict check to avoid false positives on truncated tags or typos.
+        // We focus on English letters combined with brackets, keys like "function", "return", or known tool names.
+        return /[A-Za-z]+[\[\{]|[\]\}];|["'`]{2,}|showQuiz|drawOnBoard|askToWrite|function|return|optionsCount|fallbackAnswer|options\s*:|question\s*:|answer\s*:/i.test(base);
     };
 
     const prepareTextForTTS = (text) => {
         if (!text) return '';
         let result = text;
         
-        // 🧹 تنظيف Markdown formatting
+        // 0. 🔢 إزالة الأرقام الموجودة بين أقواس لمنع التكرار (مثال: "عشرة (١٠)" -> "عشرة")
+        result = result.replace(/\(\s*[\d\u0660-\u0669]+\s*\)/g, '');
+
+        // 1. إزالة أي بقايا للأدوات (Tools)
+        result = result.replace(/[a-zA-Z]+\s*\([^)]*\)/g, '');
+
+        // 2. تنظيف Markdown formatting
         result = result.replace(/\*\*([^*]+)\*\*/g, '$1'); // **bold** → bold
         result = result.replace(/\*([^*]+)\*/g, '$1'); // *italic* → italic
         result = result.replace(/_([^_]+)_/g, '$1'); // _underline_ → underline
+        result = result.replace(/`([^`]+)`/g, ''); // Remove code blocks completely
         result = result.replace(/^\s*[\*\-]\s+/gm, ''); // * list item → list item
         
-        // تنظيف الأحرف العربية في الأقواس
+        // 3. إزالة الرموز المزعجة للنطق
+        result = result.replace(/[*#_~`>]/g, ''); 
+        
+        // 4. معالجة خاصة للأحرف بين الأقواس (نطقها بدلاً من تجاهلها)
         result = result.replace(/حرف\s*\(\s*([\u0600-\u06FF])\s*\)/g, (m, ch) => {
             const name = letterNamesForTTS[ch] || ch;
             return `حرف ${name}`;
@@ -1657,10 +1763,23 @@ const ClassroomScreen = ({ navigation, route }) => {
             const name = letterNamesForTTS[ch] || ch;
             return name;
         });
+
+        // 5. إزالة الأقواس الإنجليزية المتبقية
+        result = result.replace(/[(){}[\]]/g, '');
+
+        // 6. ضغط المسافات
+        result = result.replace(/\s+/g, ' ').trim();
+
         return result;
     };
 
     const speakResponse = async (response) => {
+        // 🛑 SECURITY CHECK: If component unmounted, stop immediately
+        if (!isMountedRef.current) {
+             console.log('🛑 [TTS] Component unmounted, aborting speech.');
+             return;
+        }
+
         // 🛑 SECURITY CHECK: If user interrupted, DO NOT start speaking a delayed chunk!
         if (isInterruptedRef.current) {
             console.log('🛑 [INTERRUPT] Blocked speakResponse because user interrupted.');
@@ -1690,7 +1809,7 @@ const ClassroomScreen = ({ navigation, route }) => {
         }
 
         if (response.draw) {
-            avatarRef.current?.walkToBoard();
+            avatarRef.current?.walkToRight();
             setTimeout(() => {
                 const count = response.intent?.count || 1;
                 const drawContent = typeof response.draw === 'string' ? response.draw : '';
@@ -1710,17 +1829,32 @@ const ClassroomScreen = ({ navigation, route }) => {
             .replace(/^\s*<speak>/i, '').replace(/<\/speak>\s*$/i, '')
             .replace(/[*#_~]/g, '')
             // Remove any tool-like calls (even if multi-line)
-            .replace(/askToWrite\s*\([\s\S]*?\)/gi, '')
-            .replace(/showQuiz\s*\([\s\S]*?\)/gi, '')
-            .replace(/drawOnBoard\s*\([\s\S]*?\)/gi, '')
-            .replace(/askToWrite|drawOnBoard|showQuiz/gi, '')
+            .replace(/markLessonComplete\s*\([\s\S]*?\)/gi, '') // 🛠️ تنظيف خاص لأمر إنهاء الدرس
+            .replace(/askToWrite|drawOnBoard|showQuiz|markLessonComplete/gi, '')
             .replace(/`[^`]*`/g, '')
             .trim();
 
         const stillLooksLikeCode = looksLikeCodeForChild(ttsText);
         if (stillLooksLikeCode) {
-            console.log('🧼 [TTS-SANITIZER] Detected residual code pattern in TTS text. Replacing with safe narration.');
-            ttsText = 'لَدَيَّ سُؤَالٌ أَوْ نَشَاطٌ لَكَ. انْظُرْ إِلَى الشَّاشَةِ وَاتَّبِعِ التَّعْلِيمَاتِ، ثُمَّ اخْتَرِ الْإِجَابَةَ الصَّحِيحَةَ أَوِ اكْتُبِ الْحَرْفَ الْمَطْلُوبَ.';
+            console.log('🧼 [TTS-SANITIZER] Detected residual code pattern. Attempting to extract text only.');
+            
+            // 🛠️ Improved extraction: Keep only Arabic text, numbers, basic punctuation, and emojis.
+            // This regex removes English letters, brackets, and code symbols (<, >, {, }, ;).
+            let safeText = ttsText.replace(/[A-Za-z<>{}[\];=]+/g, " ").trim();
+             
+            // Remove double spaces created by cleaning
+            safeText = safeText.replace(/\s+/g, ' ').trim();
+
+            // ⚡ CHECK: Is the recovered text substantial?
+            // If we have > 5 characters of actual content, we prioritize it over the generic fallback.
+            if (safeText.length > 5) {
+                ttsText = safeText;
+                console.log('🧼 [TTS-SANITIZER] Recovered text:', ttsText);
+            } else {
+                // Only use generic fail-safe if the text is TRULY unrecoverable garbage.
+                console.log('⚠️ [TTS-SANITIZER] Text was unusable. Fallback to generic message.');
+                ttsText = 'لَدَيَّ سُؤَالٌ أَوْ نَشَاطٌ لَكَ. انْظُرْ إِلَى الشَّاشَةِ وَاتَّبِعِ التَّعْلِيمَاتِ.';
+            }
         }
 
         // Prepare Subtitles
@@ -1777,8 +1911,8 @@ const ClassroomScreen = ({ navigation, route }) => {
                     }
 
                     // Optimized for Arabic Chirp3 speed
-                    const charSpeed = isLiveModeRef.current ? 60 : 105;
-                    const baseDelay = isLiveModeRef.current ? 200 : 500;
+                    const charSpeed = isLiveModeRef.current ? 45 : 100;
+                    const baseDelay = isLiveModeRef.current ? 150 : 400;
                     const duration = baseDelay + (sub.length * charSpeed);
 
                     if (i < subtitles.length - 1) {
@@ -1786,7 +1920,7 @@ const ClassroomScreen = ({ navigation, route }) => {
                     }
                 }
                 // Final safety: show full text
-                setTranscript(cleanFullText);
+                setTimeout(() => setTranscript(cleanFullText), 500);
             };
             
             // Only run subtitle animation if there is text
@@ -1948,6 +2082,12 @@ const ClassroomScreen = ({ navigation, route }) => {
 
     const pickImage = async () => {
         try {
+            const hasPermission = await requestCameraPermissions();
+            if (!hasPermission) {
+                Alert.alert("عذراً", "يجب منح صلاحية الكاميرا والوسائط لتتمكني من رفع الصور.");
+                return;
+            }
+
             setIsCameraActive(true); // 🟡 Activate Button
             const result = await launchCamera({
                 mediaType: 'photo',
@@ -1963,15 +2103,72 @@ const ClassroomScreen = ({ navigation, route }) => {
 
             const asset = result.assets[0];
             if (asset.uri) {
+                // Show the image on the whiteboard immediately
                 whiteboardRef.current?.showImage(asset.uri);
-                setTranscript("جاري تحليل الصورة... 🖼️");
-                await processUserMessage("انظري لهذه الصورة، هل حلي صحيح؟", asset.base64);
+                
+                // Move teacher to the other side so she doesn't block the image
+                // AGGRESSIVE POSITIONING: Send multiple pulses to ensure bridge connectivity after Camera resume
+                const triggerMovement = () => {
+                    if (avatarRef.current) {
+                        console.log('🎬 [POST-CAMERA] Position Pulse...');
+                        avatarRef.current.walkToRight();
+                        avatarRef.current.setEmotion('happy');
+                    }
+                };
+                
+                triggerMovement(); // 0ms
+                [100, 300, 600, 1000, 1500, 2000, 3000, 5000].forEach(delay => {
+                    setTimeout(triggerMovement, delay);
+                });
+                
+                setTranscript("جاري تحليل الصورة إعداد الدرس... 🖼️");
+                updateStatus('thinking'); // Show thinking state manually
+
+                try {
+                    console.log('📸 [CLASSROOM] Start analyzing captured image (Lesson Mode)...');
+                    
+                    // 1. Analyze the image to extract curriculum content (Just like creating a lesson)
+                    const analysisResult = await curriculumSearchService.analyzeImages([asset.uri], "صورة من الكاميرا");
+
+                    if (analysisResult.success) {
+                        console.log('✅ [CLASSROOM] Analysis success. Restarting session with new curriculum context.');
+                        
+                        // 2. Update References to act as a new Lesson
+                        curriculumContentRef.current = analysisResult.content;
+                        lessonTitleRef.current = "تبسيط محتوى الصورة"; 
+                        lessonTypeRef.current = "تحليل صورة";
+                        lessonImagesRef.current = [asset.uri]; 
+
+                        // 3. Restart the Live Session with the new System Prompt (Strict Mode)
+                        // We call setupLiveMode which now forces a disconnect first
+                        await setupLiveMode(userName, aiService.userProfile.grade);
+                        
+                        // 4. Ensure teacher is in position after restart
+                        const restartPulse = () => {
+                            console.log('🎬 [POST-RESTART] Position Pulse...');
+                            avatarRef.current?.walkToRight();
+                            avatarRef.current?.setEmotion('happy');
+                        };
+                        [1000, 2500, 4500].forEach(delay => setTimeout(restartPulse, delay));
+                    } else {
+                        console.log('⚠️ [CLASSROOM] Analysis failed, falling back to simple image send.');
+                        // Fallback: If analysis fails, just send the image to the current session
+                        await geminiLiveService.sendImages([asset.uri], "انظري لهذه الصورة، وهل حلي صحيح؟");
+                        updateStatus('listening');
+                    }
+
+                } catch (e) {
+                    console.error('❌ [CLASSROOM] Error processing image:', e);
+                    // Final Fallback
+                    await geminiLiveService.sendImages([asset.uri], "اشرحي لي هذه الصورة.");
+                    updateStatus('listening');
+                }
             }
         } catch (error) {
             console.error("ImagePicker Error:", error);
-            Alert.alert("خطأ", "حدث خطأ أثناء فتح المعرض");
+            Alert.alert("خطأ", "حدث خطأ أثناء فتح الكاميرا");
         } finally {
-            setIsCameraActive(false); // ⚪ Reset after processing (or error)
+            setIsCameraActive(false); // ⚪ Reset button state
         }
     };
 
@@ -2112,7 +2309,10 @@ const ClassroomScreen = ({ navigation, route }) => {
                     </View>
 
                     {/* Right: Back Button (Circle) */}
-                    <BouncyButton onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <BouncyButton onPress={() => {
+                        console.log('🔙 [UI] Classroom Back Button Pressed');
+                        navigation.goBack();
+                    }} style={styles.backButton}>
                         <Text style={styles.backButtonText}>←</Text>
                     </BouncyButton>
                 </View>

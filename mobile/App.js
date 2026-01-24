@@ -14,6 +14,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import StudentSetupScreen from './src/screens/StudentSetupScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import SupportScreen from './src/screens/SupportScreen';
 import SubscriptionScreen from './src/screens/SubscriptionScreen';
 import LessonsScreen from './src/screens/LessonsScreen';
 import LessonDetailScreen from './src/screens/LessonDetailScreen';
@@ -21,6 +22,7 @@ import ClassroomScreen from './src/screens/ClassroomScreen';
 import MiniGameScreen from './src/screens/MiniGameScreen';
 import QuizScreen from './src/screens/QuizScreen';
 import CurriculumScreen from './src/screens/CurriculumScreen';
+import SubjectLessonsScreen from './src/screens/SubjectLessonsScreen';
 import DashboardScreen from './src/screens/DashboardScreen';
 
 import { subscriptionService } from './src/services/SubscriptionService';
@@ -28,6 +30,7 @@ import geminiLiveService from './src/services/GeminiLiveService';
 import { authService } from './src/services/AuthService';
 import { firebaseService } from './src/services/FirebaseService';
 import GlobalAudioService from './src/services/GlobalAudioService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Stack = createNativeStackNavigator();
 
@@ -84,7 +87,14 @@ const AuthCheckScreen = ({ navigation }) => {
 
             // Check if student profile exists
             const studentData = await firebaseService.getStudentData();
-            if (studentData && studentData.guardianName) {
+            if (studentData && (studentData.guardianName || studentData.name)) {
+                // Restore local storage if missing
+                await AsyncStorage.setItem('user', JSON.stringify(studentData));
+                
+                // Sync to AI Service memory
+                const { aiService } = require('./src/services/AIService');
+                await aiService.loadMemory();
+
                 navigation.replace('Home');
             } else {
                 navigation.replace('StudentSetup');
@@ -150,6 +160,10 @@ const AuthCheckScreen = ({ navigation }) => {
     );
 };
 
+import { fcmService } from './src/services/FCMService';
+
+// ... (existing imports)
+
 function App() {
     useEffect(() => {
         const initServices = async () => {
@@ -158,10 +172,16 @@ function App() {
             
             // 🎵 Start app background music
             GlobalAudioService.playAppBackgroundMusic();
+
+            // 🔔 Init Notifications
+            await fcmService.requestUserPermission();
+            const unsubscribeFCM = fcmService.listenForNotifications();
+            return () => unsubscribeFCM();
         };
-        initServices();
+        const cleanupPromise = initServices();
 
         return () => {
+             // We can't easily await inside cleanup, but unsub is returned
             subscriptionService.shutdown();
             GlobalAudioService.cleanup();
         };
@@ -170,9 +190,13 @@ function App() {
     return (
         <ErrorBoundary>
             <SafeAreaProvider>
-                <NavigationContainer onStateChange={() => {
+                <NavigationContainer onStateChange={(state) => {
                     // 🎵 Play click sound on navigation
                     GlobalAudioService.playClickSound();
+                    
+                    // 📊 LOG: Screen Navigation
+                    const currentRouteName = state.routes[state.index].name;
+                    console.log('📱 [NAV] Navigated to:', currentRouteName);
                 }}>
                     <Stack.Navigator
                         initialRouteName="Splash"
@@ -198,10 +222,12 @@ function App() {
                         <Stack.Screen name="Dashboard" component={DashboardScreen} />
                         <Stack.Screen name="Profile" component={ProfileScreen} />
                         <Stack.Screen name="Settings" component={SettingsScreen} />
+                        <Stack.Screen name="Support" component={SupportScreen} />
                         <Stack.Screen name="Subscription" component={SubscriptionScreen} />
 
                         {/* Features */}
                         <Stack.Screen name="Curriculum" component={CurriculumScreen} />
+                        <Stack.Screen name="SubjectLessons" component={SubjectLessonsScreen} />
                         <Stack.Screen name="Lessons" component={LessonsScreen} />
                         <Stack.Screen name="LessonDetail" component={LessonDetailScreen} />
                         <Stack.Screen name="Classroom" component={ClassroomScreen} />

@@ -120,6 +120,63 @@ class FirebaseService {
             throw error;
         }
     }
+
+    async ensureAuthenticated() {
+        if (!auth().currentUser) {
+            console.log('⚠️ [Firebase] No user signed in, signing in anonymously for support ticket...');
+            await auth().signInAnonymously();
+        }
+        return auth().currentUser;
+    }
+
+    /**
+     * إرسال تذكرة دعم فني
+     * Submits a support ticket to Firestore
+     */
+    async submitSupportTicket(ticketData) {
+        try {
+            // 1. Ensure we have a valid Firebase User (Auth)
+            const user = await this.ensureAuthenticated();
+            const userId = user.uid;
+
+            // 2. Write to the Main Student Document using arrayUnion
+            // This guarantees success if the user can save their own profile
+            const ticketEntry = {
+                ...ticketData,
+                id: Date.now().toString(),
+                createdAt: new Date().toISOString(), // Use string for array storage
+                status: 'new'
+            };
+
+            await this.collection.doc(userId).update({
+                supportRequests: firestore.FieldValue.arrayUnion(ticketEntry),
+                hasPendingSupportRequest: true,
+                lastSupportRequestDate: firestore.FieldValue.serverTimestamp()
+            });
+
+            console.log('✅ [Firebase] Support ticket appended to profile successfully');
+            return true;
+        } catch (error) {
+            console.error('❌ [Firebase] Error submitting ticket:', error);
+
+            // Fallback: If document doesn't exist yet, create it with merge
+            if (error.code === 'firestore/not-found' || error.message.includes('not found')) {
+                const user = await this.ensureAuthenticated();
+                await this.collection.doc(user.uid).set({
+                    supportRequests: [{
+                        ...ticketData,
+                        id: Date.now().toString(),
+                        createdAt: new Date().toISOString(),
+                        status: 'new'
+                    }],
+                    hasPendingSupportRequest: true
+                }, { merge: true });
+                return true;
+            }
+
+            throw error;
+        }
+    }
 }
 
 export const firebaseService = new FirebaseService();

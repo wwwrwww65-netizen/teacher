@@ -85,6 +85,36 @@ class AuthService {
     /**
      * Sign Out
      */
+    /**
+     * Delete Account
+     */
+    async deleteAccount() {
+        try {
+            const user = auth().currentUser;
+            if (user) {
+                const uid = user.uid;
+                // 1. Delete Firestore Data
+                await firebaseService.deleteStudentData(uid);
+                
+                // 2. Sign out from Google locally to force picker next time
+                try {
+                    await GoogleSignin.revokeAccess();
+                    await GoogleSignin.signOut();
+                } catch (googleError) {
+                    console.log('Google signout cleanup error (ignorable):', googleError);
+                }
+
+                // 3. Delete Auth User
+                await user.delete();
+                console.log('🗑️ [AUTH] Account deleted successfully');
+                return true;
+            }
+        } catch (error) {
+            console.error('Delete Account Error:', error);
+            throw this.handleError(error);
+        }
+    }
+
     async signOut() {
         try {
             await GoogleSignin.signOut(); // If signed in with Google
@@ -109,6 +139,26 @@ class AuthService {
         return auth().currentUser;
     }
 
+    /**
+     * Re-authenticate with Google
+     */
+    async reauthenticateWithGoogle() {
+        try {
+            await GoogleSignin.hasPlayServices();
+            const { idToken } = await GoogleSignin.signIn();
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            const user = auth().currentUser;
+            if (user) {
+                await user.reauthenticateWithCredential(googleCredential);
+                return true;
+            }
+            return false;
+        } catch (error) {
+            console.error('Google Re-auth Error:', error);
+            throw error;
+        }
+    }
+
     handleError(error) {
         let message = 'حدث خطأ غير متوقع';
         if (error.code === 'auth/email-already-in-use') message = 'البريد الإلكتروني مستخدم بالفعل';
@@ -116,6 +166,8 @@ class AuthService {
         if (error.code === 'auth/weak-password') message = 'كلمة المرور ضعيفة جداً';
         if (error.code === 'auth/user-not-found') message = 'لا يوجد حساب بهذا البريد';
         if (error.code === 'auth/wrong-password') message = 'كلمة المرور غير صحيحة';
+        if (error.code === 'auth/too-many-requests') message = 'تم حظر هذه العملية مؤقتاً بسبب كثرة المحاولات. الرجاء المحاولة لاحقاً.';
+        if (error.code === 'auth/requires-recent-login') message = 'لإتمام هذه العملية، يرجى إعادة تسجيل الدخول للتحقق من هويتك.';
         return { message, code: error.code };
     }
 }

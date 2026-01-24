@@ -23,6 +23,7 @@ import { lessons } from '../data/lessons';
 import { subscriptionService } from '../services/SubscriptionService';
 import GlobalAudioService from '../services/GlobalAudioService';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import CustomAlert from '../components/CustomAlert';
 
 const { width, height } = Dimensions.get('window');
 
@@ -54,6 +55,7 @@ const HomeScreen = ({ navigation }) => {
             }
 
             if (navigation.isFocused()) {
+                console.log('🔙 [UI] Hardware Back Button Pressed (Show Exit Modal)');
                 setShowExitModal(true);
                 return true; 
             }
@@ -343,43 +345,45 @@ const HomeScreen = ({ navigation }) => {
                         <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
                             
                             {/* 👑 PRO Badge - Pulsing & Shining */}
-                            <Animated.View 
-                                style={{ 
-                                    transform: [{ scale: pulseAnim }],
-                                    marginRight: 10, 
-                                    marginTop: 15,
-                                    shadowColor: '#FFD700',
-                                    shadowOffset: { width: 0, height: 0 },
-                                    shadowOpacity: 0.8,
-                                    shadowRadius: 10,
-                                    elevation: 10
-                                }}
-                            >
-                                <TouchableOpacity
-                                    style={[styles.premiumBadge, { minWidth: 65, borderWidth: 1, borderColor: '#FFF' }]}
-                                    onPress={() => navigation.navigate('Subscription')}
+                            {!subscriptionService.STORE_REVIEW_MODE && (
+                                <Animated.View 
+                                    style={{ 
+                                        transform: [{ scale: pulseAnim }],
+                                        marginRight: 10, 
+                                        marginTop: 15,
+                                        shadowColor: '#FFD700',
+                                        shadowOffset: { width: 0, height: 0 },
+                                        shadowOpacity: 0.8,
+                                        shadowRadius: 10,
+                                        elevation: 10
+                                    }}
                                 >
-                                    <LinearGradient
-                                        colors={['#FFD700', '#FDB931', '#FFD700']} // Gold Shine Gradient
-                                        start={{ x: 0, y: 0 }}
-                                        end={{ x: 1, y: 1 }}
-                                        style={styles.premiumGradient}
+                                    <TouchableOpacity
+                                        style={[styles.premiumBadge, { minWidth: 65, borderWidth: 1, borderColor: '#FFF' }]}
+                                        onPress={() => navigation.navigate('Subscription')}
                                     >
-                                        <Text style={styles.premiumText}>👑 PRO</Text>
-                                        
-                                        {/* ✨ Subtle Shine Overlay */}
-                                        <View style={{
-                                            position: 'absolute',
-                                            top: -10,
-                                            right: -10,
-                                            width: 30,
-                                            height: 50,
-                                            backgroundColor: 'rgba(255,255,255,0.3)',
-                                            transform: [{ rotate: '25deg' }]
-                                        }} />
-                                    </LinearGradient>
-                                </TouchableOpacity>
-                            </Animated.View>
+                                        <LinearGradient
+                                            colors={['#FFD700', '#FDB931', '#FFD700']} // Gold Shine Gradient
+                                            start={{ x: 0, y: 0 }}
+                                            end={{ x: 1, y: 1 }}
+                                            style={styles.premiumGradient}
+                                        >
+                                            <Text style={styles.premiumText}>👑 PRO</Text>
+                                            
+                                            {/* ✨ Subtle Shine Overlay */}
+                                            <View style={{
+                                                position: 'absolute',
+                                                top: -10,
+                                                right: -10,
+                                                width: 30,
+                                                height: 50,
+                                                backgroundColor: 'rgba(255,255,255,0.3)',
+                                                transform: [{ rotate: '25deg' }]
+                                            }} />
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+                                </Animated.View>
+                            )}
 
                             {/* 👤 Avatar & 🎵 Music Stack */}
                             <View style={{ alignItems: 'center', gap: 16 }}>
@@ -391,7 +395,21 @@ const HomeScreen = ({ navigation }) => {
                                         colors={['#667eea', '#764ba2']}
                                         style={styles.avatarGradient}
                                     >
-                                        <Text style={styles.avatarText}>{user?.avatar || '🦁'}</Text>
+                                        {user?.gender === 'boy' ? (
+                                            <Image 
+                                                source={require('../assets/boy_avatar.png')} 
+                                                style={styles.avatarImage} 
+                                                resizeMode="contain" 
+                                            />
+                                        ) : user?.gender === 'girl' ? (
+                                            <Image 
+                                                source={require('../assets/girl_avatar.png')} 
+                                                style={styles.avatarImage} 
+                                                resizeMode="contain" 
+                                            />
+                                        ) : (
+                                            <Text style={styles.avatarText}>{user?.avatar || '🦁'}</Text>
+                                        )}
                                     </LinearGradient>
                                 </TouchableOpacity>
 
@@ -414,7 +432,7 @@ const HomeScreen = ({ navigation }) => {
                             <Text style={styles.statIcon}>🎯</Text>
                             <View>
                                 <Text style={styles.statValue}>{user?.level || 1}</Text>
-                                <Text style={styles.statLabel}>المستوى</Text>
+                                <Text style={styles.statLabel}>   المستوى   </Text>
                             </View>
                         </View>
                         
@@ -422,7 +440,7 @@ const HomeScreen = ({ navigation }) => {
                             <Text style={styles.statIcon}>⭐</Text>
                             <View>
                                 <Text style={styles.statValue}>{user?.points || 0}</Text>
-                                <Text style={styles.statLabel}>نقطة</Text>
+                                <Text style={styles.statLabel}>   نقطة   </Text>
                             </View>
                         </View>
                         
@@ -430,7 +448,7 @@ const HomeScreen = ({ navigation }) => {
                             <Text style={styles.statIcon}>🏆</Text>
                             <View>
                                 <Text style={styles.statValue}>{Math.floor((user?.points || 0) / 50)}</Text>
-                                <Text style={styles.statLabel}>إنجاز</Text>
+                                <Text style={styles.statLabel}>   إنجاز   </Text>
                             </View>
                         </View>
                     </View>
@@ -511,7 +529,7 @@ const HomeScreen = ({ navigation }) => {
                                                 <Text style={styles.heroTitle}>المعلمة نورا</Text>
                                                 <Text style={styles.heroSubtitle}>تعلم بالذكاء الاصطناعي</Text>
                                                 <View style={styles.heroBadge}>
-                                                    <Text style={styles.heroBadgeText}>🔥 الأكثر شعبية</Text>
+                                                    <Text style={styles.heroBadgeText}>🔥 الأكثر شعبية   </Text>
                                                 </View>
                                             </View>
                                         </View>
@@ -705,75 +723,17 @@ const HomeScreen = ({ navigation }) => {
             </Modal>
             
             {/* 🚪 Custom Exit Confirmation Modal */}
-            <Modal
+            <CustomAlert 
                 visible={showExitModal}
-                transparent={true}
-                animationType="fade"
-                onRequestClose={() => setShowExitModal(false)} // Android back button on modal
-            >
-                <TouchableWithoutFeedback onPress={() => setShowExitModal(false)}>
-                    <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center'}}>
-                        <TouchableWithoutFeedback>
-                            <View style={{
-                                width: '85%',
-                                backgroundColor: '#FFF',
-                                borderRadius: 25,
-                                padding: 25,
-                                alignItems: 'center',
-                                elevation: 20,
-                                shadowColor: '#000',
-                                shadowOffset: {width: 0, height: 10},
-                                shadowOpacity: 0.3,
-                                shadowRadius: 20
-                            }}>
-                                <View style={{
-                                    width: 60, height: 60, borderRadius: 30, 
-                                    backgroundColor: '#FFEBEE', justifyContent: 'center', alignItems: 'center',
-                                    marginBottom: 15
-                                }}>
-                                    <Text style={{fontSize: 30}}>👋</Text>
-                                </View>
-                                
-                                <Text style={{
-                                    fontSize: 22, fontWeight: 'bold', color: '#333', 
-                                    marginBottom: 10, textAlign: 'center',
-                                    fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium'
-                                }}>
-                                    هل تود المغادرة؟
-                                </Text>
-                                
-                                <Text style={{
-                                    fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 25, lineHeight: 22
-                                }}>
-                                    سنشتاق إليك! هل أنت متأكد من رغبتك في إغلاق التطبيق؟
-                                </Text>
-
-                                <View style={{flexDirection: 'row', gap: 15, width: '100%'}}>
-                                    <TouchableOpacity 
-                                        style={{
-                                            flex: 1, paddingVertical: 12, borderRadius: 15, 
-                                            backgroundColor: '#F5F5F5', alignItems: 'center'
-                                        }}
-                                        onPress={() => setShowExitModal(false)}
-                                    >
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: '#666'}}>إلغاء</Text>
-                                    </TouchableOpacity>
-
-                                    <TouchableOpacity 
-                                        style={{
-                                            flex: 1, paddingVertical: 12, borderRadius: 15, 
-                                            backgroundColor: '#FF6B6B', alignItems: 'center'
-                                        }}
-                                        onPress={() => BackHandler.exitApp()}
-                                    >
-                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: '#FFF'}}>نعم، خروج</Text>
-                                    </TouchableOpacity>
-                                </View>
-                            </View>
-                        </TouchableWithoutFeedback>
-                    </View>
-                </TouchableWithoutFeedback>
-            </Modal>
+                title="هل تود المغادرة؟"
+                message="سنشتاق إليك! هل أنت متأكد من رغبتك في إغلاق التطبيق؟"
+                confirmText="     نعم، خروج     "
+                cancelText="     إلغاء     "
+                onConfirm={() => BackHandler.exitApp()}
+                onCancel={() => setShowExitModal(false)}
+                singleButton={false}
+                icon="log-out-outline"
+            />
         </View>
     );
 };
@@ -875,6 +835,10 @@ const styles = StyleSheet.create({
     avatarText: {
         fontSize: 28,
     },
+    avatarImage: {
+        width: '100%',
+        height: '100%',
+    },
     inlineStats: {
         flexDirection: 'row',
         justifyContent: 'space-around',
@@ -886,8 +850,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.15)',
         borderRadius: 16,
-        padding: 12,
-        gap: 8,
+        padding: 8,
+        gap: 6,
     },
     statIcon: {
         fontSize: 24,
@@ -1028,7 +992,7 @@ const styles = StyleSheet.create({
     },
     heroBadge: {
         backgroundColor: 'rgba(255, 255, 255, 0.25)',
-        paddingHorizontal: 10,
+        paddingHorizontal: 16,
         paddingVertical: 4,
         borderRadius: 12,
         alignSelf: 'flex-start',

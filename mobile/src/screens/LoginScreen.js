@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import {
     View,
     Text,
@@ -11,33 +11,109 @@ import {
     ScrollView,
     TouchableOpacity,
     Alert,
-    ActivityIndicator
+    ActivityIndicator,
+    BackHandler,
+    Modal,
+    TouchableWithoutFeedback,
+    Animated,
+    Dimensions,
+    Image
 } from 'react-native';
-import BouncyButton from '../components/BouncyButton';
+import { useFocusEffect } from '@react-navigation/native';
+import LinearGradient from 'react-native-linear-gradient';
 import { theme } from '../config/theme';
 import { soundService } from '../services/SoundService';
-import Svg, { Defs, LinearGradient, Stop, Rect, Circle } from 'react-native-svg';
 import { authService } from '../services/AuthService';
 import { firebaseService } from '../services/FirebaseService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+const { width } = Dimensions.get('window');
 
 const LoginScreen = ({ navigation }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showExitModal, setShowExitModal] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
+    // Animations
+    const fadeAnim = useRef(new Animated.Value(0)).current;
+    const slideAnim = useRef(new Animated.Value(50)).current;
+    const scaleAnim = useRef(new Animated.Value(0.9)).current;
+    const pulseAnim = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+        // Entrance animations
+        Animated.parallel([
+            Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 800,
+                useNativeDriver: true,
+            }),
+            Animated.spring(slideAnim, {
+                toValue: 0,
+                friction: 8,
+                tension: 40,
+                useNativeDriver: true,
+            }),
+            Animated.spring(scaleAnim, {
+                toValue: 1,
+                friction: 6,
+                tension: 40,
+                useNativeDriver: true,
+            }),
+        ]).start();
+
+        // Pulse animation for icon
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(pulseAnim, {
+                    toValue: 1.1,
+                    duration: 1500,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(pulseAnim, {
+                    toValue: 1,
+                    duration: 1500,
+                    useNativeDriver: true,
+                }),
+            ])
+        ).start();
+    }, []);
+
+    useFocusEffect(
+        useCallback(() => {
+            const onBackPress = () => {
+                setShowExitModal(true);
+                return true;
+            };
+
+            BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+            return () => BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+        }, [])
+    );
 
     const checkUserAndNavigate = async (user) => {
-        // If email not verified (and you want to enforce it)
-        if (!user.emailVerified) {
-             // Optional: Force verification. For now, we allow it or redirect.
-             // navigation.replace('EmailVerification');
-             // Let's assume we proceed or check verification.
-        }
+        try {
+            const studentData = await firebaseService.getStudentData();
+            if (studentData && studentData.name) {
+                await AsyncStorage.setItem('user', JSON.stringify(studentData));
+                
+                const { aiService } = require('../services/AIService');
+                await aiService.loadMemory();
 
-        const studentData = await firebaseService.getStudentData();
-        if (studentData && studentData.name) {
-             navigation.replace('Home');
-        } else {
-             navigation.replace('StudentSetup');
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Home' }],
+                });
+            } else {
+                navigation.replace('StudentSetup');
+            }
+        } catch (error) {
+            console.error('Check user error:', error);
+            navigation.replace('StudentSetup');
         }
     };
 
@@ -74,172 +150,411 @@ const LoginScreen = ({ navigation }) => {
         }
     };
 
-    // Background Gradient Component
-    const Background = () => (
-        <View style={StyleSheet.absoluteFill}>
-            <Svg height="100%" width="100%">
-                <Defs>
-                    <LinearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <Stop offset="0" stopColor="#E0F7FA" stopOpacity="1" />
-                        <Stop offset="1" stopColor="#F8FAFC" stopOpacity="1" />
-                    </LinearGradient>
-                </Defs>
-                <Rect x="0" y="0" width="100%" height="100%" fill="url(#bgGrad)" />
-                <Circle cx="10%" cy="10%" r="50" fill={theme.colors.primary} opacity="0.1" />
-                <Circle cx="90%" cy="20%" r="80" fill={theme.colors.secondary} opacity="0.1" />
-            </Svg>
-        </View>
-    );
-
     return (
         <View style={styles.container}>
-            <Background />
-            <StatusBar barStyle="dark-content" backgroundColor="transparent" translucent />
+            {/* Animated Gradient Background */}
+            <LinearGradient
+                colors={['#667eea', '#764ba2', '#f093fb']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+            />
 
-            <SafeAreaView style={{ flex: 1 }}>
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                    style={{ flex: 1 }}
-                >
-                    <ScrollView contentContainerStyle={styles.scrollContent}>
+            {/* Decorative Circles */}
+            <View style={StyleSheet.absoluteFill}>
+                <View style={[styles.circle, { top: -50, right: -50, width: 200, height: 200, opacity: 0.1 }]} />
+                <View style={[styles.circle, { bottom: -80, left: -80, width: 250, height: 250, opacity: 0.08 }]} />
+                <View style={[styles.circle, { top: '40%', left: -30, width: 150, height: 150, opacity: 0.06 }]} />
+            </View>
 
-                        <View style={styles.mascotContainer}>
-                            <Text style={styles.mascot}>👩‍🏫</Text>
-                            <Text style={styles.title}>أهلاً بك مجدداً!</Text>
-                            <Text style={styles.subtitle}>المعلمة نورا اشتاقت إليك</Text>
-                        </View>
+            <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
 
-                        <View style={styles.card}>
-                            
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>البريد الإلكتروني</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="example@mail.com"
-                                    placeholderTextColor="#A0AEC0"
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    textAlign="right"
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                />
-                            </View>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+                style={{ flex: 1 }}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+            >
+                <ScrollView 
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                        scrollEventThrottle={16}
+                        bounces={true}
+                        overScrollMode="always"
+                        nestedScrollEnabled={true}
+                        keyboardShouldPersistTaps="handled"
+                    >
+                        {/* Header Section */}
+                        <Animated.View 
+                            style={[
+                                styles.headerContainer,
+                                { 
+                                    opacity: fadeAnim,
+                                    transform: [{ translateY: slideAnim }, { scale: scaleAnim }]
+                                }
+                            ]}
+                            renderToHardwareTextureAndroid={true}
+                        >
+                            <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
+                                <LinearGradient
+                                    colors={['#FFD700', '#FFA500']}
+                                    style={styles.iconGradient}
+                                >
+                                    <Image 
+                                        source={require('../assets/teacher_logo.png')}
+                                        style={styles.logoImage}
+                                        resizeMode="contain"
+                                    />
+                                </LinearGradient>
+                            </Animated.View>
+                            <Text style={styles.title}>مرحباً بك</Text>
+                            <Text style={styles.subtitle}>لنبدأ رحلة التعلم معاً</Text>
+                        </Animated.View>
 
-                            <View style={styles.inputWrapper}>
-                                <Text style={styles.label}>كلمة المرور</Text>
-                                <TextInput
-                                    style={styles.input}
-                                    placeholder="••••••••"
-                                    placeholderTextColor="#A0AEC0"
-                                    value={password}
-                                    onChangeText={setPassword}
-                                    textAlign="right"
-                                    secureTextEntry
-                                />
-                            </View>
+                        {/* Form Card */}
+                        <Animated.View 
+                            style={[
+                                styles.cardContainer,
+                                { 
+                                    opacity: fadeAnim,
+                                    transform: [{ translateY: slideAnim }]
+                                }
+                            ]}
+                            renderToHardwareTextureAndroid={true}
+                        >
+                            <View style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.95)' }]}>
+                                {/* Email Input */}
+                                <View style={styles.inputWrapper}>
+                                    <View style={styles.labelRow}>
+                                        <Ionicons name="mail" size={18} color="#667eea" />
+                                        <Text style={styles.label}>البريد الإلكتروني</Text>
+                                    </View>
+                                    <View style={styles.inputContainer}>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="example@mail.com"
+                                            placeholderTextColor="rgba(0,0,0,0.5)"
+                                            value={email}
+                                            onChangeText={setEmail}
+                                            textAlign="right"
+                                            keyboardType="email-address"
+                                            autoCapitalize="none"
+                                        />
+                                    </View>
+                                </View>
 
-                            <TouchableOpacity 
-                                style={styles.forgotPass}
-                                onPress={() => {
-                                    if(email) authService.sendPasswordReset(email).then(() => Alert.alert('تم','راجع بريدك'));
-                                    else Alert.alert('تنبيه', 'ادخل البريد اولا');
-                                }}
-                            >
-                                <Text style={styles.forgotPassText}>نسيت كلمة المرور؟</Text>
-                            </TouchableOpacity>
+                                {/* Password Input */}
+                                <View style={styles.inputWrapper}>
+                                    <View style={styles.labelRow}>
+                                        <Ionicons name="lock-closed" size={18} color="#667eea" />
+                                        <Text style={styles.label}>كلمة المرور</Text>
+                                    </View>
+                                    <View style={styles.inputContainer}>
+                                        <TouchableOpacity 
+                                            onPress={() => setShowPassword(!showPassword)}
+                                            style={styles.eyeIcon}
+                                        >
+                                            <Ionicons name={showPassword ? "eye-off" : "eye"} size={22} color="rgba(0,0,0,0.4)" />
+                                        </TouchableOpacity>
+                                        <TextInput
+                                            style={styles.input}
+                                            placeholder="••••••••"
+                                            placeholderTextColor="rgba(0,0,0,0.5)"
+                                            value={password}
+                                            onChangeText={setPassword}
+                                            textAlign="right"
+                                            secureTextEntry={!showPassword}
+                                        />
+                                    </View>
+                                </View>
 
-                            <BouncyButton
-                                onPress={handleLogin}
-                                style={styles.loginButton}
-                                disabled={loading}
-                            >
-                                {loading ? <ActivityIndicator color="white" /> : <Text style={styles.loginButtonText}>دخول 🚀</Text>}
-                            </BouncyButton>
-
-                            <View style={styles.separator}>
-                                <View style={styles.line} />
-                                <Text style={styles.orText}>أو</Text>
-                                <View style={styles.line} />
-                            </View>
-
-                             <BouncyButton
-                                onPress={handleGoogleLogin}
-                                style={styles.googleButton}
-                                disabled={loading}
-                            >
-                                <Text style={styles.googleButtonText}>الدخول عبر Google 🇬</Text>
-                            </BouncyButton>
-
-                            <View style={styles.footerLink}>
-                                <Text style={styles.footerText}>ليس لديك حساب؟ </Text>
-                                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                                    <Text style={styles.linkText}>إنشاء حساب جديد</Text>
+                                {/* Forgot Password */}
+                                <TouchableOpacity 
+                                    style={styles.forgotPass}
+                                    onPress={() => {
+                                        if(email) authService.sendPasswordReset(email).then(() => Alert.alert('تم','راجع بريدك'));
+                                        else Alert.alert('تنبيه', 'ادخل البريد اولا');
+                                    }}
+                                >
+                                    <Text style={styles.forgotPassText} numberOfLines={1} adjustsFontSizeToFit>نسيت كلمة المرور؟</Text>
                                 </TouchableOpacity>
+
+                                {/* Login Button */}
+                                <TouchableOpacity
+                                    onPress={handleLogin}
+                                    disabled={loading}
+                                    activeOpacity={0.8}
+                                    style={styles.loginButtonContainer}
+                                >
+                                    <LinearGradient
+                                        colors={['#4ECDC4', '#44A08D']}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                        style={styles.loginButton}
+                                    >
+                                        {loading ? (
+                                            <ActivityIndicator color="white" size="small" />
+                                        ) : (
+                                            <View style={{ flexDirection: 'row-reverse', alignItems: 'center', width: '100%', paddingHorizontal: 15 }}>
+                                                <Text style={[styles.loginButtonText, { flex: 1 }]}>
+                                                    تسجيل الدخول
+                                                </Text>
+                                                <Ionicons name="arrow-back" size={20} color="#FFF" />
+                                            </View>
+                                        )}
+                                    </LinearGradient>
+                                </TouchableOpacity>
+
+                                {/* Separator */}
+                                <View style={styles.separator}>
+                                    <View style={styles.line} />
+                                    <Text style={styles.orText} numberOfLines={1}>أو الدخول عبر</Text>
+                                    <View style={styles.line} />
+                                </View>
+
+                                {/* Google Button */}
+                                <TouchableOpacity
+                                    onPress={handleGoogleLogin}
+                                    disabled={loading}
+                                    activeOpacity={0.8}
+                                    style={styles.googleButtonContainer}
+                                >
+                                    <View style={styles.googleButton}>
+                                        <Image 
+                                            source={{ uri: 'https://img.icons8.com/color/96/000000/google-logo.png' }}
+                                            style={{ width: 28, height: 28 }}
+                                            resizeMode="contain"
+                                        />
+                                    </View>
+                                </TouchableOpacity>
+
+                                {/* Footer Link */}
+                                <View style={styles.footerLink}>
+                                    <TouchableOpacity onPress={() => navigation.navigate('Register')} style={{ width: '100%' }}>
+                                        <Text style={styles.linkText} numberOfLines={2} adjustsFontSizeToFit>
+                                            ليس لديك حساب؟ إنشاء حساب جديد
+                                        </Text>
+                                    </TouchableOpacity>
+                                </View>
                             </View>
-
-                        </View>
-
+                        </Animated.View>
                     </ScrollView>
                 </KeyboardAvoidingView>
-            </SafeAreaView>
+
+            {/* Custom Exit Confirmation Modal */}
+            <Modal
+                visible={showExitModal}
+                transparent={true}
+                animationType="fade"
+                onRequestClose={() => setShowExitModal(false)}
+            >
+                <TouchableWithoutFeedback onPress={() => setShowExitModal(false)}>
+                    <View style={{flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'center', alignItems: 'center'}}>
+                        <TouchableWithoutFeedback>
+                            <View style={{
+                                width: '85%',
+                                backgroundColor: '#FFF',
+                                borderRadius: 25,
+                                padding: 25,
+                                alignItems: 'center',
+                                elevation: 20,
+                                shadowColor: '#000',
+                                shadowOffset: {width: 0, height: 10},
+                                shadowOpacity: 0.3,
+                                shadowRadius: 20
+                            }}>
+                                <View style={{
+                                    width: 60, height: 60, borderRadius: 30, 
+                                    backgroundColor: '#FFEBEE', justifyContent: 'center', alignItems: 'center',
+                                    marginBottom: 15
+                                }}>
+                                    <Text style={{fontSize: 30}}>👋</Text>
+                                </View>
+                                
+                                <Text style={{
+                                    fontSize: 22, fontWeight: 'bold', color: '#333', 
+                                    marginBottom: 10, textAlign: 'center',
+                                    fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium'
+                                }}>
+                                    هل تود المغادرة؟
+                                </Text>
+                                
+                                <Text style={{
+                                    fontSize: 16, color: '#666', textAlign: 'center', marginBottom: 25, lineHeight: 22
+                                }}>
+                                    سنشتاق إليك! هل أنت متأكد من رغبتك في إغلاق التطبيق؟
+                                </Text>
+
+                                <View style={{flexDirection: 'row', gap: 15, width: '100%'}}>
+                                    <TouchableOpacity 
+                                        style={{
+                                            flex: 1, paddingVertical: 12, borderRadius: 15, 
+                                            backgroundColor: '#F5F5F5', alignItems: 'center'
+                                        }}
+                                        onPress={() => setShowExitModal(false)}
+                                    >
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: '#666'}}>   إلغاء   </Text>
+                                    </TouchableOpacity>
+
+                                    <TouchableOpacity 
+                                        style={{
+                                            flex: 1, paddingVertical: 12, borderRadius: 15, 
+                                            backgroundColor: '#FF6B6B', alignItems: 'center'
+                                        }}
+                                        onPress={() => BackHandler.exitApp()}
+                                    >
+                                        <Text style={{fontSize: 16, fontWeight: 'bold', color: '#FFF'}}>   نعم، خروج   </Text>
+                                    </TouchableOpacity>
+                                </View>
+                            </View>
+                        </TouchableWithoutFeedback>
+                    </View>
+                </TouchableWithoutFeedback>
+            </Modal>
         </View>
     );
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#fff' },
-    scrollContent: { flexGrow: 1, justifyContent: 'center', padding: theme.spacing.lg },
-    mascotContainer: { alignItems: 'center', marginBottom: theme.spacing.lg },
-    mascot: { fontSize: 80, marginBottom: theme.spacing.sm },
-    title: { fontSize: 28, fontWeight: 'bold', color: theme.colors.text, marginBottom: 5 },
-    subtitle: { fontSize: 16, color: theme.colors.textSecondary },
-    card: {
-        backgroundColor: '#fff',
-        borderRadius: 30,
-        padding: 25,
-        ...theme.shadows.lg,
-        borderWidth: 1,
-        borderColor: '#F1F5F9',
+    container: { flex: 1 },
+    circle: { position: 'absolute', borderRadius: 1000, backgroundColor: '#FFF' },
+    scrollContent: { 
+        padding: 20, 
+        paddingTop: 100, 
+        paddingBottom: 40,
+        minHeight: '100%',
     },
+    headerContainer: { alignItems: 'center', marginBottom: 30 },
+    iconGradient: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 3,
+        borderColor: 'rgba(255,255,255,0.3)',
+        overflow: 'hidden',
+    },
+    logoImage: {
+        width: 80,
+        height: 80,
+    },
+    mascot: { fontSize: 50 },
+    title: { 
+        fontSize: 32, 
+        fontWeight: 'bold', 
+        color: '#FFF', 
+        marginBottom: 8,
+        textShadowColor: 'rgba(0, 0, 0, 0.3)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
+        textAlign: 'center',
+        width: '100%',
+        paddingHorizontal: 20,
+    },
+    subtitle: { 
+        fontSize: 16, 
+        color: '#FFFFFF',
+        textAlign: 'center',
+        width: '100%',
+        paddingHorizontal: 5,
+        marginTop: 5,
+    },
+    cardContainer: {
+        borderRadius: 30,
+        backgroundColor: '#fff',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 5,
+        marginBottom: 20,
+    },
+    card: { padding: 25, borderRadius: 30 },
     inputWrapper: { marginBottom: 20 },
-    label: { fontSize: 14, fontWeight: 'bold', color: theme.colors.text, marginBottom: 8, textAlign: 'right' },
+    labelRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 6, justifyContent: 'flex-start' },
+    label: { fontSize: 14, fontWeight: '600', color: '#333', flex: 1, textAlign: 'left' },
+    inputContainer: { position: 'relative' },
     input: {
         backgroundColor: '#F7FAFC',
         borderRadius: 15,
         padding: 15,
+        paddingLeft: 45,
         fontSize: 16,
-        borderWidth: 1,
+        borderWidth: 2,
         borderColor: '#E2E8F0',
-        color: theme.colors.text,
-        textAlign: 'right'
+        color: '#333',
+        textAlign: 'right',
+    },
+    eyeIcon: { position: 'absolute', left: 12, top: 15, zIndex: 1 },
+    forgotPass: { alignItems: 'flex-start', marginBottom: 20 },
+    forgotPassText: { color: '#667eea', fontWeight: '600', fontSize: 14 },
+    loginButtonContainer: {
+        marginTop: 10,
+        borderRadius: 15,
+        elevation: 2,
+        shadowColor: '#4ECDC4',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
     },
     loginButton: {
-        backgroundColor: theme.colors.primary,
-        padding: 18,
+        height: 60,
         borderRadius: 15,
+        flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 10,
-        ...theme.shadows.button,
+        justifyContent: 'center',
+        paddingHorizontal: 25,
     },
-    loginButtonText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+    loginButtonText: { 
+        color: '#fff', 
+        fontSize: 18, 
+        fontWeight: 'bold',
+        textAlign: 'center',
+        paddingHorizontal: 15,
+    },
+    googleButtonContainer: {
+        borderRadius: 15,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
     googleButton: {
         backgroundColor: '#fff',
-        padding: 18,
+        paddingVertical: 14,
+        paddingHorizontal: 14,
         borderRadius: 15,
+        flexDirection: 'row',
         alignItems: 'center',
-        borderWidth: 1,
+        justifyContent: 'center',
+        borderWidth: 2,
         borderColor: '#E2E8F0',
-        marginTop: 10
     },
-    googleButtonText: { color: '#333', fontSize: 16, fontWeight: '600' },
-    separator: { flexDirection: 'row', alignItems: 'center', marginVertical: 20 },
-    line: { flex: 1, height: 1, backgroundColor: '#E2E8F0' },
-    orText: { marginHorizontal: 10, color: '#A0AEC0' },
-    forgotPass: { alignItems: 'flex-start', marginBottom: 20 },
-    forgotPassText: { color: theme.colors.primary, fontWeight: '600' },
-    footerLink: { flexDirection: 'row-reverse', justifyContent: 'center', marginTop: 25 },
-    footerText: { color: theme.colors.textSecondary },
-    linkText: { color: theme.colors.primary, fontWeight: 'bold' }
+    separator: { flexDirection: 'row', alignItems: 'center', marginVertical: 25, justifyContent: 'center' },
+    line: { width: 60, height: 1, backgroundColor: 'rgba(0,0,0,0.1)' },
+    orText: { 
+        paddingHorizontal: 12,
+        color: 'rgba(0,0,0,0.5)', 
+        fontSize: 14, 
+        fontWeight: '600',
+        textAlign: 'center',
+        minWidth: 150,
+    },
+    forgotPass: { marginBottom: 20, width: '100%' },
+    forgotPassText: { 
+        color: '#667eea', 
+        fontWeight: '600', 
+        fontSize: 14,
+    },
+    footerLink: { alignItems: 'center', marginTop: 20 },
+    linkText: { 
+        color: '#667eea', 
+        fontWeight: 'bold', 
+        fontSize: 15,
+        textAlign: 'center',
+    },
 });
 
 export default LoginScreen;

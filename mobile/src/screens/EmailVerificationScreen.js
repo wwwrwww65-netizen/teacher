@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, SafeAreaView, AppState } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView, AppState, TouchableOpacity, Alert } from 'react-native';
 import { authService } from '../services/AuthService';
 import BouncyButton from '../components/BouncyButton';
 import { theme } from '../config/theme';
@@ -32,9 +32,16 @@ const EmailVerificationScreen = ({ navigation }) => {
     const handleResend = async () => {
         try {
             const user = authService.getCurrentUser();
-            if (user) await user.sendEmailVerification();
-            alert('تم إعادة إرسال رابط التحقق');
+            if (user) {
+                await user.sendEmailVerification();
+                Alert.alert('تم! ✅', 'أرسلنا رابطاً جديداً إلى بريدك. لا تنسَ تفقد صندوق الرسائل غير المرغوب فيها (Spam).');
+            }
         } catch (e) {
+            if (e.code === 'auth/too-many-requests') {
+                Alert.alert('عذراً ✋', 'لقد طلبت الكثير من المحاولات. الرجاء الانتظار قليلاً قبل المحاولة مرة أخرى لحماية حسابك.');
+            } else {
+                Alert.alert('خطأ', 'فشل إرسال البريد. تأكد من أن البريد صحيح.');
+            }
             console.error(e);
         }
     };
@@ -47,22 +54,34 @@ const EmailVerificationScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <View style={styles.card}>
                 <Text style={styles.emoji}>📧</Text>
-                <Text style={styles.title}>تحقق من بريدك</Text>
+                <Text style={styles.title}>تفعيل الحساب</Text>
                 <Text style={styles.subtitle}>
-                    أرسلنا رابط تحقق إلى بريدك الإلكتروني. الرجاء الضغط عليه ثم العودة هنا.
+                    أرسلنا <Text style={{fontWeight: 'bold'}}>رابط تفعيل</Text> إلى بريدك الإلكتروني.
+                    {"\n\n"}
+                    ⚠️ <Text style={{color: '#E53E3E'}}>ملاحظة:</Text> لا يوجد رمز (Code). فقط اضغط على الرابط في الرسالة ليتفعل حسابك تلقائياً.
                 </Text>
 
+                <View style={styles.tipBox}>
+                    <Text style={styles.tipText}>💡 تفقد مجلد "الرسائل غير المرغوب فيها" (Junk/Spam) إذا لم تجد الرسالة.</Text>
+                </View>
+
                 <BouncyButton onPress={handleManualCheck} style={styles.checkButton}>
-                    <Text style={styles.btnText}>تحققت من البريد ✅</Text>
+                    <Text style={styles.btnText}>ضغطت على الرابط ✅</Text>
                 </BouncyButton>
 
                 <BouncyButton onPress={handleResend} style={styles.resendButton}>
-                    <Text style={styles.resendText}>إعادة إرسال الرابط</Text>
+                    <Text style={styles.resendText}>لم تصلني الرسالة؟ إعادة الإرسال</Text>
                 </BouncyButton>
                 
-                 <BouncyButton onPress={() => authService.signOut()} style={styles.logoutBtn}>
-                    <Text style={styles.resendText}>تسجيل الخروج</Text>
-                </BouncyButton>
+                 <TouchableOpacity 
+                    onPress={async () => {
+                        await authService.signOut();
+                        navigation.replace('Login');
+                    }} 
+                    style={styles.logoutLink}
+                >
+                    <Text style={styles.linkText}>استخدام بريد آخر / خروج</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -109,8 +128,28 @@ const styles = StyleSheet.create({
         backgroundColor: '#F7FAFC'
     },
     resendText: { color: theme.colors.textSecondary, fontWeight: '600' },
-    logoutBtn: {
-        marginTop: 20
+    tipBox: {
+        backgroundColor: '#FFFBEB',
+        padding: 12,
+        borderRadius: 12,
+        marginBottom: 25,
+        borderWidth: 1,
+        borderColor: '#FEF3C7'
+    },
+    tipText: {
+        color: '#92400E',
+        fontSize: 13,
+        textAlign: 'center',
+        lineHeight: 18
+    },
+    logoutLink: {
+        marginTop: 20,
+        padding: 10
+    },
+    linkText: {
+        color: theme.colors.primary,
+        fontWeight: 'bold',
+        fontSize: 14
     }
 });
 

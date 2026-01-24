@@ -44,10 +44,10 @@
 
         // --- Config ---
         // --- Config ---
-        const BACKGROUND_IMAGE = 'classroom_bg.jpg';
-        const TEACHER_TALKING = 'teacher_talking.mp4';
-        const TEACHER_IDLE = 'teacher_idle.mp4';
-        const BACKGROUND_MUSIC = 'classroom_music.mp3';
+        const BACKGROUND_IMAGE = './classroom_bg.jpg';
+        const TEACHER_TALKING = './teacher_talking.mp4';
+        const TEACHER_IDLE = './teacher_idle.mp4';
+        const BACKGROUND_MUSIC = './classroom_music.mp3';
 
         let scene, camera, renderer;
         let teacherMesh, backgroundMesh, uniforms;
@@ -66,7 +66,7 @@
 
         // Movement State
         let targetPosition = new THREE.Vector3(0, 0.1, 0);
-        const WALK_SPEED = 2.0;
+        const WALK_SPEED = 3.5; // Much faster responsiveness
         const BOARD_X = -0.6;
         const CENTER_X = 0.0;
 
@@ -90,12 +90,15 @@
             createBackground();
 
             // --- SETUP VIDEOS ---
-            videoTalking = createVideoElement(TEACHER_TALKING, true); // Loop talking to match unlimited speech duration
-            videoIdle = createVideoElement(TEACHER_IDLE, true); // Loop idle
+            videoTalking = createVideoElement(TEACHER_TALKING, true); 
+            videoIdle = createVideoElement(TEACHER_IDLE, true); 
 
             // --- SETUP TEXTURES ---
             textureTalking = createVideoTexture(videoTalking);
             textureIdle = createVideoTexture(videoIdle);
+
+            videoIdle.addEventListener('canplay', checkReady);
+            videoIdle.addEventListener('playing', checkReady);
 
             // --- SETUP MUSIC (DISABLED) ---
             // Using Independent BackgroundMusic.js component
@@ -104,7 +107,13 @@
             createTeacherVideoSprite();
 
             // Start Idle immediately
-            videoIdle.play().catch(e => console.log('Idle Autoplay blocked', e));
+            videoIdle.play().then(() => {
+                checkReady();
+            }).catch(e => {
+                console.log('Idle Autoplay blocked', e);
+                // Even if blocked, try to show something
+                checkReady();
+            });
 
             onWindowResize();
 
@@ -125,11 +134,19 @@
         function createVideoElement(src, loop) {
             const vid = document.createElement('video');
             vid.src = src;
-            vid.loop = loop; // Loop idle, maybe talking too? Talking usually handled by app logic
+            vid.loop = loop;
             vid.muted = true;
             vid.playsInline = true;
             vid.crossOrigin = 'anonymous';
+            vid.setAttribute('webkit-playsinline', 'true');
             vid.style.display = 'none';
+            
+            vid.onloadeddata = () => {
+                console.log('Video Packed: ' + src);
+                checkReady();
+            };
+            vid.onerror = (e) => sendMessage('LOG', 'Video Fail: ' + src);
+
             document.body.appendChild(vid);
             return vid;
         }
@@ -137,35 +154,49 @@
         function createVideoTexture(video) {
             const tex = new THREE.VideoTexture(video);
             tex.colorSpace = THREE.SRGBColorSpace;
-            tex.minFilter = THREE.LinearFilter;
-            tex.magFilter = THREE.LinearFilter;
             return tex;
         }
 
+        let isReadySent = false;
+        function checkReady() {
+            if (isReadySent) return;
+            // Force show if anything is ready or after timeout
+            onWindowResize();
+            sendMessage('READY', 'Teacher Loaded');
+            isReadySent = true;
+        }
+
+        // Emergency timeout
+        setTimeout(checkReady, 3000);
+
         function createBackground() {
             const loader = new THREE.TextureLoader();
-            const bgTex = loader.load(BACKGROUND_IMAGE, (tex) => {
+            loader.load(BACKGROUND_IMAGE, (tex) => {
+                tex.colorSpace = THREE.SRGBColorSpace;
                 textures['bg'] = tex;
+                
+                const geometry = new THREE.PlaneGeometry(1, 1);
+                const material = new THREE.MeshBasicMaterial({ map: tex, depthTest: false });
+                backgroundMesh = new THREE.Mesh(geometry, material);
+                backgroundMesh.position.set(0, 0, -5);
+                backgroundMesh.renderOrder = -1;
+                scene.add(backgroundMesh);
+                
                 onWindowResize();
-                sendMessage('READY', 'Teacher Loaded');
+                checkReady();
+            }, undefined, () => {
+                // Fallback background color if image fails
+                scene.background = new THREE.Color(0xf0f0f0);
+                checkReady();
             });
-            bgTex.colorSpace = THREE.SRGBColorSpace;
-
-            const geometry = new THREE.PlaneGeometry(1, 1);
-            const material = new THREE.MeshBasicMaterial({ map: bgTex, depthTest: false });
-            backgroundMesh = new THREE.Mesh(geometry, material);
-            backgroundMesh.position.set(0, 0, -5);
-            backgroundMesh.renderOrder = -1;
-            scene.add(backgroundMesh);
-            textures['bg'] = bgTex;
         }
 
         function createTeacherVideoSprite() {
             // Initial Texture: Idle
             const initialTexture = textureIdle;
 
-            // Geometry: SQUARE (2.5 x 2.5) 
-            const geometry = new THREE.PlaneGeometry(2.5, 2.5);
+            // Geometry: Widescreen (4.4 x 2.5) to match video aspect ratio and prevent thinning
+            const geometry = new THREE.PlaneGeometry(4.4, 2.5);
 
             uniforms = {
                 uTexture: { value: initialTexture },
@@ -183,8 +214,7 @@
                     varying vec2 vUv;
 
                     void main() {
-                        // CROP VIDEO: Focus on the center 50% of width to cut off side black bars
-                        vUv = vec2(uv.x * 0.5 + 0.25, uv.y);
+                        vUv = uv; // Remove the 50% crop as it might be cutting the new video incorrectly
                         
                         vec3 pos = position;
                         gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
@@ -197,13 +227,31 @@
                     void main() {
                         vec4 color = texture2D(uTexture, vUv);
                         
-                        // GREEN SCREEN REMOVAL
-                        vec3 keyColor = vec3(0.0, 1.0, 0.0);
-                        float dist = distance(color.rgb, keyColor);
-                        if (dist < 0.6) discard;
-                        if (color.g > 0.5 && color.g > (color.r + 0.2) && color.g > (color.b + 0.2)) discard;
+                        // 1. GREEN SCREEN SMOOTH REMOVAL
+                        float greenness = color.g - max(color.r, color.b);
+                        float alphaG = 1.0 - smoothstep(0.05, 0.12, greenness);
+                        
+                        // 2. BLACK SCREEN SMOOTH REMOVAL
+                        float brightness = max(max(color.r, color.g), color.b);
+                        float alphaB = smoothstep(0.02, 0.15, brightness);
+                        
+                        // Combined Alpha
+                        float alpha = min(alphaG, alphaB);
 
-                        gl_FragColor = color;
+                        // 3. SPILL SUPPRESSION (Removes green/black edges)
+                        if (greenness > 0.02) {
+                            color.g = max(color.r, color.b); // Neutralize green spill
+                        }
+                        
+                        // Neutralize dark edges
+                        if (brightness < 0.2) {
+                            color.rgb *= (alphaB * 1.5); // Brighten slightly near dark edges
+                        }
+
+                        gl_FragColor = vec4(color.rgb, alpha);
+                        
+                        // Essential for clipping
+                        if (alpha < 0.05) discard;
                     }
                 `
             });
@@ -225,6 +273,7 @@
         function handleControlEvent(e) {
             const data = e.detail;
             if (!data) return;
+            console.log('🎮 [3D] Control Event:', data.type, data);
             switch (data.type) {
                 case 'startTalking':
                     if (!isTalking) {
@@ -246,6 +295,8 @@
                     }
                     break;
                 case 'walkToBoard': targetPosition.x = BOARD_X; break;
+                case 'walkToLeft': targetPosition.x = -1.0; break; // Further left
+                case 'walkToRight': targetPosition.x = 0.9; break; // Full Right visibility
                 case 'walkToCenter': targetPosition.x = CENTER_X; break;
                 case 'viseme': break;
                 case 'playAnimation': break;

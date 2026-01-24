@@ -9,11 +9,16 @@ import {
     Switch,
     TextInput,
     Modal,
+    Linking
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LinearGradient from 'react-native-linear-gradient';
 import { authService } from '../services/AuthService';
 import { firebaseService } from '../services/FirebaseService';
+import { subscriptionService } from '../services/SubscriptionService';
+import { aiService } from '../services/AIService';
+import CustomAlert from '../components/CustomAlert';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const SettingsScreen = ({ navigation }) => {
     const [userProfile, setUserProfile] = useState(null);
@@ -24,6 +29,37 @@ const SettingsScreen = ({ navigation }) => {
     const [soundEffects, setSoundEffects] = useState(true);
     const [autoSave, setAutoSave] = useState(true);
     const [showEditModal, setShowEditModal] = useState(false);
+
+    // Alert State
+    const [alertConfig, setAlertConfig] = useState({
+        visible: false,
+        title: '',
+        message: '',
+        onConfirm: () => {},
+        singleButton: true,
+        confirmText: 'موافق   ',
+        cancelText: 'إلغاء   ',
+        icon: 'alert-circle'
+    });
+
+    const showAlert = (config) => {
+        setAlertConfig({
+            confirmText: 'موافق   ',
+            cancelText: 'إلغاء   ',
+            singleButton: true,
+            icon: 'alert-circle',
+            ...config,
+            visible: true,
+            onConfirm: () => {
+                setAlertConfig(prev => ({...prev, visible: false}));
+                if (config.onConfirm) config.onConfirm();
+            },
+            onCancel: () => {
+                setAlertConfig(prev => ({...prev, visible: false}));
+                if (config.onCancel) config.onCancel();
+            }
+        });
+    };
 
     useEffect(() => {
         loadSettings();
@@ -104,125 +140,180 @@ const SettingsScreen = ({ navigation }) => {
     };
 
     const handleLogout = () => {
-        Alert.alert(
-            'تسجيل الخروج',
-            'هل أنت متأكد من تسجيل الخروج؟',
-            [
-                { text: 'إلغاء', style: 'cancel' },
-                {
-                    text: 'تسجيل الخروج',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            await authService.signOut();
-                            await AsyncStorage.clear();
-                            navigation.replace('StudentSetup');
-                        } catch (error) {
-                            console.error('Logout error:', error);
-                        }
-                    },
-                },
-            ]
-        );
+        showAlert({
+            title: '⚠️ تسجيل الخروج',
+            message: 'هل تريد تسجيل الخروج من التطبيق؟ (سيتم حفظ بياناتك)',
+            confirmText: 'تسجيل الخروج   ',
+            cancelText: 'إلغاء   ',
+            singleButton: false,
+            icon: 'log-out',
+            onConfirm: async () => {
+                try {
+                    // Reset Services Memory
+                    aiService.reset();
+                    await subscriptionService.reset();
+
+                    await authService.signOut();
+                    await AsyncStorage.clear();
+                    navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Login' }],
+                    });
+                } catch (error) {
+                    console.error('Logout error:', error);
+                }
+            }
+        });
     };
 
     const handleDeleteAccount = () => {
-        Alert.alert(
-            '⚠️ حذف الحساب',
-            'هل أنت متأكد؟ سيتم حذف جميع البيانات والتقدم بشكل نهائي ولا يمكن استرجاعها!',
-            [
-                { text: 'إلغاء', style: 'cancel' },
-                {
-                    text: 'حذف نهائياً',
-                    style: 'destructive',
-                    onPress: () => {
-                        // Second confirmation
-                        Alert.alert(
-                            '⚠️ تأكيد نهائي',
-                            'هذا الإجراء لا يمكن التراجع عنه. هل أنت متأكد تماماً؟',
-                            [
-                                { text: 'إلغاء', style: 'cancel' },
-                                {
-                                    text: 'نعم، احذف الحساب',
-                                    style: 'destructive',
-                                    onPress: async () => {
-                                        try {
-                                            // Delete from Firebase
-                                            const user = authService.getCurrentUser();
-                                            if (user) {
-                                                await firebaseService.deleteStudentData();
-                                            }
-                                            
-                                            // Clear local storage
-                                            await AsyncStorage.clear();
-                                            
-                                            // Sign out
-                                            await authService.signOut();
-                                            
-                                            Alert.alert('تم الحذف', 'تم حذف الحساب بنجاح', [
-                                                {
-                                                    text: 'حسناً',
-                                                    onPress: () => navigation.replace('StudentSetup'),
-                                                },
-                                            ]);
-                                        } catch (error) {
-                                            console.error('Delete account error:', error);
-                                            Alert.alert('خطأ', 'فشل حذف الحساب');
+        const performCleanup = async () => {
+            try {
+                aiService.reset();
+                await subscriptionService.reset();
+                await AsyncStorage.clear();
+                
+                showAlert({
+                    title: 'تم الحذف ✅',
+                    message: 'تم حذف حسابك وجميع بياناتك نهائياً. يمكنك الآن التسجيل من جديد.',
+                    singleButton: true,
+                    confirmText: 'حسناً   ',
+                    onConfirm: () => navigation.reset({
+                        index: 0,
+                        routes: [{ name: 'Login' }],
+                    })
+                });
+            } catch (error) {
+                console.error('Cleanup error:', error);
+            }
+        };
+
+        const performDelete = async () => {
+            try {
+                await authService.deleteAccount();
+                await performCleanup();
+            } catch (error) {
+                console.error('Delete account error:', error);
+                
+                if (error.code === 'auth/requires-recent-login') {
+                    const user = authService.getCurrentUser();
+                    const isGoogle = user?.providerData.find(p => p.providerId === 'google.com');
+
+                    if (isGoogle) {
+                        setTimeout(() => {
+                            showAlert({
+                                title: 'مطلوب التحقق',
+                                message: 'لإتمام عملية الحذف، يرجى تأكيد هويتك عبر Google.',
+                                confirmText: 'تأكيد وحذف   ',
+                                cancelText: 'إلغاء   ',
+                                singleButton: false,
+                                icon: 'lock-closed',
+                                onConfirm: async () => {
+                                    try {
+                                        const reauthSuccess = await authService.reauthenticateWithGoogle();
+                                        if (reauthSuccess) {
+                                            await authService.deleteAccount();
+                                            await performCleanup();
                                         }
-                                    },
-                                },
-                            ]
-                        );
-                    },
-                },
-            ]
-        );
+                                    } catch (err) {
+                                        console.error(err);
+                                        showAlert({ title: 'خطأ', message: 'فشل التحقق من الهوية.' });
+                                    }
+                                }
+                            });
+                        }, 500);
+                    } else {
+                        setTimeout(() => {
+                            showAlert({
+                                title: 'مطلوب تسجيل دخول حديث',
+                                message: 'لدواعٍ أمنية، يرجى تسجيل الخروج ثم الدخول مرة أخرى لإتمام عملية الحذف.',
+                                confirmText: 'تسجيل الخروج   ',
+                                cancelText: 'إلغاء   ',
+                                singleButton: false,
+                                icon: 'log-out',
+                                onConfirm: handleLogout
+                            });
+                        }, 500);
+                    }
+                } else {
+                    showAlert({ title: 'خطأ في الحذف', message: error.message || 'حدث خطأ غير متوقع' });
+                }
+            }
+        };
+
+        // First Warning
+        showAlert({
+            title: '⚠️ حذف الحساب',
+            message: 'هل أنت متأكد؟ سيتم حذف جميع البيانات والتقدم بشكل نهائي\nولا يمكن استرجاعها!',
+            confirmText: 'حذف نهائياً   ',
+            cancelText: 'إلغاء   ',
+            singleButton: false,
+            icon: 'trash-outline',
+            onConfirm: () => {
+                // Second Warning
+                setTimeout(() => {
+                    showAlert({
+                        title: '⚠️ تأكيد نهائي',
+                        message: 'هذا الإجراء لا يمكن التراجع عنه. هل أنت متأكد تماماً من رغبتك في حذف الحساب؟',
+                        confirmText: 'نعم، احذف الحساب   ',
+                        cancelText: 'إلغاء   ',
+                        singleButton: false,
+                        icon: 'alert-circle',
+                        onConfirm: performDelete
+                    });
+                }, 500);
+            }
+        });
     };
 
     const handleClearProgress = () => {
-        Alert.alert(
-            '⚠️ مسح التقدم',
-            'هل تريد مسح جميع التقدم والبدء من جديد؟ (سيتم الاحتفاظ بالحساب)',
-            [
-                { text: 'إلغاء', style: 'cancel' },
-                {
-                    text: 'مسح التقدم',
-                    style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            const memoryData = await AsyncStorage.getItem('nora_memory');
-                            const parsed = memoryData ? JSON.parse(memoryData) : {};
-                            
-                            const resetProfile = {
-                                ...parsed.userProfile,
-                                totalSessions: 0,
-                                completedLessons: 0,
-                                lastLesson: '',
-                                lastTopic: '',
-                                isFirstTime: true,
-                            };
+        showAlert({
+            title: '⚠️ مسح التقدم',
+            message: 'هل تريد مسح جميع التقدم والبدء من جديد؟ (سيتم الاحتفاظ بالحساب)',
+            confirmText: 'مسح التقدم   ',
+            cancelText: 'إلغاء   ',
+            singleButton: false,
+            onConfirm: async () => {
+                try {
+                    const memoryData = await AsyncStorage.getItem('nora_memory');
+                    const parsed = memoryData ? JSON.parse(memoryData) : {};
+                    
+                    const resetProfile = {
+                        ...parsed.userProfile,
+                        totalSessions: 0,
+                        completedLessons: 0,
+                        lastLesson: '',
+                        lastTopic: '',
+                        isFirstTime: true,
+                    };
 
-                            const resetMemory = {
-                                userProfile: resetProfile,
-                                context: [],
-                            };
+                    const resetMemory = {
+                        userProfile: resetProfile,
+                        context: [],
+                    };
 
-                            await AsyncStorage.setItem('nora_memory', JSON.stringify(resetMemory));
-                            await AsyncStorage.setItem('user', JSON.stringify({
-                                ...resetProfile,
-                                level: 1,
-                                points: 0,
-                            }));
+                    await AsyncStorage.setItem('nora_memory', JSON.stringify(resetMemory));
+                    await AsyncStorage.setItem('user', JSON.stringify({
+                        ...resetProfile,
+                        level: 1,
+                        points: 0,
+                    }));
 
-                            Alert.alert('✅ تم المسح', 'تم مسح التقدم بنجاح');
-                            loadSettings();
-                        } catch (error) {
-                            Alert.alert('خطأ', 'فشل مسح التقدم');
-                        }
-                    },
-                },
-            ]
-        );
+                    showAlert({
+                        title: '✅ تم المسح',
+                        message: 'تم مسح التقدم بنجاح',
+                        singleButton: true,
+                        onConfirm: () => loadSettings()
+                    });
+                } catch (error) {
+                    showAlert({ title: 'خطأ', message: 'فشل مسح التقدم' });
+                }
+            }
+        });
+    };
+
+    const handleOpenPrivacyPolicy = () => {
+        Linking.openURL('https://docs.google.com/document/d/125qJ-1gg9-XGzGuKQ90N26bZdMlyQIYsAoNmfoXUwFw/preview');
     };
 
     return (
@@ -242,11 +333,11 @@ const SettingsScreen = ({ navigation }) => {
                         colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.1)']}
                         style={styles.headerButton}
                     >
-                        <Text style={styles.backIcon}>←</Text>
+                        <Text style={styles.backIcon}>→</Text>
                     </LinearGradient>
                 </TouchableOpacity>
                 
-                <Text style={styles.headerTitle}>⚙️ الإعدادات</Text>
+                <Text style={styles.headerTitle}>⚙️ الإعدادات  </Text>
                 
                 <View style={{ width: 44 }} />
             </View>
@@ -258,7 +349,7 @@ const SettingsScreen = ({ navigation }) => {
             >
                 {/* Profile Section */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>👤 معلومات الحساب</Text>
+                    <Text style={styles.sectionTitle}>👤 معلومات الحساب  </Text>
                     
                     <View style={styles.card}>
                         <LinearGradient
@@ -266,23 +357,23 @@ const SettingsScreen = ({ navigation }) => {
                             style={styles.cardGradient}
                         >
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>ولي الأمر:</Text>
-                                <Text style={styles.infoValue}>{guardianName || 'غير محدد'}</Text>
+                                <Text style={styles.infoLabel}>ولي الأمر:  </Text>
+                                <Text style={styles.infoValue}>{(guardianName || 'غير محدد') + '  '}</Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>اسم الطالب:</Text>
-                                <Text style={styles.infoValue}>{studentName || 'غير محدد'}</Text>
+                                <Text style={styles.infoLabel}>اسم الطالب:   </Text>
+                                <Text style={styles.infoValue}>{(studentName || 'غير محدد') + '  '}</Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>العمر:</Text>
-                                <Text style={styles.infoValue}>{studentAge || '6'} سنوات</Text>
+                                <Text style={styles.infoLabel}>العمر:  </Text>
+                                <Text style={styles.infoValue}>{studentAge || '6'} سنوات  </Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>الصف:</Text>
-                                <Text style={styles.infoValue}>{userProfile?.grade || 'KG1'}</Text>
+                                <Text style={styles.infoLabel}>الصف:  </Text>
+                                <Text style={styles.infoValue}>{(userProfile?.grade || 'KG1') + '  '}</Text>
                             </View>
 
                             <TouchableOpacity 
@@ -301,37 +392,39 @@ const SettingsScreen = ({ navigation }) => {
                 </View>
 
                 {/* Subscription Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>👑 الاشتراك</Text>
-                    
-                    <TouchableOpacity 
-                        style={styles.card}
-                        onPress={() => navigation.navigate('Subscription')}
-                        activeOpacity={0.9}
-                    >
-                        <LinearGradient
-                            colors={['#FFD700', '#FFA500']}
-                            style={styles.cardGradient}
+                {!subscriptionService.STORE_REVIEW_MODE && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>👑 الاشتراك  </Text>
+                        
+                        <TouchableOpacity 
+                            style={styles.card}
+                            onPress={() => navigation.navigate('Subscription')}
+                            activeOpacity={0.9}
                         >
-                            <View style={styles.subscriptionContent}>
-                                <View style={styles.subscriptionIcon}>
-                                    <Text style={styles.subscriptionEmoji}>💎</Text>
+                            <LinearGradient
+                                colors={['#FFD700', '#FFA500']}
+                                style={styles.cardGradient}
+                            >
+                                <View style={styles.subscriptionContent}>
+                                    <View style={styles.subscriptionIcon}>
+                                        <Text style={styles.subscriptionEmoji}>💎</Text>
+                                    </View>
+                                    <View style={styles.subscriptionInfo}>
+                                        <Text style={styles.subscriptionTitle}>الاشتراك المميز  </Text>
+                                        <Text style={styles.subscriptionDesc}>
+                                            احصل على وصول كامل لجميع المميزات
+                                        </Text>
+                                    </View>
+                                    <Text style={styles.subscriptionArrow}>→</Text>
                                 </View>
-                                <View style={styles.subscriptionInfo}>
-                                    <Text style={styles.subscriptionTitle}>الاشتراك المميز</Text>
-                                    <Text style={styles.subscriptionDesc}>
-                                        احصل على وصول كامل لجميع المميزات
-                                    </Text>
-                                </View>
-                                <Text style={styles.subscriptionArrow}>→</Text>
-                            </View>
-                        </LinearGradient>
-                    </TouchableOpacity>
-                </View>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                )}
 
                 {/* App Settings */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>🔧 إعدادات التطبيق</Text>
+                    <Text style={styles.sectionTitle}>🔧 إعدادات التطبيق  </Text>
                     
                     <View style={styles.card}>
                         <LinearGradient
@@ -389,8 +482,31 @@ const SettingsScreen = ({ navigation }) => {
                                     colors={['#FFD93D', '#F6C90E']}
                                     style={styles.saveGradient}
                                 >
-                                    <Text style={styles.saveButtonText}>💾 حفظ الإعدادات</Text>
+                                    <Text style={styles.saveButtonText}>💾 حفظ الإعدادات  </Text>
                                 </LinearGradient>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    </View>
+                </View>
+
+                {/* Privacy Policy */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>🔒 الخصوصية</Text>
+                    <View style={styles.card}>
+                        <LinearGradient
+                            colors={['rgba(255,255,255,0.25)', 'rgba(255,255,255,0.1)']}
+                            style={styles.cardGradient}
+                        >
+                             <TouchableOpacity 
+                                style={styles.dangerButton}
+                                onPress={handleOpenPrivacyPolicy}
+                            >
+                                <Text style={styles.dangerIcon}>📄</Text>
+                                <View style={styles.dangerInfo}>
+                                    <Text style={[styles.dangerTitle, { color: '#FFF' }]}>سياسة الخصوصية</Text>
+                                    <Text style={styles.dangerDesc}>قراءة الشروط والأحكام</Text>
+                                </View>
+                                <Ionicons name="open-outline" size={20} color="#FFF" style={{ opacity: 0.8 }} />
                             </TouchableOpacity>
                         </LinearGradient>
                     </View>
@@ -398,7 +514,7 @@ const SettingsScreen = ({ navigation }) => {
 
                 {/* Danger Zone */}
                 <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>⚠️ منطقة الخطر</Text>
+                    <Text style={styles.sectionTitle}>⚠️ منطقة الخطر  </Text>
                     
                     <View style={styles.card}>
                         <LinearGradient
@@ -455,14 +571,29 @@ const SettingsScreen = ({ navigation }) => {
                             style={styles.cardGradient}
                         >
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>الإصدار:</Text>
+                                <Text style={styles.infoLabel}>الإصدار:  </Text>
                                 <Text style={styles.infoValue}>1.0.0</Text>
                             </View>
                             <View style={styles.divider} />
                             <View style={styles.infoRow}>
-                                <Text style={styles.infoLabel}>المطور:</Text>
-                                <Text style={styles.infoValue}>هاشم محمد الجائفي</Text>
+                                <Text style={styles.infoLabel}>المطور:  </Text>
+                                <Text style={styles.infoValue}>hash jeeey</Text>
                             </View>
+
+                            <TouchableOpacity 
+                                style={styles.saveButton}
+                                onPress={() => navigation.navigate('Support')}
+                            >
+                                <LinearGradient
+                                    colors={['#667eea', '#764ba2']}
+                                    style={styles.saveGradient}
+                                >
+                                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                                        <Text style={styles.saveButtonText}>تواصل مع الدعم     </Text>
+                                        <Text style={{ fontSize: 20, marginLeft: 8 }}>📞</Text>
+                                    </View>
+                                </LinearGradient>
+                            </TouchableOpacity>
                         </LinearGradient>
                     </View>
                 </View>
@@ -543,6 +674,18 @@ const SettingsScreen = ({ navigation }) => {
                     </View>
                 </View>
             </Modal>
+
+            <CustomAlert 
+                visible={alertConfig.visible}
+                title={alertConfig.title}
+                message={alertConfig.message}
+                onConfirm={alertConfig.onConfirm}
+                onCancel={alertConfig.onCancel}
+                singleButton={alertConfig.singleButton}
+                confirmText={alertConfig.confirmText}
+                cancelText={alertConfig.cancelText}
+                icon={alertConfig.icon}
+            />
         </View>
     );
 };

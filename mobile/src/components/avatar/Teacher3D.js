@@ -12,11 +12,12 @@ const Teacher3D = forwardRef((props, ref) => {
         const timestamp = Date.now();
         return Platform.OS === 'web'
             ? `classroom.html?t=${timestamp}`
-            : { uri: `file:///android_asset/classroom.html?v=${timestamp}` };
+            : { uri: 'file:///android_asset/classroom.html' };
     });
 
     // Bridge to send commands to Three.js
     const sendMessage = (type, data = {}) => {
+        console.log('📡 [AVATAR-REF] sendMessage:', type, data);
         const payload = JSON.stringify({ type, ...data });
 
         if (Platform.OS === 'web') {
@@ -40,6 +41,8 @@ const Teacher3D = forwardRef((props, ref) => {
         setEmotion: (emotion) => sendMessage('setEmotion', { emotion }),
         laugh: () => sendMessage('playAnimation', { name: 'laugh' }),
         walkToBoard: () => sendMessage('walkToBoard'),
+        walkToLeft: () => sendMessage('walkToLeft'),
+        walkToRight: () => sendMessage('walkToRight'),
         walkToCenter: () => sendMessage('walkToCenter'),
         lookAtUser: () => sendMessage('lookAtUser'),
         speakVisually: (viseme) => sendMessage('viseme', { value: viseme }),
@@ -109,6 +112,7 @@ const Teacher3D = forwardRef((props, ref) => {
                 allowFileAccessFromFileURLs={true}
                 allowingReadAccessToURL={true}
                 mediaPlaybackRequiresUserAction={false} // FIX: Enable Auto-Play Audio/Video on Android
+                cacheEnabled={true}
                 // onLoadEnd={() => setIsLoaded(true)} // REMOVED: Wait for READY message
                 onMessage={(event) => {
                     const data = JSON.parse(event.nativeEvent.data);

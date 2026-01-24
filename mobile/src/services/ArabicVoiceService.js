@@ -14,6 +14,7 @@ class ArabicVoiceService {
         this.voiceCallbacks = [];
         this.isPlaying = false;
         this.isLiveMode = true;
+        this.cancellationSignal = false; // 🛑 Signal to abort pending speech
     }
 
     async initialize() {
@@ -66,23 +67,52 @@ class ArabicVoiceService {
     }
 
     async fetchGoogleTTS(text, retryCount = 0) {
+        // 🛡️ Ensure initialization
+        if (!this.apiKey) {
+            console.log('⚠️ [TTS] API Key missing, re-initializing...');
+            await this.initialize();
+        }
+
         const key = this.apiKey || GOOGLE_API_KEY;
+        if (!key) {
+            console.error('❌ [TTS] No API Key found even after initialization!');
+            throw new Error('No API Key');
+        }
+
         const url = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${key}`;
         
         // ✨ تطبيق المعالجة المسبقة
-        const cleanText = this._preprocessText(text.replace(/<[^>]+>/g, '')); 
+        // 1. Remove HTML/XML tags first
+        let safeText = text.replace(/<[^>]+>/g, '');
+        // 2. Remove Markdown asterisks and underscores
+        safeText = safeText.replace(/[*_#`]/g, ' '); 
+        // 3. Remove SSML reserved characters (<, >, &, ", ') entirely to prevent 400 errors
+        safeText = safeText.replace(/[<>&"']/g, ' ');
+
+        const cleanText = this._preprocessText(safeText); 
         const ssmlText = `<speak>${cleanText}</speak>`;
 
         const body = {
             input: { ssml: ssmlText },
             voice: { languageCode: 'ar-XA', name: 'ar-XA-Chirp3-HD-Sulafat', ssmlGender: 'FEMALE' },
-            audioConfig: { audioEncoding: 'MP3', speakingRate: 1.0, pitch: 0.0, volumeGainDb: 0.0 } // ⚡ عودة للسرعة الطبيعية
+            audioConfig: { audioEncoding: 'MP3', speakingRate: 1.0, pitch: 0.0, volumeGainDb: 0.0 }
         };
+
         try {
+            console.log(`📡 [TTS] Fetching audio (Attempt ${retryCount + 1}). Text len: ${cleanText.length}`);
             const response = await axios.post(url, body, { timeout: 15000 });
             return response.data.audioContent;
         } catch (error) {
-            if (retryCount < 2) return this.fetchGoogleTTS(text, retryCount + 1);
+            console.error(`❌ [TTS] Error (Attempt ${retryCount + 1}):`, error.message);
+            if (error.response) {
+                console.error('❌ [TTS] Response Data:', JSON.stringify(error.response.data));
+            }
+            
+            if (retryCount < 2) {
+                console.log('🔄 [TTS] Retrying...');
+                await new Promise(r => setTimeout(r, 1000)); // Wait 1s before retry
+                return this.fetchGoogleTTS(text, retryCount + 1);
+            }
             throw error;
         }
     }
@@ -116,6 +146,7 @@ class ArabicVoiceService {
     }
 
     async speak(text, options = {}) {
+        this.cancellationSignal = false; // ✅ Reset signal on new speak request
         await this.initialize();
         try {
             console.log('🔊 [TEACHER-SPEAK] Teacher starting to speak:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
@@ -128,6 +159,12 @@ class ArabicVoiceService {
             } else {
                 console.log('⏱️ [TTS-SLOW] Fetching audio now (no preload)...');
                 audioContent = await this.fetchGoogleTTS(text);
+            }
+
+            // 🛑 Check for cancellation race-condition (e.g. User left screen during fetch)
+            if (this.cancellationSignal) {
+                console.log('🛑 [TTS] Speak was cancelled during fetch/prep. Aborting playback.');
+                return false;
             }
             
             console.log('📊 [TTS-DEBUG] Audio Size:', audioContent?.length);
@@ -172,6 +209,7 @@ class ArabicVoiceService {
     }
 
     async stop() {
+        this.cancellationSignal = true; // 🛑 Set signal immediately
         this.isPlaying = false;
         SoundPlayer.stop();
         this.stopVisemeAnimation();

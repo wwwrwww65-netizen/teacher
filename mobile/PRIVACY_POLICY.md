@@ -1,84 +1,82 @@
-# Privacy Policy for Tiny Teacher
 
-**Last Updated: December 3, 2025**
+# سياسة الخصوصية - تطبيق المعلمة نورة (Teacher Nora)
 
-## Introduction
+آخر تحديث: 2026-01-21
 
-Tiny Teacher ("we", "our", or "us") is committed to protecting the privacy of children who use our educational application. This Privacy Policy explains how we collect, use, and protect information when you use our mobile application.
+في تطبيق **المعلمة نورة** (يرمز له فيما بعد بـ "التطبيق" أو "نحن")، نعتبر خصوصية أطفالكم وأمانهم هي أولويتنا القصوى. صُمم هذا التطبيق المدعوم بالذكاء الاصطناعي ليكون أداة تعليمية تفاعلية وآمنة للأطفال في المدارس ورياض الأطفال (من الصفوف KG1 حتى الصف الثالث الابتدائي، أو الأعمار 4-9 سنوات).
 
-## Information We Collect
+توضح هذه السياسة كيفية جمعنا واستخدامنا وحمايتنا للمعلومات، وذلك بما يتوافق مع سياسات العائلات (Google Play Families Policy) وقوانين حماية خصوصية الأطفال (COPPA).
 
-### Information You Provide
-- **Account Information**: Name, email address (for parent/guardian accounts)
-- **Progress Data**: Learning progress, quiz scores, achievements
-- **Voice Input**: When using the AI teacher feature (processed in real-time, not stored)
+## 1. المعلومات التي نجمعها ولماذا نجمعها (Information Collection and Use)
 
-### Automatically Collected Information
-- **Usage Data**: App features used, time spent learning
-- **Device Information**: Device type, operating system version
-- **Performance Data**: Crash reports, error logs
+نحن نجمع الحد الأدنى من البيانات الضرورية فقط لتمكين ميزات التعليم التفاعلي.
 
-## How We Use Information
+### أ. البيانات الصوتية (Microphone & Voice Data)
+*   **ماذا نجمع:** يقوم التطبيق باستخدام ميكروفون الجهاز لتسجيل صوت الطفل *فقط* عندما يضغط الطفل على زر التحدث للتفاعل مع المعلمة الذكية (AI Teacher).
+*   **لماذا:** لتمكين ميزة المحادثة التعليمية، وسماع إجابات الطفل، وتصحيح نطقه للكلمات، والرد على أسئلته الدراسية.
+*   **المعالجة والتخزين:** يتم إرسال الصوت بشكل مؤقت ومشفر إلى خوادم المعالجة السحابية (Google Cloud / Gemini API) لتحويل الصوت إلى نص وفهم سياق الكلام. **لا نقوم** بتخزين التسجيلات الصوتية بشكل دائم لأغراض تجارية، ولا نشاركها مع أي جهات إعلانية.
 
-We use collected information to:
-- Provide and improve our educational services
-- Track learning progress and achievements
-- Personalize the learning experience
-- Communicate with parents/guardians about their child's progress
-- Ensure app security and prevent fraud
+### ب. الكاميرا والوسائط (Camera & Media)
+*   **ماذا نجمع:** يطلب التطبيق إذن الكاميرا للسماح للطالب بتصوير واجباته المدرسية، وإذن الوصول إلى الوسائط (المعرض) في حال أراد رفع صورة محفوظة مسبقاً للواجب.
+*   **لماذا:** يتم استخدام الصور لغرض تعليمي بحت، حيث تقوم المعلمة الذكية بتحليل الصورة (مثل مسائل الرياضيات أو الجمل المكتوبة) ومساعدة الطفل في حلها أو تصحيحها.
+*   **المعالجة:** يتم إرسال الصورة للمعالجة ولا يتم مشاركتها علنياً أو استخدامها لأغراض غير تعليمية.
 
-## Children's Privacy (COPPA Compliance)
+### ج. حسابات أولياء الأمور والطلاب (Parent & Student Accounts)
+*   **إنشاء الحساب:** يتيح التطبيق لولي الأمر إنشاء حساب ومتابعته باستخدام **البريد الإلكتروني (Email)** أو عبر **تسجيل الدخول بحساب Google (Google Sign-In)**.
+*   **البيانات الشخصية:** نجمع **الاسم الأول** فقط و **الصف الدراسي** (مثل "الصف الأول") للطفل.
+*   **الهدف:**
+    1.  تخصيص التجربة التعليمية (مثلاً: "مرحباً يا أحمد، لنبدأ درس اليوم").
+    2.  مواءمة مستوى الأسئلة مع الصف الدراسي للطفل.
+    3.  إدارة الاشتراكات والوصول للمحتوى من قبل ولي الأمر.
+*   **تخزين البيانات:** يتم تخزين هذه البيانات بشكل آمن ومشفّر باستخدام خدمات **Google Firebase Authentication & Firestore**.
 
-Tiny Teacher is designed for children ages 4-8. We comply with the Children's Online Privacy Protection Act (COPPA):
+### د. تقييم الأداء والمتابعة التعليمية (Educational Progress & AI Analysis)
+*   **حفظ التقدم:** يقوم التطبيق بحفظ تقدم الطالب في الدروس، وعدد النجوم التي جمعها، والمستويات التي اجتازها.
+*   **تقييم الذكاء الاصطناعي:** تقوم المعلمة الذكية (AI) بتحليل إجابات الطفل الشفهية والمكتوبة لتقديم تقييم فوري وتشجيعي، وتحديد نقاط القوة والضعف لتحسين مستواه الدراسي مع الوقت.
+*   **الخصوصية:** جميع بيانات التقدم الدراسي والتقييمات مرتبطة بحساب الطالب وتستخدم فقط لتحسين تجربته التعليمية ولا تشارك مع أي أطراف خارجية لأغراض تجارية.
 
-- We do NOT collect personal information from children without parental consent
-- We do NOT share children's information with third parties for marketing
-- Parents can review, delete, or refuse further collection of their child's information
-- We use reasonable security measures to protect children's data
+### هـ. تفاصيل المعالجة بالذكاء الاصطناعي (AI Voice & Processing Details)
+*   نستخدم تقنيات ذكاء اصطناعي متقدمة (Google Cloud & Gemini API) لفهم كلام الطفل (Voice Recognition) والرد عليه بصوت طبيعي (Text-to-Speech).
+*   **تنويه هام:** على الرغم من دقة الذكاء الاصطناعي العالية، قد تحدث بعض الأخطاء في الفهم أو النطق. ننصح بوجود إشراف من ولي الأمر أثناء استخدام الطفل للتطبيق لضمان أفضل استفادة تعليمية.
 
-## Data Storage and Security
+### و. معلومات الجهاز والاستخدام (Device Information)
+*   نجمع بيانات تقنية مثل نوع الجهاز وإصدار النظام لضمان عمل التطبيق بكفاءة، وذلك عبر خدمات موثوقة مثل Google Analytics for Firebase. يتم جمع هذه البيانات بشكل مجهول (Anonymized) لتحسين التطبيق وإصلاح الأعطال.
 
-- Data is stored securely on your device (local storage)
-- Cloud data (if enabled) is encrypted in transit and at rest
-- We use industry-standard security measures
-- We do NOT sell or rent user data to third parties
+### ز. الإشعارات والتنبيهات (Notifications)
+*   **ماذا نستخدم:** نستخدم خدمة **Firebase Cloud Messaging (FCM)** لإرسال إشعارات وتنبيهات إلى جهازك.
+*   **نوع البيانات:** قد نقوم بجمع واستخدام **رمز تعريف الجهاز (Device Token)** لإرسال هذه الإشعارات بشكل مباشر وشخصي.
+*   **الغرض:** تستخدم الإشعارات لأغراض تعليمية وتشغيلية فقط، مثل:
+    1.  تذكير الطالب بموعد الدرس أو التشجيع على المراجعة.
+    2.  إرسال تحديثات حول محتوى تعليمي جديد (مثل إضافة قصص أو دروس جديدة).
+    3.  إشعارات إدارية تتعلق بحالة الاشتراك أو الحساب.
+*   **التحكم:** يمكنك في أي وقت إيقاف استلام الإشعارات من خلال إعدادات جهاز الهاتف أو إعدادات التطبيق.
 
-## Third-Party Services
+## 2. الإعلانات (No Ads Policy)
+**لا يحتوي هذا التطبيق على أي إعلانات.**
+نحن نلتزم ببيئة خالية تماماً من الإعلانات التجارية للحفاظ على تركيز الأطفال وحمايتهم من المحتوى غير المناسب. يعتمد نموذج عملنا على الاشتراكات الشهرية فقط.
 
-We use the following third-party services:
-- **OpenAI API**: For AI-powered teaching (voice input is processed but not stored)
-- **Analytics**: Anonymous usage statistics to improve the app
+## 3. مشاركة البيانات مع أطراف ثالثة (Third-Party Data Sharing)
 
-These services have their own privacy policies and we encourage you to review them.
+نحن لا نبيع ولا نؤجر بيانات أطفالك. نحن نشارك البيانات فقط مع مزودي الخدمات اللازمين لعمل التطبيق، وهم ملزمون بحماية البيانات:
 
-## Parental Rights
+1.  **Google Cloud / Gemini API:** لمعالجة الأوامر الصوتية وتحليل صور الواجبات (Heart of the AI).
+2.  **Firebase (by Google):** لإدارة الحسابات وقاعدة البيانات والتحليلات الآمنة.
+3.  **RevenueCat:** لإدارة عمليات الدفع والاشتراكات الشهرية بأمان (لا نطلع على بيانات بطاقتك البنكية، حيث تتم العملية عبر متجر Google Play).
 
-Parents/guardians have the right to:
-- Review their child's information
-- Request deletion of their child's data
-- Refuse further collection of information
-- Contact us with privacy concerns
+## 4. أمان البيانات (Data Security)
+نحن نطبق إجراءات أمان صارمة لحماية المعلومات من الوصول غير المصرح به. يتم تشفير جميع الاتصالات بين التطبيق والسيرفرات باستخدام بروتوكول SSL/TLS الآمن.
 
-To exercise these rights, email: privacy@tinyteacher.com
+## 5. إدارة وحذف البيانات (Data Management & Deletion)
+بصفتك ولي أمر، يحق لك في أي وقت التحكم في بياناتك:
+*   **مراجعة البيانات:** يمكنك مراجعة المعلومات التي جمعناها عن طفلك.
+*   **حذف الحساب (طريقتان):**
+    1.  **من داخل التطبيق:** يمكنك الذهاب إلى "الإعدادات" ثم النقر على "حذف الحساب". سيؤدي هذا إلى مسح جميع بياناتك، سجلاتك، واشتراكك من خوادمنا بشكل فوري ونهائي.
+    2.  **عبر التواصل معنا:** يمكنك طلب حذف حسابك وجميع البيانات المرتبطة به عبر مراسلتنا على البريد الإلكتروني أدناه، وسنقوم بتنفيذ الطلب خلال 48 ساعة.
 
-## Data Retention
+## 6. تغييرات على سياسة الخصوصية
+قد نقوم بتحديث هذه السياسة من وقت لآخر لتعكس التحسينات في تطبيقنا. سيتم إشعار المستخدمين بأي تغييرات جوهرية داخل التطبيق.
 
-- Account data: Retained until account deletion
-- Progress data: Retained for educational purposes
-- Voice input: NOT stored (processed in real-time only)
-
-## Changes to This Policy
-
-We may update this Privacy Policy from time to time. We will notify users of significant changes via the app or email.
-
-## Contact Us
-
-If you have questions about this Privacy Policy, contact us at:
-- Email: privacy@tinyteacher.com
-- Website: www.tinyteacher.com
-
----
-
-**Parent/Guardian Consent**
-
-By creating an account for your child, you consent to the collection and use of information as described in this Privacy Policy.
+## 7. اتصل بنا (Contact Us)
+إذا كانت لديك أي أسئلة حول سياسة الخصوصية، يرجى التواصل معنا:
+*   **المالك/المطور:** Hash Jeeey
+*   **البريد الإلكتروني:** [ضع بريدك الإلكتروني هنا - nora@jeeey.com]

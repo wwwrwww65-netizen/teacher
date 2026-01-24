@@ -20,6 +20,11 @@
     *   `react-native-live-audio-stream`: `^1.1.1`
 *   **Storage:** `@react-native-async-storage/async-storage`: `1.21.0`
 *   **Network:** `axios`: `^1.13.2`
+*   **Firebase Integration:**
+    *   `@react-native-firebase/app`: `^18.7.3`
+    *   `@react-native-firebase/auth`: `^18.7.3`
+    *   `@react-native-firebase/firestore`: `^18.7.3`
+    *   `@react-native-firebase/messaging`: `18.9.0`
 *   **Graphics/SVG:** `react-native-svg`: `14.1.0`
 
 ## 3. Environment Configuration (Android)

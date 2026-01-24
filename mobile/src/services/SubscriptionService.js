@@ -7,10 +7,11 @@ import { Alert } from 'react-native';
  */
 class GooglePlaySubscriptionService {
     constructor() {
-        this.isSubscribed = false;
-        this.subscriptionType = null; // 'monthly', 'yearly', null
-        this.expiryDate = null;
+        this.isSubscribed = true; // 🚨 STORE REVIEW MODE: Forced true
+        this.subscriptionType = 'yearly';
+        this.expiryDate = new Date(2030, 0, 1);
         this.onSubscriptionChange = null;
+        this.STORE_REVIEW_MODE = true; // Flag for UI to hide buy buttons
         
         // معرفات المنتجات في Google Play Console
         this.PRODUCT_IDS = {
@@ -272,6 +273,16 @@ class GooglePlaySubscriptionService {
         if (!this.isSubscribed) return false;
         if (!this.expiryDate) return true; // اشتراك دائم (للتطوير)
         return new Date() < this.expiryDate;
+    }
+
+    async reset() {
+        this.isSubscribed = false;
+        this.subscriptionType = null;
+        this.expiryDate = null;
+        await AsyncStorage.removeItem('is_premium_user');
+        await AsyncStorage.removeItem('subscription_type');
+        await AsyncStorage.removeItem('subscription_expiry');
+        console.log('🧹 [Subscription] Status reset to FREE.');
     }
 
     shutdown() {
