@@ -281,6 +281,14 @@ class AIService {
     }
 
     /**
+     * الحصول على الملف الشخصي للطالب
+     * 🆕 Added to fix GeminiLiveService dependency
+     */
+    getUserProfile() {
+        return this.userProfile;
+    }
+
+    /**
      * تحديث معلومات الجلسة الحالية
      */
     updateSession(updates = {}) {
